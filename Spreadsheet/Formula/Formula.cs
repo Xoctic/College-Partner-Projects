@@ -33,12 +33,40 @@ namespace Formulas
         ///     "_"
         ///     "-5.3"
         ///     "2 5 + 3"
+        ///     
         /// 
         /// If the formula is syntacticaly invalid, throws a FormulaFormatException with an 
         /// explanatory Message.
         /// </summary>
         public Formula(String formula)
         {
+              Enumerator tokens = GetTokens(formula).GetEnumerator;
+              TokenType type = new TokenType();
+
+               
+
+              if(tokens.current == null)
+              {
+                //is this where condition 2.there must be at least one token, is met?
+                //why do no methods show up when i do tokens.
+              }
+
+
+
+              foreach(string token in tokens)
+              {
+                try
+                {
+                   
+                }
+                catch(UndefinedVariableException e)
+                {
+                    Console.WriteLine("Undefined Variable Exception: {0} is Undefined", variable);
+                }
+
+              }
+              
+
 
         }
         /// <summary>
@@ -118,6 +146,7 @@ namespace Formulas
                     else if (match.Groups[7].Success)
                     {
                         type = Invalid;
+                        throw new UndefinedVariableException(type);
                     }
                     else
                     {
@@ -195,7 +224,7 @@ namespace Formulas
         public UndefinedVariableException(String variable)
             : base(variable)
         {
-            Console.WriteLine("Undefined Variable Exception: {0} is Undefined", variable);
+            
         }
     }
 
