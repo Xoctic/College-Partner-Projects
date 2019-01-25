@@ -1,4 +1,4 @@
-﻿// Skeleton written by Joe Zachary for CS 3500, January 2019
+﻿ // Skeleton written by Joe Zachary for CS 3500, January 2019
 
 using System;
 using System.Collections.Generic;
@@ -39,6 +39,7 @@ namespace Formulas
         /// </summary>
         public Formula(String formula)
         {
+
         }
         /// <summary>
         /// Evaluates this Formula, using the Lookup delegate to determine the values of variables.  (The
@@ -194,6 +195,7 @@ namespace Formulas
         public UndefinedVariableException(String variable)
             : base(variable)
         {
+            Console.WriteLine("Undefined Variable Exception: {0} is Undefined", variable);
         }
     }
 
@@ -208,6 +210,7 @@ namespace Formulas
         /// </summary>
         public FormulaFormatException(String message) : base(message)
         {
+            Console.WriteLine("Formula Format Exception: {0}", message);
         }
     }
 
@@ -222,6 +225,7 @@ namespace Formulas
         /// </summary>
         public FormulaEvaluationException(String message) : base(message)
         {
+            Console.WriteLine("Formula Evaluation Exception: {0}", message);
         }
     }
 }
