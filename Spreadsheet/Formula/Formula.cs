@@ -40,33 +40,98 @@ namespace Formulas
         /// </summary>
         public Formula(String formula)
         {
-              Enumerator tokens = GetTokens(formula).GetEnumerator;
-              TokenType type = new TokenType();
+              IEnumerator tokens = GetTokens(formula).GetEnumerator;
+              double lookupNum;
+              int numOfLeftParen = 0;
+              int numOfRightParen = 0;
+              string previousToken;
+              int position = 0;
+              
 
                
 
               if(tokens.current == null)
               {
-                //is this where condition 2.there must be at least one token, is met?
-                //why do no methods show up when i do tokens.
+                //condition 2
+                throw new FormulaFormatException("Less than one token in the expression");
+              }
+              //condition 5
+              else if(tokens.Current == TokenType.Oper || tokens.Current == TokenType.RParen || tokens.Current == TokenType.Invalid)
+              {
+                throw new FormulaFormatException(tokens.Current);
               }
 
 
 
               foreach(string token in tokens)
               {
+                position++;
+                 
                 try
                 {
-                   
+                    Lookup(token);
                 }
                 catch(UndefinedVariableException e)
                 {
+                    
+                    //condition 1
                     Console.WriteLine("Undefined Variable Exception: {0} is Undefined", variable);
                 }
 
-              }
-              
+                
+                if(position != 1)
+                {
+                    //condition 7
+                    if(previousToken == TokenType.LParen || TokenType.Oper)
+                    {
+                        if(token == TokenType.Invalid || TokenType.Oper || TokenType.RParen)
+                        {
+                            throw new FormulaFormatException(token);
+                        }
+                    }
+                    //condition 8
+                    if(previousToken == TokenType.RParen || TokenType.Number || TokenType.Var)
+                    {
+                        if(previousToken == TokenType.Number || TokenType.Var || TokenType.RParen)
+                        {
+                            if(token != TokenType.Oper && token != TokenType.RParen)
+                            {
+                                throw new FormulaFormatException(token);
+                            }
+                        }
+                    }
+                    
 
+                    
+                }
+
+                //condition 3
+                if(numOfRightParen > numOfLeftParen)
+                {
+                    throw new FormulaFormatException("Too many right parentheses");
+                }
+
+                if(token == TokenType.LParen)
+                {
+                    numOfLeftParen++;
+                }
+                else if(token == TokenType.RParen)
+                {
+                    numOfRightParen++;
+                }
+                previousToken = token;
+
+              }
+              //condition 6
+              if(tokens.Current == TokenType.Oper || tokens.Current == TokenType.LParen || tokens.Current == TokenType.Invalid)
+              {
+                throw new FormulaFormatException(tokens.Current);
+              }
+              //condition 4
+              if(numOfLeftParen != numOfRightParen)
+              {
+                throw new FormulaFormatException(tokens.Current);
+              }
 
         }
         /// <summary>
