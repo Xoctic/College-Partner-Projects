@@ -37,52 +37,53 @@ namespace Formulas
         /// 
         /// If the formula is syntacticaly invalid, throws a FormulaFormatException with an 
         /// explanatory Message.
+        /// item1 is a string which shows what the token actually is such as +-*/ ect
+        /// item2 is the tokenType enums such as oper, Lparen, rightParen, Ivalid ect...
         /// </summary>
         public Formula(String formula)
         {
-              IEnumerator tokens = GetTokens(formula).GetEnumerator;
+              List<Tuple<string, TokenType>> tokens = new List<Tuple<string, TokenType>>(GetTokens(formula));
+              
               double lookupNum;
               int numOfLeftParen = 0;
               int numOfRightParen = 0;
-              string previousToken;
+              Tuple<string, TokenType> previousToken;
               int position = 0;
+              Boolean isFirst = true;
               
 
-               
-
-              if(tokens.current == null)
+              if(tokens.Capacity == 0)
               {
                 //condition 2
                 throw new FormulaFormatException("Less than one token in the expression");
               }
               //condition 5
-              else if(tokens.Current == TokenType.Oper || tokens.Current == TokenType.RParen || tokens.Current == TokenType.Invalid)
+              else if(tokens[0].Item2 == TokenType.Oper || tokens[0].Item2 == TokenType.RParen || tokens[0].Item2 == TokenType.Invalid)
               {
-                throw new FormulaFormatException(tokens.Current);
+                throw new FormulaFormatException(tokens[0].Item1);
               }
 
 
-
-              foreach(string token in tokens)
+              foreach(Tuple<string,TokenType> token in tokens)
               {
                 position++;
                  
                 try
                 {
-                    Lookup(token);
+                    Lookup(token.Item1);
                 }
                 catch(UndefinedVariableException e)
                 {
                     
                     //condition 1
-                    Console.WriteLine("Undefined Variable Exception: {0} is Undefined", variable);
+                    Console.WriteLine("Undefined Variable Exception: {0} is Undefined", token.Item1);
                 }
 
                 
-                if(position != 1)
+                if(isFirst == false)
                 {
                     //condition 7
-                    if(previousToken == TokenType.LParen || TokenType.Oper)
+                    if(previousToken.Item2 == TokenType.LParen || previousToken.Item2 == TokenType.Oper)
                     {
                         if(token == TokenType.Invalid || TokenType.Oper || TokenType.RParen)
                         {
@@ -90,11 +91,11 @@ namespace Formulas
                         }
                     }
                     //condition 8
-                    if(previousToken == TokenType.RParen || TokenType.Number || TokenType.Var)
+                    if(previousToken.Item2 == TokenType.RParen || previousToken.Item2 == TokenType.Number || previousToken.Item2 == TokenType.Var)
                     {
-                        if(previousToken == TokenType.Number || TokenType.Var || TokenType.RParen)
+                        if(previousToken.Item2 == TokenType.Number || previousToken.Item2 == TokenType.Var || previousToken.Item2 == TokenType.RParen)
                         {
-                            if(token != TokenType.Oper && token != TokenType.RParen)
+                            if(token.Item2 != TokenType.Oper && token.Item2 != TokenType.RParen)
                             {
                                 throw new FormulaFormatException(token);
                             }
@@ -121,6 +122,11 @@ namespace Formulas
                 }
                 previousToken = token;
 
+                if(isFirst == true)
+                {
+                    isFirst = false;
+                }
+
               }
               //condition 6
               if(tokens.Current == TokenType.Oper || tokens.Current == TokenType.LParen || tokens.Current == TokenType.Invalid)
@@ -145,6 +151,8 @@ namespace Formulas
         /// </summary>
         public double Evaluate(Lookup lookup)
         {
+            
+
             return 0;
         }
 
