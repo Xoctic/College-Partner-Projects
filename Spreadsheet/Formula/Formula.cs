@@ -1,4 +1,4 @@
-﻿ // Skeleton written by Joe Zachary for CS 3500, January 2019
+﻿// Skeleton written by Joe Zachary for CS 3500, January 2019
 
 using System;
 using System.Collections.Generic;
@@ -16,6 +16,7 @@ namespace Formulas
     /// </summary>
     public class Formula
     {
+        private List<Tuple<string, TokenType>> tokens;
 
         /// <summary>
         /// Creates a Formula from a string that consists of a standard infix expression composed
@@ -42,102 +43,90 @@ namespace Formulas
         /// </summary>
         public Formula(String formula)
         {
-              List<Tuple<string, TokenType>> tokens = new List<Tuple<string, TokenType>>(GetTokens(formula));
-              
-              double lookupNum;
-              int numOfLeftParen = 0;
-              int numOfRightParen = 0;
-              Tuple<string, TokenType> previousToken;
-              int position = 0;
-              Boolean isFirst = true;
-              
+            tokens = new List<Tuple<string, TokenType>>(GetTokens(formula));
 
-              if(tokens.Capacity == 0)
-              {
+            int numOfLeftParen = 0;
+            int numOfRightParen = 0;
+            Tuple<string, TokenType> previousToken = new Tuple<string, TokenType>("", TokenType.Invalid);
+            Boolean isFirst = true;
+
+
+            if (tokens.Count == 0)
+            {
                 //condition 2
                 throw new FormulaFormatException("Less than one token in the expression");
-              }
-              //condition 5
-              else if(tokens[0].Item2 == TokenType.Oper || tokens[0].Item2 == TokenType.RParen || tokens[0].Item2 == TokenType.Invalid)
-              {
+            }
+            //condition 5
+            else if (tokens[0].Item2 == TokenType.Oper || tokens[0].Item2 == TokenType.RParen || tokens[0].Item2 == TokenType.Invalid)
+            {
                 throw new FormulaFormatException(tokens[0].Item1);
-              }
+            }
 
 
-              foreach(Tuple<string,TokenType> token in tokens)
-              {
-                position++;
-                 
-                try
-                {
-                    Lookup(token.Item1);
-                }
-                catch(UndefinedVariableException e)
-                {
-                    
-                    //condition 1
-                    Console.WriteLine("Undefined Variable Exception: {0} is Undefined", token.Item1);
-                }
+            foreach (Tuple<string, TokenType> token in tokens)
+            {
 
-                
-                if(isFirst == false)
+                if (isFirst == false)
                 {
                     //condition 7
-                    if(previousToken.Item2 == TokenType.LParen || previousToken.Item2 == TokenType.Oper)
+                    if (previousToken.Item2 == TokenType.LParen || previousToken.Item2 == TokenType.Oper)
                     {
-                        if(token == TokenType.Invalid || TokenType.Oper || TokenType.RParen)
+                        if (token.Item2 == TokenType.Invalid || token.Item2 == TokenType.Oper || token.Item2 == TokenType.RParen)
                         {
-                            throw new FormulaFormatException(token);
+                            throw new FormulaFormatException(token.Item1);
                         }
                     }
                     //condition 8
-                    if(previousToken.Item2 == TokenType.RParen || previousToken.Item2 == TokenType.Number || previousToken.Item2 == TokenType.Var)
+                    if (previousToken.Item2 == TokenType.RParen || previousToken.Item2 == TokenType.Number || previousToken.Item2 == TokenType.Var)
                     {
-                        if(previousToken.Item2 == TokenType.Number || previousToken.Item2 == TokenType.Var || previousToken.Item2 == TokenType.RParen)
+                        if (previousToken.Item2 == TokenType.Number || previousToken.Item2 == TokenType.Var || previousToken.Item2 == TokenType.RParen)
                         {
-                            if(token.Item2 != TokenType.Oper && token.Item2 != TokenType.RParen)
+                            if (token.Item2 != TokenType.Oper && token.Item2 != TokenType.RParen)
                             {
-                                throw new FormulaFormatException(token);
+                                throw new FormulaFormatException(token.Item1);
                             }
                         }
                     }
-                    
 
-                    
+
+
                 }
 
+
+
+
                 //condition 3
-                if(numOfRightParen > numOfLeftParen)
+                if (numOfRightParen > numOfLeftParen)
                 {
                     throw new FormulaFormatException("Too many right parentheses");
                 }
 
-                if(token == TokenType.LParen)
+                if (token.Item2 == TokenType.LParen)
                 {
                     numOfLeftParen++;
                 }
-                else if(token == TokenType.RParen)
+                else if (token.Item2 == TokenType.RParen)
                 {
                     numOfRightParen++;
                 }
                 previousToken = token;
 
-                if(isFirst == true)
+                if (isFirst == true)
                 {
                     isFirst = false;
                 }
 
-              }
-              //condition 6
-              if(tokens.Current == TokenType.Oper || tokens.Current == TokenType.LParen || tokens.Current == TokenType.Invalid)
-              {
-                throw new FormulaFormatException(tokens.Current);
-              }
-              //condition 4
-              if(numOfLeftParen != numOfRightParen)
-              {
-                throw new FormulaFormatException(tokens.Current);
-              }
+            }
+            //condition 6
+            if (tokens[tokens.Count - 1].Item2 == TokenType.Oper || tokens[tokens.Count - 1].Item2 == TokenType.LParen || tokens[tokens.Count - 1].Item2 == TokenType.Invalid)
+            {
+                throw new FormulaFormatException(tokens[tokens.Count - 1].Item1);
+            }
+            //condition 4
+            if (numOfLeftParen != numOfRightParen)
+            {
+                throw new FormulaFormatException(tokens[tokens.Count - 1].Item1);
+            }
 
         }
         /// <summary>
@@ -151,9 +140,215 @@ namespace Formulas
         /// </summary>
         public double Evaluate(Lookup lookup)
         {
-            
+            Stack<string> operators = new Stack<string>();
+            Stack<double> values = new Stack<double>();
+
+
+            foreach (Tuple<string, TokenType> t in tokens)
+            {
+                switch (t.Item2)
+                {
+                    case TokenType.LParen:
+                        operators.Push(t.Item1);
+                        break;
+                    case TokenType.RParen:
+                        
+                        if (operators.Count != 0  && operators.Peek() == "+")
+                        {
+                            double val;
+
+                            val = values.Pop() + values.Pop();
+
+                            values.Push(val);
+
+                            operators.Pop();
+                        }
+                        else if (operators.Count != 0 && operators.Peek() == "-")
+                        {
+                            double rVal = values.Pop();
+                            double lVal = values.Pop();
+                            double val = lVal - rVal;
+                            values.Push(val);
+                            operators.Pop();
+                        }
+
+
+                        operators.Pop();
+
+                        if (operators.Count != 0 && operators.Peek() == "*")
+                        {
+                            double val;
+
+                            val = values.Pop() * values.Pop();
+
+                            values.Push(val);
+
+                            operators.Pop();
+                        }
+                        else if (operators.Count != 0 && operators.Peek() == "/")
+                        {
+                            double rVal = values.Pop();
+                            double lVal = values.Pop();
+                            if (rVal == 0)
+                            {
+                                throw new FormulaEvaluationException("Division by 0");
+                            }
+                            double val = lVal / rVal;
+                            values.Push(val);
+                            operators.Pop();
+                        }
+                        break;
+                    case TokenType.Number:
+                        if (operators.Count != 0 && operators.Peek() == "*")
+                        {
+                            double val;
+
+                            val = values.Pop() * Double.Parse(t.Item1);
+
+                            values.Push(val);
+
+                            operators.Pop();
+                        }
+                        else if (operators.Count != 0 && operators.Peek() == "/")
+                        {
+                            double lVal = values.Pop();
+                            if (Double.Parse(t.Item1) == 0)
+                            {
+                                throw new FormulaEvaluationException("Division by 0");
+                            }
+                            double val = lVal / Double.Parse(t.Item1);
+                            values.Push(val);
+                            operators.Pop();
+                        }
+                        else
+                        {
+                            values.Push(Double.Parse(t.Item1));
+                        }
+                        break;
+                    case TokenType.Oper:
+                        if (t.Item1 == "+" || t.Item1 == "-")
+                        {
+                            if (operators.Count != 0 && operators.Peek() == "+")
+                            {
+                                double val;
+
+                                val = values.Pop() + values.Pop();
+
+                                values.Push(val);
+
+                                operators.Pop();
+                            }
+                            else if (operators.Count != 0 && operators.Peek() == "-")
+                            {
+                                double rVal = values.Pop();
+                                double lVal = values.Pop();
+                                double val = lVal - rVal;
+                                values.Push(val);
+                                operators.Pop();
+                            }
+                        }
+                        operators.Push(t.Item1);
+                        break;
+
+                    case TokenType.Var:
+                        if (operators.Count != 0 && operators.Peek() == "*")
+                        {
+                            double val;
+
+                            try
+                            {
+                                val = values.Pop() * lookup(t.Item1);
+                            }
+                            catch (UndefinedVariableException e)
+                            {
+
+                                throw new FormulaEvaluationException("Undefined variable: " + t.Item1);
+                            }
+
+
+                            values.Push(val);
+                            operators.Pop();
+
+
+                        }
+                        else if (operators.Count != 0 && operators.Peek() == "/")
+                        {
+
+                            double lVal = values.Pop();
+
+                            try
+                            {
+                                if (lookup(t.Item1) == 0)
+                                {
+                                    throw new FormulaEvaluationException("Division by 0");
+                                }
+                                double val = lVal / lookup(t.Item1);
+                                values.Push(val);
+                                operators.Pop();
+                            }
+                            catch (UndefinedVariableException e)
+                            {
+
+                                throw new FormulaEvaluationException("Undefined variable: " + t.Item1);
+                            }
+
+
+
+                        }
+                        else
+                        {
+
+                            try
+                            {
+                                values.Push(lookup(t.Item1));
+                            }
+                            catch (UndefinedVariableException e)
+                            {
+
+                                throw new FormulaEvaluationException("Undefined variable: " + t.Item1);
+                            }
+                        }
+
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+
+            if(operators.Count == 0)
+            {
+                return values.Pop();
+            }
+
+            if(operators.Count == 1)
+            {
+                double rVal = values.Pop();
+                double lVal = values.Pop();
+                if (operators.Count != 0 && operators.Peek() == "+")
+                {
+                    double val;
+
+                    val = rVal + lVal;
+
+
+                    operators.Pop();
+                    return val;
+                }
+                else if (operators.Count != 0 && operators.Peek() == "-")
+                {
+                    
+                    double val = lVal - rVal;
+                   
+                    operators.Pop();
+
+                    return val;
+                }
+
+            }
 
             return 0;
+            
         }
 
         /// <summary>
@@ -219,7 +414,7 @@ namespace Formulas
                     else if (match.Groups[7].Success)
                     {
                         type = Invalid;
-                        throw new UndefinedVariableException(type);
+                        throw new FormulaFormatException(type + "");
                     }
                     else
                     {
@@ -297,7 +492,7 @@ namespace Formulas
         public UndefinedVariableException(String variable)
             : base(variable)
         {
-            
+
         }
     }
 
