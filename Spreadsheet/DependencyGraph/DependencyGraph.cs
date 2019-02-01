@@ -48,11 +48,16 @@ namespace Dependencies
     /// </summary>
     public class DependencyGraph
     {
+        private Dictionary<string, HashSet<string>> dependants;
+        private Dictionary<string, HashSet<string>> dependees;
+        private int num = 0;
         /// <summary>
         /// Creates a DependencyGraph containing no dependencies.
         /// </summary>
         public DependencyGraph()
         {
+            dependants = new Dictionary<string, HashSet<string>>();
+            dependees = new Dictionary<string, HashSet<string>>();
         }
 
         /// <summary>
@@ -60,7 +65,10 @@ namespace Dependencies
         /// </summary>
         public int Size
         {
-            get { return 0; }
+            get
+            {
+                return num;
+            }
         }
 
         /// <summary>
@@ -68,6 +76,25 @@ namespace Dependencies
         /// </summary>
         public bool HasDependents(string s)
         {
+            if (s != null)
+            {
+                if (dependants.ContainsKey(s))
+                {
+                    if (dependants[s].Count > 0)
+                    {
+                        return true;
+                    }
+                    else
+                        return false;
+                }
+                else
+                {
+                    Console.WriteLine(s + " not found in dependents");
+                    return false;
+                }
+            }
+            else
+                Console.WriteLine("Can not search Dependants using a null key");
             return false;
         }
 
@@ -76,6 +103,25 @@ namespace Dependencies
         /// </summary>
         public bool HasDependees(string s)
         {
+            if (s != null)
+            {
+                if (dependees.ContainsKey(s))
+                {
+                    if (dependees[s].Count > 0)
+                    {
+                        return true;
+                    }
+                    else
+                        return false;
+                }
+                else
+                {
+                    Console.WriteLine(s + " not found in dependees");
+                    return false;
+                }
+            }
+            else
+                Console.WriteLine("Can not search Dependees using a null key");
             return false;
         }
 
@@ -84,7 +130,23 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
-            return null;
+            if (s != null)
+            {
+                if (dependants.ContainsKey(s))
+                {
+                    return dependants[s];
+                }
+                else
+                {
+                    Console.WriteLine("Cant return an IEnumerable of key: " + s + " because " + s + " is not a key in Dependants");
+                    return new HashSet<string>();
+                }
+            }
+            else
+            {
+                Console.WriteLine("Can not return an IEnumerable of a null key value");
+                return null;
+            }
         }
 
         /// <summary>
@@ -92,7 +154,23 @@ namespace Dependencies
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
-            return null;
+            if (s != null)
+            {
+                if (dependees.ContainsKey(s))
+                {
+                    return dependees[s];
+                }
+                else
+                {
+                    Console.WriteLine("Can't return an IEnumerable of key: " + s + "because " + s + " is not a key in Dependees");
+                    return new HashSet<string>();
+                }
+            }
+            else
+            {
+                Console.WriteLine("Can not return an IEnumerable of a null key value");
+                return null;
+            }
         }
 
         /// <summary>
@@ -102,6 +180,37 @@ namespace Dependencies
         /// </summary>
         public void AddDependency(string s, string t)
         {
+            if (dependants.ContainsKey(s))
+            {
+                if (!dependants[s].Contains(t))
+                {
+                    dependants[s].Add(t);
+                    num++;
+                }
+
+            }
+            else
+            {
+                dependants.Add(s, new HashSet<string>());
+                dependants[s].Add(t);
+                num++;
+            }
+
+
+            if (dependees.ContainsKey(t))
+            {
+                if (!dependees[t].Contains(s))
+                {
+                    dependees[t].Add(s);
+                }
+
+            }
+            else
+            {
+                dependees.Add(t, new HashSet<string>());
+                dependees[t].Add(s);
+            }
+
         }
 
         /// <summary>
@@ -111,6 +220,36 @@ namespace Dependencies
         /// </summary>
         public void RemoveDependency(string s, string t)
         {
+            if (s != null && t != null)
+            {
+                if (dependants.ContainsKey(s))
+                {
+                    if (dependants[s].Contains(t))
+                    {
+                        dependants[s].Remove(t);
+                        num--;
+                        if (dependants[s].Count == 0)
+                        {
+                            dependants.Remove(s);
+                        }
+                    }
+                }
+                if (dependees.ContainsKey(t))
+                {
+                    if (dependees[t].Contains(s))
+                    {
+                        dependees[t].Remove(s);
+                        if (dependees[t].Count == 0)
+                        {
+                            dependees.Remove(t);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("Can not delete a dependency that contains a null value");
+            }
         }
 
         /// <summary>
@@ -120,6 +259,31 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
+            if (s != null)
+            {
+                HashSet<string> temp = new HashSet<string>();
+
+                if (dependants.ContainsKey(s))
+                {
+                    num -= dependants[s].Count;
+                    dependants.Remove(s);
+                }
+
+                IEnumerator<string> enumer = newDependents.GetEnumerator();
+                while (enumer.MoveNext())
+                {
+                    temp.Add(enumer.Current);
+                }
+
+
+                foreach (string el in temp)
+                {
+                    AddDependency(s, el);
+                }
+
+
+
+            }
         }
 
         /// <summary>
@@ -129,6 +293,38 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
+            if (t != null)
+            {
+
+                IEnumerator<string> enumer;
+                HashSet<string> temp = new HashSet<string>();
+
+
+                if (dependees.ContainsKey(t))
+                {
+                    enumer = dependees[t].GetEnumerator();
+                    while (enumer.MoveNext())
+                    {
+                        temp.Add(enumer.Current);
+                    }
+
+                    enumer = temp.GetEnumerator();
+
+
+                    while (enumer.MoveNext())
+                    {
+                        RemoveDependency(enumer.Current, t);
+                    }
+
+                }
+
+                enumer = newDependees.GetEnumerator();
+                while (enumer.MoveNext())
+                {
+                    AddDependency(enumer.Current, t);
+                }
+
+            }
         }
     }
 }
