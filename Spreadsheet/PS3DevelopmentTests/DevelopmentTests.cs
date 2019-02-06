@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Dependencies;
+using System.Diagnostics;
 
 namespace DevelopmentTests
 {
@@ -212,5 +213,32 @@ namespace DevelopmentTests
             Assert.IsTrue(t.HasDependents("b"));
             Assert.IsTrue(t.HasDependees("b"));
         }
+
+        [TestMethod]
+        public void timingAdd()
+        {
+            Stopwatch timer = new Stopwatch();
+
+            DependencyGraph t = new DependencyGraph();
+
+            int i;
+            long timeTaken;
+
+            i = 0;
+
+            timer.Start();
+
+            while(i < 1000000)
+            {
+                t.AddDependency("a", "b");
+                i++;
+            }
+
+            timer.Stop();
+
+            Console.WriteLine("Something" + timer.ElapsedMilliseconds);
+        }
+
+       
     }
 }
