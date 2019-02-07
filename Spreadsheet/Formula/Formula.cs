@@ -497,8 +497,14 @@ namespace Formulas
     /// double) or throw an UndefinedVariableException (meaning that the string is unmapped 
     /// to a value. Exactly how a Lookup method decides which strings map to doubles and which
     /// don't is up to the implementation of the method.
+    /// 
+    /// Normalizer - 
+    /// 
+    /// Validator - 
     /// </summary>
     public delegate double Lookup(string var);
+    public delegate string Normalizer(string s);
+    public delegate bool Validator(string s);
 
     /// <summary>
     /// Used to report that a Lookup delegate is unable to determine the value
