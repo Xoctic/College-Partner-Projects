@@ -19,6 +19,18 @@ namespace Formulas
         private List<Tuple<string, TokenType>> tokens;
 
 
+        struct Token
+        {
+            string Text;
+            TokenType Type;
+
+            public Token(string _text, TokenType _type)
+            {
+                Text = _text;
+                Type = _type;
+            }
+        }
+
 
         /// <summary>
         /// Creates a Formula from a string that consists of a standard infix expression composed
@@ -55,10 +67,10 @@ namespace Formulas
 
             if (tokens.Count == 0)
             {
-                //condition 2
+                //condition 2: There must be at least one token.
                 throw new FormulaFormatException("Less than one token in the expression");
             }
-            //condition 5
+            //condition 5: The first token of a formula must be a number, a variable, or an opening parenthesis.
             else if (tokens[0].Item2 == TokenType.Oper || tokens[0].Item2 == TokenType.RParen || tokens[0].Item2 == TokenType.Invalid)
             {
                 throw new FormulaFormatException(tokens[0].Item1);
@@ -70,7 +82,7 @@ namespace Formulas
 
                 if (isFirst == false)
                 {
-                    //condition 7
+                    //condition 7: Any token that immediately follows an opening parenthesis or an operator must be either a number, a variable, or an opening parenthesis.
                     if (previousToken.Item2 == TokenType.LParen || previousToken.Item2 == TokenType.Oper)
                     {
                         if (token.Item2 == TokenType.Invalid || token.Item2 == TokenType.Oper || token.Item2 == TokenType.RParen)
@@ -78,7 +90,7 @@ namespace Formulas
                             throw new FormulaFormatException(token.Item1);
                         }
                     }
-                    //condition 8
+                    //condition 8: Any token that immediately follows a number, a variable, or a closing parenthesis must be either an operator or a closing parenthesis.
                     if (previousToken.Item2 == TokenType.RParen || previousToken.Item2 == TokenType.Number || previousToken.Item2 == TokenType.Var)
                     {
                         if (previousToken.Item2 == TokenType.Number || previousToken.Item2 == TokenType.Var || previousToken.Item2 == TokenType.RParen)
@@ -97,7 +109,7 @@ namespace Formulas
 
 
 
-                //condition 3
+                //condition 3: When reading tokens from left to right, at no point should the number of closing parentheses seen so far be greater than the number of opening parentheses seen so far.
                 if (numOfRightParen > numOfLeftParen)
                 {
                     throw new FormulaFormatException("Too many right parentheses");
@@ -119,12 +131,12 @@ namespace Formulas
                 }
 
             }
-            //condition 6
+            //condition 6: The last token of a formula must be a number, a variable, or a closing parenthesis.
             if (tokens[tokens.Count - 1].Item2 == TokenType.Oper || tokens[tokens.Count - 1].Item2 == TokenType.LParen || tokens[tokens.Count - 1].Item2 == TokenType.Invalid)
             {
                 throw new FormulaFormatException(tokens[tokens.Count - 1].Item1);
             }
-            //condition 4
+            //condition 4: The total number of opening parentheses must equal the total number of closing parentheses.
             if (numOfLeftParen != numOfRightParen)
             {
                 throw new FormulaFormatException(tokens[tokens.Count - 1].Item1);
