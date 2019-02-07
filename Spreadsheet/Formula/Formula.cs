@@ -166,12 +166,12 @@ namespace Formulas
             Stack<double> values = new Stack<double>();
 
 
-            foreach (Tuple<string, TokenType> t in tokens)
+            foreach (Token t in tokens)
             {
-                switch (t.Item2)
+                switch (t.Type)
                 {
                     case TokenType.LParen:
-                        operators.Push(t.Item1);
+                        operators.Push(t.Text);
                         break;
                     case TokenType.RParen:
                         
@@ -225,7 +225,7 @@ namespace Formulas
                         {
                             double val;
 
-                            val = values.Pop() * Double.Parse(t.Item1);
+                            val = values.Pop() * Double.Parse(t.Text);
 
                             values.Push(val);
 
@@ -234,21 +234,21 @@ namespace Formulas
                         else if (operators.Count != 0 && operators.Peek() == "/")
                         {
                             double lVal = values.Pop();
-                            if (Double.Parse(t.Item1) == 0)
+                            if (Double.Parse(t.Text) == 0)
                             {
                                 throw new FormulaEvaluationException("Division by 0");
                             }
-                            double val = lVal / Double.Parse(t.Item1);
+                            double val = lVal / Double.Parse(t.Text);
                             values.Push(val);
                             operators.Pop();
                         }
                         else
                         {
-                            values.Push(Double.Parse(t.Item1));
+                            values.Push(Double.Parse(t.Text));
                         }
                         break;
                     case TokenType.Oper:
-                        if (t.Item1 == "+" || t.Item1 == "-")
+                        if (t.Text == "+" || t.Text == "-")
                         {
                             if (operators.Count != 0 && operators.Peek() == "+")
                             {
@@ -269,7 +269,7 @@ namespace Formulas
                                 operators.Pop();
                             }
                         }
-                        operators.Push(t.Item1);
+                        operators.Push(t.Text);
                         break;
 
                     case TokenType.Var:
@@ -279,12 +279,12 @@ namespace Formulas
 
                             try
                             {
-                                val = values.Pop() * lookup(t.Item1);
+                                val = values.Pop() * lookup(t.Text);
                             }
                             catch (UndefinedVariableException e)
                             {
 
-                                throw new FormulaEvaluationException("Undefined variable: " + t.Item1);
+                                throw new FormulaEvaluationException("Undefined variable: " + t.Text);
                             }
 
 
@@ -300,18 +300,18 @@ namespace Formulas
 
                             try
                             {
-                                if (lookup(t.Item1) == 0)
+                                if (lookup(t.Text) == 0)
                                 {
                                     throw new FormulaEvaluationException("Division by 0");
                                 }
-                                double val = lVal / lookup(t.Item1);
+                                double val = lVal / lookup(t.Text);
                                 values.Push(val);
                                 operators.Pop();
                             }
                             catch (UndefinedVariableException e)
                             {
 
-                                throw new FormulaEvaluationException("Undefined variable: " + t.Item1);
+                                throw new FormulaEvaluationException("Undefined variable: " + t.Text);
                             }
 
 
@@ -327,7 +327,7 @@ namespace Formulas
                             catch (UndefinedVariableException e)
                             {
 
-                                throw new FormulaEvaluationException("Undefined variable: " + t.Item1);
+                                throw new FormulaEvaluationException("Undefined variable: " + t.Text);
                             }
                         }
 
