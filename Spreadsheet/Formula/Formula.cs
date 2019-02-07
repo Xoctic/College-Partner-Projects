@@ -106,9 +106,6 @@ namespace Formulas
 
                 }
 
-
-
-
                 //condition 3: When reading tokens from left to right, at no point should the number of closing parentheses seen so far be greater than the number of opening parentheses seen so far.
                 if (numOfRightParen > numOfLeftParen)
                 {
@@ -370,7 +367,7 @@ namespace Formulas
         /// Tuple containing the token's text and TokenType.  There are no empty tokens, and no
         /// token contains white space.
         /// </summary>
-        private static IEnumerable<Tuple<string, TokenType>> GetTokens(String formula)
+        private static IEnumerable<Token> GetTokens(String formula)
         {
             // Patterns for individual tokens.
             String lpPattern = @"\(";
@@ -436,8 +433,8 @@ namespace Formulas
                         throw new InvalidOperationException("Regular exception failed in GetTokens");
                     }
 
-                    // Yield the token
-                    yield return new Tuple<string, TokenType>(match.Value, type);
+                    //Yield the token
+                    yield return new Token(match.Value, type);
                 }
 
                 // Look for the next match
