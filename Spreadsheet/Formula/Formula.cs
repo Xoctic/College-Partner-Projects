@@ -16,18 +16,29 @@ namespace Formulas
     /// </summary>
     public class Formula
     {
-        private List<Tuple<string, TokenType>> tokens;
+        private List<Token> tokens;
 
 
         struct Token
         {
-            string Text;
-            TokenType Type;
+            public string Text;
+            public TokenType Type;
 
             public Token(string _text, TokenType _type)
             {
                 Text = _text;
                 Type = _type;
+            }
+
+            public string getText()
+            {
+                
+                return Text;
+            }
+
+            public TokenType getTokenType()
+            {
+                return Type;
             }
         }
 
@@ -57,11 +68,11 @@ namespace Formulas
         /// </summary>
         public Formula(String formula)
         {
-            tokens = new List<Tuple<string, TokenType>>(GetTokens(formula));
+            tokens = new List<Token>(GetTokens(formula));
 
             int numOfLeftParen = 0;
             int numOfRightParen = 0;
-            Tuple<string, TokenType> previousToken = new Tuple<string, TokenType>("", TokenType.Invalid);
+            Token previousToken = new Token("", TokenType.Invalid);
             Boolean isFirst = true;
 
 
@@ -71,33 +82,33 @@ namespace Formulas
                 throw new FormulaFormatException("Less than one token in the expression");
             }
             //condition 5: The first token of a formula must be a number, a variable, or an opening parenthesis.
-            else if (tokens[0].Item2 == TokenType.Oper || tokens[0].Item2 == TokenType.RParen || tokens[0].Item2 == TokenType.Invalid)
+            else if (tokens[0].Type == TokenType.Oper || tokens[0].Type == TokenType.RParen || tokens[0].Type == TokenType.Invalid)
             {
-                throw new FormulaFormatException(tokens[0].Item1);
+                throw new FormulaFormatException(tokens[0].Text);
             }
 
 
-            foreach (Tuple<string, TokenType> token in tokens)
+            foreach (Token token in tokens)
             {
 
                 if (isFirst == false)
                 {
                     //condition 7: Any token that immediately follows an opening parenthesis or an operator must be either a number, a variable, or an opening parenthesis.
-                    if (previousToken.Item2 == TokenType.LParen || previousToken.Item2 == TokenType.Oper)
+                    if (previousToken.Type == TokenType.LParen || previousToken.Type == TokenType.Oper)
                     {
-                        if (token.Item2 == TokenType.Invalid || token.Item2 == TokenType.Oper || token.Item2 == TokenType.RParen)
+                        if (token.Type == TokenType.Invalid || token.Type == TokenType.Oper || token.Type == TokenType.RParen)
                         {
-                            throw new FormulaFormatException(token.Item1);
+                            throw new FormulaFormatException(token.Text);
                         }
                     }
                     //condition 8: Any token that immediately follows a number, a variable, or a closing parenthesis must be either an operator or a closing parenthesis.
-                    if (previousToken.Item2 == TokenType.RParen || previousToken.Item2 == TokenType.Number || previousToken.Item2 == TokenType.Var)
+                    if (previousToken.Type == TokenType.RParen || previousToken.Type == TokenType.Number || previousToken.Type == TokenType.Var)
                     {
-                        if (previousToken.Item2 == TokenType.Number || previousToken.Item2 == TokenType.Var || previousToken.Item2 == TokenType.RParen)
+                        if (previousToken.Type == TokenType.Number || previousToken.Type == TokenType.Var || previousToken.Type == TokenType.RParen)
                         {
-                            if (token.Item2 != TokenType.Oper && token.Item2 != TokenType.RParen)
+                            if (token.Type != TokenType.Oper && token.Type != TokenType.RParen)
                             {
-                                throw new FormulaFormatException(token.Item1);
+                                throw new FormulaFormatException(token.Text);
                             }
                         }
                     }
@@ -112,11 +123,11 @@ namespace Formulas
                     throw new FormulaFormatException("Too many right parentheses");
                 }
 
-                if (token.Item2 == TokenType.LParen)
+                if (token.Type == TokenType.LParen)
                 {
                     numOfLeftParen++;
                 }
-                else if (token.Item2 == TokenType.RParen)
+                else if (token.Type == TokenType.RParen)
                 {
                     numOfRightParen++;
                 }
@@ -129,14 +140,14 @@ namespace Formulas
 
             }
             //condition 6: The last token of a formula must be a number, a variable, or a closing parenthesis.
-            if (tokens[tokens.Count - 1].Item2 == TokenType.Oper || tokens[tokens.Count - 1].Item2 == TokenType.LParen || tokens[tokens.Count - 1].Item2 == TokenType.Invalid)
+            if (tokens[tokens.Count - 1].Type == TokenType.Oper || tokens[tokens.Count - 1].Type == TokenType.LParen || tokens[tokens.Count - 1].Type == TokenType.Invalid)
             {
-                throw new FormulaFormatException(tokens[tokens.Count - 1].Item1);
+                throw new FormulaFormatException(tokens[tokens.Count - 1].Text);
             }
             //condition 4: The total number of opening parentheses must equal the total number of closing parentheses.
             if (numOfLeftParen != numOfRightParen)
             {
-                throw new FormulaFormatException(tokens[tokens.Count - 1].Item1);
+                throw new FormulaFormatException(tokens[tokens.Count - 1].Text);
             }
 
         }
@@ -432,6 +443,7 @@ namespace Formulas
                         // We shouldn't get here
                         throw new InvalidOperationException("Regular exception failed in GetTokens");
                     }
+
 
                     //Yield the token
                     yield return new Token(match.Value, type);
