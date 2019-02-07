@@ -151,6 +151,19 @@ namespace Formulas
             }
 
         }
+
+
+
+
+        public Formula(string formula, Normalizer norm, Validator valid)
+        {
+
+        }
+
+
+
+
+
         /// <summary>
         /// Evaluates this Formula, using the Lookup delegate to determine the values of variables.  (The
         /// delegate takes a variable name as a parameter and returns its value (if it has one) or throws
@@ -498,9 +511,9 @@ namespace Formulas
     /// to a value. Exactly how a Lookup method decides which strings map to doubles and which
     /// don't is up to the implementation of the method.
     /// 
-    /// Normalizer - 
+    /// Normalizer - convert variables into a canonical form
     /// 
-    /// Validator - 
+    /// Validator - imposes extra restrictions on the validity of a variable, beyond the ones already built into the Formula definition
     /// </summary>
     public delegate double Lookup(string var);
     public delegate string Normalizer(string s);
