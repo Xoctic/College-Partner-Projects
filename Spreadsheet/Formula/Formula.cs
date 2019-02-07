@@ -66,89 +66,92 @@ namespace Formulas
         /// item1 is a string which shows what the token actually is such as +-*/ ect
         /// item2 is the tokenType enums such as oper, Lparen, rightParen, Ivalid ect...
         /// </summary>
-        public Formula(String formula)
+        public Formula(String formula): this(formula, x => x, x => true)
         {
-            tokens = new List<Token>(GetTokens(formula));
-
-            int numOfLeftParen = 0;
-            int numOfRightParen = 0;
-            Token previousToken = new Token("", TokenType.Invalid);
-            Boolean isFirst = true;
-
-
-            if (tokens.Count == 0)
-            {
-                //condition 2: There must be at least one token.
-                throw new FormulaFormatException("Less than one token in the expression");
-            }
-            //condition 5: The first token of a formula must be a number, a variable, or an opening parenthesis.
-            else if (tokens[0].Type == TokenType.Oper || tokens[0].Type == TokenType.RParen || tokens[0].Type == TokenType.Invalid)
-            {
-                throw new FormulaFormatException(tokens[0].Text);
-            }
-
-
-            foreach (Token token in tokens)
-            {
-
-                if (isFirst == false)
-                {
-                    //condition 7: Any token that immediately follows an opening parenthesis or an operator must be either a number, a variable, or an opening parenthesis.
-                    if (previousToken.Type == TokenType.LParen || previousToken.Type == TokenType.Oper)
-                    {
-                        if (token.Type == TokenType.Invalid || token.Type == TokenType.Oper || token.Type == TokenType.RParen)
-                        {
-                            throw new FormulaFormatException(token.Text);
-                        }
-                    }
-                    //condition 8: Any token that immediately follows a number, a variable, or a closing parenthesis must be either an operator or a closing parenthesis.
-                    if (previousToken.Type == TokenType.RParen || previousToken.Type == TokenType.Number || previousToken.Type == TokenType.Var)
-                    {
-                        if (previousToken.Type == TokenType.Number || previousToken.Type == TokenType.Var || previousToken.Type == TokenType.RParen)
-                        {
-                            if (token.Type != TokenType.Oper && token.Type != TokenType.RParen)
-                            {
-                                throw new FormulaFormatException(token.Text);
-                            }
-                        }
-                    }
 
 
 
-                }
+            //tokens = new List<Token>(GetTokens(formula));
 
-                //condition 3: When reading tokens from left to right, at no point should the number of closing parentheses seen so far be greater than the number of opening parentheses seen so far.
-                if (numOfRightParen > numOfLeftParen)
-                {
-                    throw new FormulaFormatException("Too many right parentheses");
-                }
+            //int numOfLeftParen = 0;
+            //int numOfRightParen = 0;
+            //Token previousToken = new Token("", TokenType.Invalid);
+            //Boolean isFirst = true;
 
-                if (token.Type == TokenType.LParen)
-                {
-                    numOfLeftParen++;
-                }
-                else if (token.Type == TokenType.RParen)
-                {
-                    numOfRightParen++;
-                }
-                previousToken = token;
 
-                if (isFirst == true)
-                {
-                    isFirst = false;
-                }
+            //if (tokens.Count == 0)
+            //{
+            //    //condition 2: There must be at least one token.
+            //    throw new FormulaFormatException("Less than one token in the expression");
+            //}
+            ////condition 5: The first token of a formula must be a number, a variable, or an opening parenthesis.
+            //else if (tokens[0].Type == TokenType.Oper || tokens[0].Type == TokenType.RParen || tokens[0].Type == TokenType.Invalid)
+            //{
+            //    throw new FormulaFormatException(tokens[0].Text);
+            //}
 
-            }
-            //condition 6: The last token of a formula must be a number, a variable, or a closing parenthesis.
-            if (tokens[tokens.Count - 1].Type == TokenType.Oper || tokens[tokens.Count - 1].Type == TokenType.LParen || tokens[tokens.Count - 1].Type == TokenType.Invalid)
-            {
-                throw new FormulaFormatException(tokens[tokens.Count - 1].Text);
-            }
-            //condition 4: The total number of opening parentheses must equal the total number of closing parentheses.
-            if (numOfLeftParen != numOfRightParen)
-            {
-                throw new FormulaFormatException(tokens[tokens.Count - 1].Text);
-            }
+
+            //foreach (Token token in tokens)
+            //{
+
+            //    if (isFirst == false)
+            //    {
+            //        //condition 7: Any token that immediately follows an opening parenthesis or an operator must be either a number, a variable, or an opening parenthesis.
+            //        if (previousToken.Type == TokenType.LParen || previousToken.Type == TokenType.Oper)
+            //        {
+            //            if (token.Type == TokenType.Invalid || token.Type == TokenType.Oper || token.Type == TokenType.RParen)
+            //            {
+            //                throw new FormulaFormatException(token.Text);
+            //            }
+            //        }
+            //        //condition 8: Any token that immediately follows a number, a variable, or a closing parenthesis must be either an operator or a closing parenthesis.
+            //        if (previousToken.Type == TokenType.RParen || previousToken.Type == TokenType.Number || previousToken.Type == TokenType.Var)
+            //        {
+            //            if (previousToken.Type == TokenType.Number || previousToken.Type == TokenType.Var || previousToken.Type == TokenType.RParen)
+            //            {
+            //                if (token.Type != TokenType.Oper && token.Type != TokenType.RParen)
+            //                {
+            //                    throw new FormulaFormatException(token.Text);
+            //                }
+            //            }
+            //        }
+
+
+
+            //    }
+
+            //    //condition 3: When reading tokens from left to right, at no point should the number of closing parentheses seen so far be greater than the number of opening parentheses seen so far.
+            //    if (numOfRightParen > numOfLeftParen)
+            //    {
+            //        throw new FormulaFormatException("Too many right parentheses");
+            //    }
+
+            //    if (token.Type == TokenType.LParen)
+            //    {
+            //        numOfLeftParen++;
+            //    }
+            //    else if (token.Type == TokenType.RParen)
+            //    {
+            //        numOfRightParen++;
+            //    }
+            //    previousToken = token;
+
+            //    if (isFirst == true)
+            //    {
+            //        isFirst = false;
+            //    }
+
+            //}
+            ////condition 6: The last token of a formula must be a number, a variable, or a closing parenthesis.
+            //if (tokens[tokens.Count - 1].Type == TokenType.Oper || tokens[tokens.Count - 1].Type == TokenType.LParen || tokens[tokens.Count - 1].Type == TokenType.Invalid)
+            //{
+            //    throw new FormulaFormatException(tokens[tokens.Count - 1].Text);
+            //}
+            ////condition 4: The total number of opening parentheses must equal the total number of closing parentheses.
+            //if (numOfLeftParen != numOfRightParen)
+            //{
+            //    throw new FormulaFormatException(tokens[tokens.Count - 1].Text);
+            //}
 
         }
 
@@ -170,6 +173,8 @@ namespace Formulas
 
            try
             {
+                   
+
                 formula = norm(formula);
                 checkFormula(formula);
             }
@@ -180,11 +185,11 @@ namespace Formulas
 
             if(!valid(formula))
             {
-                throw new FormulaFormatException("Formula doesn't work after validating");
+                throw new FormulaFormatException("Formula normalized but doesn't work after validating");
             }
 
-
-
+            //Code from first constructor
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             tokens = new List<Token>(GetTokens(formula));
 
             int numOfLeftParen = 0;
@@ -232,6 +237,9 @@ namespace Formulas
 
 
 
+
+
+
                 }
 
                 //condition 3: When reading tokens from left to right, at no point should the number of closing parentheses seen so far be greater than the number of opening parentheses seen so far.
@@ -267,7 +275,7 @@ namespace Formulas
                 throw new FormulaFormatException(tokens[tokens.Count - 1].Text);
             }
 
-
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
