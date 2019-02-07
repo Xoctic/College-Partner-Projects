@@ -322,7 +322,7 @@ namespace Formulas
 
                             try
                             {
-                                values.Push(lookup(t.Item1));
+                                values.Push(lookup(t.Text));
                             }
                             catch (UndefinedVariableException e)
                             {
