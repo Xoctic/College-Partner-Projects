@@ -263,6 +263,23 @@ namespace Formulas
 
 
 
+        public ISet<string> GetVariables()
+        {
+            HashSet<string> variables = new HashSet<string>();
+            
+            foreach(Token token in tokens)
+            {
+                if(token.Type == TokenType.Var)
+                {
+                    variables.Add(token.Text);
+                }
+            }
+
+            return variables;
+        }
+
+
+
 
 
         public void checkFormula(string formula)
