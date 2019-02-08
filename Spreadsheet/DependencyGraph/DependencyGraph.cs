@@ -76,6 +76,7 @@ namespace Dependencies
         /// </summary>
         public bool HasDependents(string s)
         {
+
             if (s != null)
             {
                 if (dependees.ContainsKey(s))
@@ -94,8 +95,7 @@ namespace Dependencies
                 }
             }
             else
-                Console.WriteLine("Can not search Dependants using a null key");
-            return false;
+                throw new ArgumentNullException("Can not search Dependants using a null key");
         }
 
         /// <summary>
@@ -121,8 +121,7 @@ namespace Dependencies
                 }
             }
             else
-                Console.WriteLine("Can not search Dependees using a null key");
-            return false;
+                throw new ArgumentNullException("Can not search Dependees using a null key");
         }
 
         /// <summary>
@@ -144,8 +143,7 @@ namespace Dependencies
             }
             else
             {
-                Console.WriteLine("Can not return an IEnumerable of a null key value");
-                return null;
+                throw new ArgumentNullException("Can not return an IEnumerable of Dependents of a null key value");
             }
         }
 
@@ -168,8 +166,7 @@ namespace Dependencies
             }
             else
             {
-                Console.WriteLine("Can not return an IEnumerable of a null key value");
-                return null;
+                throw new ArgumentNullException("Can not return an IEnumerable of Dependees of a null key value");
             }
         }
 
@@ -180,6 +177,16 @@ namespace Dependencies
         /// </summary>
         public void AddDependency(string s, string t)
         {
+            if(s == null)
+            {
+                throw new ArgumentNullException("Cant AddDependency using a null s value");
+            }
+            else if(t == null)
+            {
+                throw new ArgumentNullException("Cant AddDependency using a null t value");
+            }
+
+
             if (dependees.ContainsKey(s))
             {
                 if (!dependees[s].Contains(t))
@@ -220,6 +227,16 @@ namespace Dependencies
         /// </summary>
         public void RemoveDependency(string s, string t)
         {
+            if(s == null)
+            {
+                throw new ArgumentNullException("cant remove dependency of a null s value");
+            }
+            else if(t == null)
+            {
+                throw new ArgumentNullException("cant remove dependency of a null t value");
+            }
+
+
             if (s != null && t != null)
             {
                 if (dependees.ContainsKey(s))
@@ -259,6 +276,15 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
+            if(s == null)
+            {
+                throw new ArgumentNullException("cant replace dependents using a null s value");
+            }
+            else if(newDependents == null)
+            {
+                throw new ArgumentNullException("cant replace dependents using a null newDependents value");
+            }
+
             if (s != null)
             {
                 HashSet<string> temp1 = new HashSet<string>(GetDependents(s));
@@ -284,6 +310,15 @@ namespace Dependencies
         /// </summary>
         public void ReplaceDependees(string t, IEnumerable<string> newDependees)
         {
+            if(t == null)
+            {
+                throw new ArgumentNullException("cant replace dependees using a null t value");
+            }
+            else if(newDependees == null)
+            {
+                throw new ArgumentNullException("cant replace dependees using a null newDependees value");
+            }
+
             if (t != null)
             {
 
