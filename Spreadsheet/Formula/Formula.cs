@@ -21,7 +21,7 @@ namespace Formulas
 
         struct Token
         {
-            public string Text;
+            public string Text { get; set; }
             public TokenType Type;
 
             public Token(string _text, TokenType _type)
@@ -30,16 +30,16 @@ namespace Formulas
                 Type = _type;
             }
 
-            public string getText()
-            {
+            //public string getText()
+            //{
                 
-                return Text;
-            }
+            //    return Text;
+            //}
 
-            public TokenType getTokenType()
-            {
-                return Type;
-            }
+            //public TokenType getTokenType()
+            //{
+            //    return Type;
+            //}
         }
 
 
@@ -161,32 +161,33 @@ namespace Formulas
         public Formula(string formula, Normalizer norm, Validator valid)
         {
             
-           try
-           {
-                checkFormula(formula);
-           }
-           catch(FormulaFormatException e)
-           {
-                throw e;
-           }
+           //try
+           //{
+           //     checkFormula(formula);
+           //}
+           //catch(FormulaFormatException e)
+           //{
+           //     throw e;
+           //}
+            
 
 
-           try
-            {
-                   
+           //try
+           // {
+                
 
-                formula = norm(formula);
-                checkFormula(formula);
-            }
-            catch(FormulaFormatException)
-            {
-                throw new FormulaFormatException("Formula doesn't work after normalizing");
-            }
+           //     formula = norm(formula);
+           //     checkFormula(formula);
+           // }
+           // catch(FormulaFormatException)
+           // {
+           //     throw new FormulaFormatException("Formula doesn't work after normalizing");
+           // }
 
-            if(!valid(formula))
-            {
-                throw new FormulaFormatException("Formula normalized but doesn't work after validating");
-            }
+           // if(!valid(formula))
+           // {
+           //     throw new FormulaFormatException("Formula normalized but doesn't work after validating");
+           // }
 
             //Code from first constructor
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -196,7 +197,8 @@ namespace Formulas
             int numOfRightParen = 0;
             Token previousToken = new Token("", TokenType.Invalid);
             Boolean isFirst = true;
-
+            int counter = 0;
+            string tempText;
 
             if (tokens.Count == 0)
             {
@@ -209,8 +211,9 @@ namespace Formulas
                 throw new FormulaFormatException(tokens[0].Text);
             }
 
+            tokens = new List<Token>();
 
-            foreach (Token token in tokens)
+            foreach (Token token in GetTokens(formula))
             {
 
                 if (isFirst == false)
@@ -262,6 +265,26 @@ namespace Formulas
                 {
                     isFirst = false;
                 }
+
+
+                if(token.Type == TokenType.Var)
+                {
+                    tempText = norm(token.Text);
+
+                    if(!valid(tempText))
+                    {
+                        throw new FormulaFormatException("Validation failed");
+                    }
+                    tokens[counter] = new Token(tempText, token.Type);
+                }
+                else
+                {
+                    tokens[counter] = new Token(token.Text, token.Type);
+                }
+
+                
+
+                counter++;
 
             }
             //condition 6: The last token of a formula must be a number, a variable, or a closing parenthesis.
