@@ -279,6 +279,19 @@ namespace Formulas
         }
 
 
+        public override string ToString()
+        {
+            string output = "";
+
+            foreach(Token el in tokens)
+            {
+                output += el.Text;
+            }
+
+            return output;
+        }
+
+
 
 
 
