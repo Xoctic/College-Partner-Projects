@@ -68,6 +68,12 @@ namespace Formulas
         /// </summary>
         public Formula(String formula): this(formula, x => x, x => true)
         {
+
+            if(formula == null)
+            {
+                throw new ArgumentNullException("formula passed in was null");
+            }
+
             //tokens = new List<Token>(GetTokens(formula));
 
             //int numOfLeftParen = 0;
@@ -157,6 +163,18 @@ namespace Formulas
 
         public Formula(string formula, Normalizer norm, Validator valid)
         {
+            if(formula == null)
+            {
+                throw new ArgumentNullException("formula passed in was null");
+            }
+            else if(norm == null)
+            {
+                throw new ArgumentNullException("normalizer passed in was null");
+            }
+            else if(valid == null)
+            {
+                throw new ArgumentNullException("validator passed in was null");
+            }
             
             tokens = new List<Token>(GetTokens(formula));
 
@@ -395,6 +413,12 @@ namespace Formulas
         /// </summary>
         public double Evaluate(Lookup lookup)
         {
+            if(lookup == null)
+            {
+                throw new ArgumentNullException("lookup passed in was null");
+            }
+
+
             Stack<string> operators = new Stack<string>();
             Stack<double> values = new Stack<double>();
 
@@ -613,6 +637,12 @@ namespace Formulas
         /// </summary>
         private static IEnumerable<Token> GetTokens(String formula)
         {
+
+            if(formula == null)
+            {
+                throw new ArgumentNullException("formula passed into GetTokens was null");
+            }
+
             // Patterns for individual tokens.
             String lpPattern = @"\(";
             String rpPattern = @"\)";
