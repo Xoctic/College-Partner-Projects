@@ -68,9 +68,6 @@ namespace Formulas
         /// </summary>
         public Formula(String formula): this(formula, x => x, x => true)
         {
-
-
-
             //tokens = new List<Token>(GetTokens(formula));
 
             //int numOfLeftParen = 0;
@@ -161,36 +158,6 @@ namespace Formulas
         public Formula(string formula, Normalizer norm, Validator valid)
         {
             
-           //try
-           //{
-           //     checkFormula(formula);
-           //}
-           //catch(FormulaFormatException e)
-           //{
-           //     throw e;
-           //}
-            
-
-
-           //try
-           // {
-                
-
-           //     formula = norm(formula);
-           //     checkFormula(formula);
-           // }
-           // catch(FormulaFormatException)
-           // {
-           //     throw new FormulaFormatException("Formula doesn't work after normalizing");
-           // }
-
-           // if(!valid(formula))
-           // {
-           //     throw new FormulaFormatException("Formula normalized but doesn't work after validating");
-           // }
-
-            //Code from first constructor
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             tokens = new List<Token>(GetTokens(formula));
 
             int numOfLeftParen = 0;
@@ -238,11 +205,6 @@ namespace Formulas
                         }
                     }
 
-
-
-
-
-
                 }
 
                 //condition 3: When reading tokens from left to right, at no point should the number of closing parentheses seen so far be greater than the number of opening parentheses seen so far.
@@ -282,7 +244,6 @@ namespace Formulas
                     tokens[counter] = new Token(token.Text, token.Type);
                 }
 
-                
 
                 counter++;
 
@@ -297,10 +258,6 @@ namespace Formulas
             {
                 throw new FormulaFormatException(tokens[tokens.Count - 1].Text);
             }
-
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 
         }
 
