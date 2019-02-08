@@ -297,6 +297,10 @@ namespace Dependencies
 
                 foreach(string el in newDependents)
                 {
+                    if(el == null)
+                    {
+                        throw new ArgumentNullException("cant replace dependents if there is a null value inside newDependents");
+                    }
                     AddDependency(s, el);
                 }
 
@@ -332,6 +336,10 @@ namespace Dependencies
 
                 foreach(string el in newDependees)
                 {
+                    if(el == null)
+                    {
+                        throw new ArgumentNullException("cant replace dependees if there is a null value inside newDependees");
+                    }
                     AddDependency(el, t);
                 }
 
