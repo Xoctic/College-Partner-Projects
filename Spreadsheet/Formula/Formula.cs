@@ -255,11 +255,11 @@ namespace Formulas
                     {
                         throw new FormulaFormatException("Validation failed");
                     }
-                    tokens[counter] = new Token(tempText, token.Type);
+                    tokens.Add(new Token(tempText, token.Type));
                 }
                 else
                 {
-                    tokens[counter] = new Token(token.Text, token.Type);
+                    tokens.Add(new Token(token.Text, token.Type));
                 }
 
 
