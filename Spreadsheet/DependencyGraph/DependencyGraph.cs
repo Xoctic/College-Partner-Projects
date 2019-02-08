@@ -51,6 +51,12 @@ namespace Dependencies
         private Dictionary<string, HashSet<string>> dependees;
         private Dictionary<string, HashSet<string>> dependants;
         private int num = 0;
+
+        public struct copy
+        {
+            public HashSet<string> dentss { get; set; }
+        }
+
         /// <summary>
         /// Creates a DependencyGraph containing no dependencies.
         /// </summary>
@@ -58,6 +64,65 @@ namespace Dependencies
         {
             dependees = new Dictionary<string, HashSet<string>>();
             dependants = new Dictionary<string, HashSet<string>>();
+        }
+
+        public DependencyGraph(DependencyGraph d1)
+        {
+
+
+
+            string tempString;
+            HashSet<string> tempSet;
+            dependants = new Dictionary<string, HashSet<string>>();
+            dependees = new Dictionary<string, HashSet<string>>();
+            
+
+
+
+            foreach(KeyValuePair<string, HashSet<string>> pair in d1.dependants)
+            {
+                if(pair.Key == null)
+                {
+                    throw new ArgumentNullException("cant copy d1 if a key in d1.dependents is null");
+                }
+                tempString = "" + pair.Key;
+                tempSet = new HashSet<string>();
+                foreach(string el in pair.Value)
+                {
+                    if(el == null)
+                    {
+                        throw new ArgumentNullException("cant copy d1 if an element in the values of d1.dependents is null");
+                    }
+                    tempSet.Add("" + el);
+                }
+
+                dependants.Add(tempString, tempSet);
+            }
+
+            foreach(KeyValuePair<string, HashSet<string>> pair in d1.dependees)
+            {
+                if (pair.Key == null)
+                {
+                    throw new ArgumentNullException("cant copy d1 if a key in d1.dependees is null");
+                }
+                tempString = "" + pair.Key;
+                tempSet = new HashSet<string>();
+                foreach (string el in pair.Value)
+                {
+                    if(el == null)
+                    {
+                        throw new ArgumentNullException("cant copy d1 if an element in the values of d1.dependees is null");
+                    }
+                    tempSet.Add("" + el);
+                }
+
+                dependees.Add(tempString, tempSet);
+            }
+
+
+
+            num += d1.Size;
+            
         }
 
         /// <summary>
