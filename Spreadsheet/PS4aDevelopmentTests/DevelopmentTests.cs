@@ -42,5 +42,44 @@ namespace PS4aDevelopmentTests
             Formula f2 = new Formula(f1.ToString());
             Assert.AreEqual(24.0, f2.Evaluate(s => char.IsLower(s[0]) ? 16 : 0), 1e-6);
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullFormula1Param()
+        {
+            Formula f = new Formula(null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullFormula3Param()
+        {
+            Formula f = new Formula(null, null, null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullNormalizer()
+        {
+            Formula f = new Formula("x+2", null, s => s != "z");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullValidator()
+        {
+            Formula f = new Formula("x+2", s => s == "x" ? "z" : s, null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullLookup()
+        {
+            Formula f = new Formula("x+2");
+
+            f.Evaluate(null);
+        }
+
+       
     }
 }
