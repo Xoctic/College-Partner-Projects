@@ -68,6 +68,10 @@ namespace Dependencies
 
         public DependencyGraph(DependencyGraph d1)
         {
+            if(d1 == null)
+            {
+                throw new ArgumentNullException("DependencyGraph passed in was null");
+            }
 
 
 
@@ -328,10 +332,7 @@ namespace Dependencies
                     }
                 }
             }
-            else
-            {
-                Console.WriteLine("Can not delete a dependency that contains a null value");
-            }
+           
         }
 
         /// <summary>

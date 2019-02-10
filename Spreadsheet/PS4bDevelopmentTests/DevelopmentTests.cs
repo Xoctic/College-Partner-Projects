@@ -39,5 +39,147 @@ namespace PS4DevelopmentTests
             Assert.AreEqual(2, new List<string>(d2.GetDependents("d")).Count);
             Assert.AreEqual(1, new List<string>(d2.GetDependents("a")).Count);
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullCopy()
+        {
+            DependencyGraph d1 = new DependencyGraph(null);
+        }
+
+        [TestMethod]
+        public void noDependents()
+        {
+            DependencyGraph d1 = new DependencyGraph();
+            Assert.IsFalse(d1.HasDependents("d"));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullSearchHasDependents()
+        {
+            DependencyGraph d1 = new DependencyGraph();
+            d1.HasDependents(null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullSearchHasDependees()
+        {
+            DependencyGraph d1 = new DependencyGraph();
+            d1.HasDependees(null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullGetDependents()
+        {
+            DependencyGraph d1 = new DependencyGraph();
+            d1.GetDependents(null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullGetDependees()
+        {
+            DependencyGraph d1 = new DependencyGraph();
+            d1.GetDependees(null);
+        }
+
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullAddDependency()
+        {
+            DependencyGraph d1 = new DependencyGraph();
+            d1.AddDependency(null, "5");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullRemoveDependency1()
+        {
+            DependencyGraph d1 = new DependencyGraph();
+            d1.RemoveDependency(null, "5");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullRemoveDependency2()
+        {
+            DependencyGraph d1 = new DependencyGraph();
+            d1.RemoveDependency("5", null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullReplaceDents1()
+        {
+            DependencyGraph d1 = new DependencyGraph();
+            d1.ReplaceDependents(null, new HashSet<string>());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullReplaceDents2()
+        {
+            DependencyGraph d1 = new DependencyGraph();
+            d1.ReplaceDependents("5", null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullReplaceDents3()
+        {
+            DependencyGraph d1 = new DependencyGraph();
+            d1.AddDependency("a", "b");
+            d1.AddDependency("a", "c");
+            d1.AddDependency("a", "d");
+
+            HashSet<string> set = new HashSet<string>();
+            set.Add("yo");
+            set.Add("mama");
+            set.Add(null);
+
+            d1.ReplaceDependents("a", set);
+
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullReplaceDees1()
+        {
+            DependencyGraph d1 = new DependencyGraph();
+            d1.ReplaceDependees(null, new HashSet<string>());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullReplaceDees2()
+        {
+            DependencyGraph d1 = new DependencyGraph();
+            d1.ReplaceDependees("4", null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void nullReplaceDees3()
+        {
+            DependencyGraph d1 = new DependencyGraph();
+            d1.AddDependency("b", "a");
+            d1.AddDependency("c", "a");
+            d1.AddDependency("d", "a");
+
+            HashSet<string> set = new HashSet<string>();
+            set.Add("yo");
+            set.Add("granny");
+            set.Add(null);
+
+            d1.ReplaceDependees("a", set);
+
+        }
+
+         
+
     }
 }
