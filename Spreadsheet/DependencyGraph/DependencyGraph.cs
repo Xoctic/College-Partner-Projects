@@ -52,10 +52,7 @@ namespace Dependencies
         private Dictionary<string, HashSet<string>> dependants;
         private int num = 0;
 
-        public struct copy
-        {
-            public HashSet<string> dentss { get; set; }
-        }
+      
 
         /// <summary>
         /// Creates a DependencyGraph containing no dependencies.
@@ -66,6 +63,9 @@ namespace Dependencies
             dependants = new Dictionary<string, HashSet<string>>();
         }
 
+        //Creates a dependencyGraph copied from another dependencyGraph passed in as a parameter
+        //Ensures that the new dependency graph is not linked to the original
+        //Ie: if something changes in one dependencyGraph, then the other dependencyGraph is not affected
         public DependencyGraph(DependencyGraph d1)
         {
             if(d1 == null)
