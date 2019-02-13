@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BAF269F6-6B3D-4319-AAD5-B163DE642AE2}</ProjectGuid>
+    <ProjectGuid>{70DDE581-A43E-46C8-8639-38603015654E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PS4GradingTests</RootNamespace>
