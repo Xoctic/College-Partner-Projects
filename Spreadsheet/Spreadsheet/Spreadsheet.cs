@@ -4,13 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Formulas;
+using Dependencies;
+using static SS.cell;
 
 namespace SS
 {
     public class Spreadsheet : AbstractSpreadsheet
     {
         Dictionary<string, cell> cells = new Dictionary<string, cell>();
-        
+        DependencyGraph dependencies = new DependencyGraph(); 
         
         public Spreadsheet()
         {
@@ -46,6 +48,8 @@ namespace SS
             }
 
             
+             
+
         }
 
         /// <summary>
@@ -88,10 +92,34 @@ namespace SS
                 throw new InvalidNameException();
             }
 
-            //Not sure how to do the dependency part
+            cell newCell = new cell();
+
+            newCell.content = number;
+
+            cells.Add(name, newCell);
+
+            object value = cells[name].value;
+
+            cells[name] = new cell(number, value);
+
+            IEnumerable<string> tempDents;
+
+            HashSet<string> dents = new HashSet<string>();
+
+            tempDents = dependencies.GetDependents(name);
+
+            dents.Add(name);
+
+            foreach(string el in tempDents)
+            {
+                dents.Add(el);
+            }
 
 
-            throw new NotImplementedException();
+
+
+
+            return dents;
         }
 
         /// <summary>
@@ -125,6 +153,8 @@ namespace SS
 
         public override ISet<string> SetCellContents(string name, Formula formula)
         {
+
+
             throw new NotImplementedException();
         }
 
