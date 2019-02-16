@@ -286,36 +286,19 @@ namespace SS
 
             Formula f;
 
-            if(cells[name].content == typeof(Formula))
+            directDependents.Add(name);
+
+            foreach(KeyValuePair<string, cell> pair in cells)
             {
-                f = (Formula)cells[name].content;
-
-                foreach(string el in f.GetVariables())
+                if(pair.Value.content == typeof(Formula))
                 {
-                    if(el == name)
+                    f = (Formula)pair.Value.content;
+                    foreach(string el in f.GetVariables())
                     {
-                        throw new CircularException();
-                    }
-
-
-                    directDependents.Add(el);
-                }
-            }
-
-            foreach(string el in directDependents)
-            {
-                if(cells[el].content == typeof(Formula))
-                {
-                    f = (Formula)cells[el].content;
-
-                    foreach(string e in f.GetVariables())
-                    {
-                        if(e == name)
+                        if(el == name)
                         {
-                            throw new CircularException();
+                            directDependents.Add(pair.Key);
                         }
-
-                        directDependents.Add(e);
                     }
                 }
             }
