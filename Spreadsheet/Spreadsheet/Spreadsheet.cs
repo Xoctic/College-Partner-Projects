@@ -6,17 +6,21 @@ using System.Threading.Tasks;
 using Formulas;
 using Dependencies;
 using static SS.cell;
+using System.Text.RegularExpressions;
 
 namespace SS
 {
     public class Spreadsheet : AbstractSpreadsheet
     {
-        Dictionary<string, cell> cells = new Dictionary<string, cell>();
-        DependencyGraph dependencies = new DependencyGraph(); 
+        Dictionary<string, cell> cells;
+        DependencyGraph dependencies;
+
+        
         
         public Spreadsheet()
         {
-            
+            cells = new Dictionary<string, cell>();
+            dependencies = new DependencyGraph();
         }
 
         /// <summary>
@@ -31,10 +35,18 @@ namespace SS
             {
                 throw new InvalidNameException();
             }
-            else if(!cells.ContainsKey(name))
+            //Change to validate the name
+            else if(!validName(name))
             {
                 throw new InvalidNameException();
             }
+            //
+            else if(!cells.ContainsKey(name))
+            {
+                return "";
+            }
+
+            //return cells[name].content;
 
             Type t = cells[name].content.GetType();
 
@@ -45,10 +57,7 @@ namespace SS
             else
             {
                 return new Exception("oops"); 
-            }
-
-            
-             
+            } 
 
         }
 
@@ -87,20 +96,20 @@ namespace SS
             {
                 throw new InvalidNameException();
             }
-            else if(!cells.ContainsKey(name))
+            //Use validator
+            else if(!validName(name))
             {
                 throw new InvalidNameException();
             }
+            //
 
-            cell newCell = new cell();
+            cell tempCell = new cell();
 
-            newCell.content = number;
+            tempCell.content = number;
 
-            cells.Add(name, newCell);
+            cells.Remove(name);
 
-            object value = cells[name].value;
-
-            cells[name] = new cell(number, value);
+            cells.Add(name, tempCell);
 
             IEnumerable<string> tempDents;
 
@@ -110,14 +119,10 @@ namespace SS
 
             dents.Add(name);
 
-            foreach(string el in tempDents)
+            foreach (string el in tempDents)
             {
                 dents.Add(el);
             }
-
-
-
-
 
             return dents;
         }
@@ -136,31 +141,158 @@ namespace SS
         /// </summary>
         public override ISet<string> SetCellContents(string name, string text)
         {
-            HashSet<string> nameNDependants = new HashSet<string>();
+           
             if(text == null)
             {
                 throw new ArgumentNullException();
             }
-            else if(name == null || !(cells.ContainsKey(name)))
+            else if(name == null)
+            {
+                throw new InvalidNameException();
+            }
+            //Use validator here
+            else if(!validName(name))
+            {
+                throw new InvalidNameException();
+            }
+            //
+
+            cell tempCell = new cell();
+            tempCell.content = text;
+
+            cells.Remove(name);
+
+            cells.Add(name, tempCell);
+
+            IEnumerable<string> tempDents;
+
+            HashSet<string> dents = new HashSet<string>();
+
+            tempDents = dependencies.GetDependents(name);
+
+            dents.Add(name);
+
+            foreach (string el in tempDents)
+            {
+                dents.Add(el);
+            }
+
+            return dents;
+
+        }
+
+
+        /// <summary>
+        /// Requires that all of the variables in formula are valid cell names.
+        /// 
+        /// If name is null or invalid, throws an InvalidNameException.
+        /// 
+        /// Otherwise, if changing the contents of the named cell to be the formula would cause a 
+        /// circular dependency, throws a CircularException.
+        /// 
+        /// Otherwise, the contents of the named cell becomes formula.  The method returns a
+        /// Set consisting of name plus the names of all other cells whose value depends,
+        /// directly or indirectly, on the named cell.
+        /// 
+        /// For example, if name is A1, B1 contains A1*2, and C1 contains B1+A1, the
+        /// set {A1, B1, C1} is returned.
+        /// </summary>
+        public override ISet<string> SetCellContents(string name, Formula formula)
+        {
+            if(name == null)
+            {
+                throw new InvalidNameException();
+            }
+            else if(!validName(name))
+            {
+                throw new InvalidNameException();
+            }
+            else if(!validFormula(name, formula))
+            {
+                throw new CircularException();
+            }
+
+            cell tempCell = new cell();
+
+            tempCell.content = formula;
+
+            cells[name] = tempCell;
+
+            IEnumerable<string> tempDents;
+
+            HashSet<string> dents = new HashSet<string>();
+
+            dents.Add(name);
+
+            tempDents = dependencies.GetDependents(name);
+
+            foreach(string el in tempDents)
+            {
+                dents.Add(el);
+            }
+
+            return dents;
+        }
+
+        /// <summary>
+        /// If name is null, throws an ArgumentNullException.
+        /// 
+        /// Otherwise, if name isn't a valid cell name, throws an InvalidNameException.
+        /// 
+        /// Otherwise, returns an enumeration, without duplicates, of the names of all cells whose
+        /// values depend directly on the value of the named cell.  In other words, returns
+        /// an enumeration, without duplicates, of the names of all cells that contain
+        /// formulas containing name.
+        /// 
+        /// For example, suppose that
+        /// A1 contains 3
+        /// B1 contains the formula A1 * A1
+        /// C1 contains the formula B1 + A1
+        /// D1 contains the formula B1 - C1
+        /// The direct dependents of A1 are B1 and C1
+        /// </summary>
+        protected override IEnumerable<string> GetDirectDependents(string name)
+        {
+            if(name == null)
+            {
+                throw new ArgumentNullException();
+            }
+            else if(!validName(name))
             {
                 throw new InvalidNameException();
             }
 
-            return nameNDependants;
 
-            
-        }
-
-        public override ISet<string> SetCellContents(string name, Formula formula)
-        {
 
 
             throw new NotImplementedException();
         }
 
-        protected override IEnumerable<string> GetDirectDependents(string name)
+
+        private bool validFormula(string name, Formula _formula)
         {
-            throw new NotImplementedException();
+            String formula = _formula.ToString();
+            Regex nameRegex = new Regex(name);
+            Match nameMatch = nameRegex.Match(formula);
+
+            if(nameMatch.Success)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+
+
+        private bool validName(String name)
+        {
+            //string namePattern = "([a-z]?[A-Z])*[0-9]*";
+            string namePattern = "[a-zA-Z]*[0-9]*";
+
+            Regex nameRegex = new Regex(namePattern);
+
+            return nameRegex.IsMatch(name);
         }
     }
 }
