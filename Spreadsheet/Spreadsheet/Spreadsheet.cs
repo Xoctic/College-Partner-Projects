@@ -30,7 +30,7 @@ namespace SS
         /// value should be either a string, a double, or a Formula.
         /// </summary>
         public override object GetCellContents(string name)
-        {
+        {  
             if(name == null)
             {
                 throw new InvalidNameException();
@@ -207,16 +207,28 @@ namespace SS
             {
                 throw new InvalidNameException();
             }
-            else if(!validFormula(name, formula))
-            {
-                throw new CircularException();
-            }
+            
 
             cell tempCell = new cell();
 
             tempCell.content = formula;
 
-            cells[name] = tempCell;
+            
+
+            foreach (string el in formula.GetVariables())
+            {
+                dependencies.AddDependency(el, name);
+            }
+
+              
+            foreach(string el in GetDirectDependents(name))
+            {
+                GetCellsToRecalculate(el);
+            }
+            
+
+            
+            
 
             IEnumerable<string> tempDents;
 
@@ -261,11 +273,57 @@ namespace SS
             {
                 throw new InvalidNameException();
             }
+            else if(!cells.ContainsKey(name))
+            {
+                return new HashSet<string>();
+            }
+            else if(cells[name].content == name)
+            {
+                throw new CircularException();
+            }
+
+            ISet<string> directDependents = new HashSet<string>();
+
+            Formula f;
+
+            if(cells[name].content == typeof(Formula))
+            {
+                f = (Formula)cells[name].content;
+
+                foreach(string el in f.GetVariables())
+                {
+                    if(el == name)
+                    {
+                        throw new CircularException();
+                    }
 
 
+                    directDependents.Add(el);
+                }
+            }
+
+            foreach(string el in directDependents)
+            {
+                if(cells[el].content == typeof(Formula))
+                {
+                    f = (Formula)cells[el].content;
+
+                    foreach(string e in f.GetVariables())
+                    {
+                        if(e == name)
+                        {
+                            throw new CircularException();
+                        }
+
+                        directDependents.Add(e);
+                    }
+                }
+            }
 
 
-            throw new NotImplementedException();
+            return directDependents;
+
+
         }
 
 
@@ -285,14 +343,22 @@ namespace SS
 
 
 
-        private bool validName(String name)
+        public bool validName(String name)
         {
             //string namePattern = "([a-z]?[A-Z])*[0-9]*";
-            string namePattern = "[a-zA-Z]*[0-9]*";
+            //string namePattern = "[a-zA-Z][a-zA-Z]*[1-9][0-9]*$";
+            string namePattern = "^([a-z]{1}[a-z]*)?([a-z]{1}[A-Z]*)?([A-Z]{1}[a-z]*)?([A-Z]{1}[A-Z]*)([1-9]{1}[0-9]*)\\z";
 
             Regex nameRegex = new Regex(namePattern);
 
-            return nameRegex.IsMatch(name);
+            Match match = nameRegex.Match(name);
+
+            
+
+            bool check = match.Success;
+
+            return check;
+            
         }
     }
 }

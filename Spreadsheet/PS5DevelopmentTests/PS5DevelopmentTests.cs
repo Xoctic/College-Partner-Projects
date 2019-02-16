@@ -57,5 +57,17 @@ namespace DevelopmentTests
             s.SetCellContents("A1", new Formula("A2"));
             s.SetCellContents("A2", new Formula("A1"));
         }
+
+        [TestMethod()]
+        public void regexNameTest()
+        {
+            Spreadsheet s = new Spreadsheet();
+            Assert.IsFalse(s.validName("A1A"));
+            Assert.IsTrue(s.validName("A1"));
+            Assert.IsTrue(s.validName("AAAAAAA1111111"));
+            Assert.IsFalse(s.validName("AAAAAAAA111111A1111"));
+            Assert.IsFalse(s.validName("AAAaAAA1111a111"));
+            
+        }
     }
 }
