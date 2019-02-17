@@ -207,6 +207,16 @@ namespace SS
             {
                 throw new InvalidNameException();
             }
+
+            foreach(string el in formula.GetVariables())
+            {
+                if(!validName(el))
+                {
+                    throw new InvalidNameException();
+                }
+            }
+
+
             
 
             cell tempCell = new cell();
@@ -225,8 +235,8 @@ namespace SS
             {
                 GetCellsToRecalculate(el);
             }
-            
 
+            cells.Add(name, tempCell);
             
             
 
@@ -305,8 +315,6 @@ namespace SS
 
 
             return directDependents;
-
-
         }
 
 
