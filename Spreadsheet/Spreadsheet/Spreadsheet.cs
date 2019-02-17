@@ -102,8 +102,46 @@ namespace SS
                 throw new InvalidNameException();
             }
             //
-
             cell tempCell = new cell();
+            if (cells.ContainsKey(name))
+            {
+                IEnumerable<string> cellsToRecalculateEnumerator = GetCellsToRecalculate(name);
+                ISet<string> cellsToRecalculate = new HashSet<string>();
+                
+
+                tempCell.content = number;
+
+                cells.Remove(name);
+
+                cells.Add(name, tempCell);
+
+               
+                foreach(string el in cellsToRecalculateEnumerator)
+                {
+                    cellsToRecalculate.Add(el);
+                }
+
+                return cellsToRecalculate;
+            }
+            else
+            {
+                tempCell.content = number;
+
+                cells.Add(name, tempCell);
+
+                return new HashSet<string>();
+            }
+
+
+
+
+
+
+
+
+
+
+            //cell tempCell = new cell();
 
             tempCell.content = number;
 
@@ -156,8 +194,49 @@ namespace SS
                 throw new InvalidNameException();
             }
             //
-
             cell tempCell = new cell();
+            if (cells.ContainsKey(name))
+            {
+                IEnumerable<string> cellsToRecalculateEnumerator = GetCellsToRecalculate(name);
+                ISet<string> cellsToRecalculate = new HashSet<string>();
+
+
+                tempCell.content = text;
+
+                cells.Remove(name);
+
+                cells.Add(name, tempCell);
+
+
+                foreach (string el in cellsToRecalculateEnumerator)
+                {
+                    cellsToRecalculate.Add(el);
+                }
+
+                return cellsToRecalculate;
+            }
+            else
+            {
+                tempCell.content = text;
+
+                cells.Add(name, tempCell);
+
+                return new HashSet<string>();
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //cell tempCell = new cell();
             tempCell.content = text;
 
             cells.Remove(name);
@@ -215,8 +294,22 @@ namespace SS
                     throw new InvalidNameException();
                 }
             }
-
             cell tempCell = new cell();
+
+            if(cells.ContainsKey(name))
+            {
+                
+            }
+
+
+
+
+
+
+
+
+
+            //cell tempCell = new cell();
 
             tempCell.content = formula;
 
