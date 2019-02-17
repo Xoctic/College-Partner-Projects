@@ -295,10 +295,52 @@ namespace SS
                 }
             }
             cell tempCell = new cell();
+            tempCell.content = formula;
+            ISet<string> variables = formula.GetVariables();
+            ISet<string> dependentCells = new HashSet<string>();
+            GetCellsToRecalculate(variables);
+
 
             if(cells.ContainsKey(name))
             {
+                int count = 0;
+                IEnumerable<string> cellsToRecalculateEnumerator = GetCellsToRecalculate(name);
                 
+                foreach(string el in cellsToRecalculateEnumerator)
+                {
+                    if(el != name)
+                    dependencyGraph.RemoveDependency(el, name);
+                }
+
+                foreach(string el in formula.GetVariables())
+                {
+                    if(el != name)
+                    dependencyGraph.AddDependency(el, name);
+                }
+
+                cells[name] = tempCell;
+
+                dependentCells.Add(name);
+
+                foreach(string el in cellsToRecalculateEnumerator)
+                {
+                    dependentCells.Add(el);
+                }
+
+                return dependentCells;
+            }
+            else
+            {
+                foreach(string el in formula.GetVariables())
+                {
+                    dependencyGraph.AddDependency(el, name);
+                }
+
+                cells.Add(name, tempCell);
+
+                dependentCells.Add(name);
+
+                return dependentCells;
             }
 
 
@@ -311,11 +353,11 @@ namespace SS
 
             //cell tempCell = new cell();
 
-            tempCell.content = formula;
+            //tempCell.content = formula;
 
-            ISet<string> variables = formula.GetVariables();
+            //ISet<string> variables = formula.GetVariables();
 
-            GetCellsToRecalculate(variables);
+            //GetCellsToRecalculate(variables);
          
 
             foreach (string el in formula.GetVariables())

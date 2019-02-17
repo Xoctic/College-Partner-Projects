@@ -67,9 +67,7 @@ namespace DevelopmentTests
             s.SetCellContents("A3", new Formula("3"));
             s.SetCellContents("A4", new Formula("A10"));
 
-            s.SetCellContents("A4", new Formula("3"));
-
-
+            s.SetCellContents("A4", new Formula("3"));            
         }
 
 
@@ -82,7 +80,6 @@ namespace DevelopmentTests
             Assert.IsTrue(s.validName("AAAAAAA1111111"));
             Assert.IsFalse(s.validName("AAAAAAAA111111A1111"));
             Assert.IsFalse(s.validName("AAAaAAA1111a111"));
-            
         }
 
 
