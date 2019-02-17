@@ -13,14 +13,14 @@ namespace SS
     public class Spreadsheet : AbstractSpreadsheet
     {
         Dictionary<string, cell> cells;
-        DependencyGraph dependencies;
+        DependencyGraph dependencyGraph;
 
         
         
         public Spreadsheet()
         {
             cells = new Dictionary<string, cell>();
-            dependencies = new DependencyGraph();
+            dependencyGraph = new DependencyGraph();
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace SS
 
             HashSet<string> dents = new HashSet<string>();
 
-            tempDents = dependencies.GetDependents(name);
+            tempDents = dependencyGraph.GetDependents(name);
 
             dents.Add(name);
 
@@ -168,7 +168,7 @@ namespace SS
 
             HashSet<string> dents = new HashSet<string>();
 
-            tempDents = dependencies.GetDependents(name);
+            tempDents = dependencyGraph.GetDependents(name);
 
             dents.Add(name);
 
@@ -216,18 +216,18 @@ namespace SS
                 }
             }
 
-
-            
-
             cell tempCell = new cell();
 
             tempCell.content = formula;
 
-            
+            ISet<string> variables = formula.GetVariables();
+
+            GetCellsToRecalculate(variables);
+         
 
             foreach (string el in formula.GetVariables())
             {
-                dependencies.AddDependency(el, name);
+                dependencyGraph.AddDependency(el, name);
             }
 
               
@@ -237,8 +237,7 @@ namespace SS
             }
 
             cells.Add(name, tempCell);
-            
-            
+           
 
             IEnumerable<string> tempDents;
 
@@ -246,7 +245,7 @@ namespace SS
 
             dents.Add(name);
 
-            tempDents = dependencies.GetDependents(name);
+            tempDents = dependencyGraph.GetDependents(name);
 
             foreach(string el in tempDents)
             {
@@ -343,8 +342,6 @@ namespace SS
             Regex nameRegex = new Regex(namePattern);
 
             Match match = nameRegex.Match(name);
-
-            
 
             bool check = match.Success;
 

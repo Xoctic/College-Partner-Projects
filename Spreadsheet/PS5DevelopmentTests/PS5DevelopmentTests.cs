@@ -59,6 +59,21 @@ namespace DevelopmentTests
         }
 
         [TestMethod()]
+        public void getCellsToRecalculateSingleStringTest()
+        {
+            AbstractSpreadsheet s = new Spreadsheet();
+            s.SetCellContents("A1", new Formula("3"));
+            s.SetCellContents("A2", new Formula("A11"));
+            s.SetCellContents("A3", new Formula("3"));
+            s.SetCellContents("A4", new Formula("A10"));
+
+            s.SetCellContents("A4", new Formula("3"));
+
+
+        }
+
+
+        [TestMethod()]
         public void regexNameTest()
         {
             Spreadsheet s = new Spreadsheet();
@@ -69,5 +84,8 @@ namespace DevelopmentTests
             Assert.IsFalse(s.validName("AAAaAAA1111a111"));
             
         }
+
+
+
     }
 }
