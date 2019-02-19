@@ -67,8 +67,12 @@ namespace DevelopmentTests
             s.SetCellContents("A3", new Formula("3"));
             s.SetCellContents("A4", new Formula("A10"));
 
-            s.SetCellContents("A4", new Formula("3"));            
+            s.SetCellContents("A4", new Formula("3"));
+
+            Assert.IsTrue(s.GetCellContents("A4").ToString() == "3");
         }
+
+
 
 
         [TestMethod()]

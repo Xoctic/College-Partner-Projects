@@ -46,7 +46,7 @@ namespace SS
                 return "";
             }
 
-            //return cells[name].content;
+            
 
             Type t = cells[name].content.GetType();
 
@@ -134,35 +134,6 @@ namespace SS
 
 
 
-
-
-
-
-
-
-
-            //cell tempCell = new cell();
-
-            tempCell.content = number;
-
-            cells.Remove(name);
-
-            cells.Add(name, tempCell);
-
-            IEnumerable<string> tempDents;
-
-            HashSet<string> dents = new HashSet<string>();
-
-            tempDents = dependencyGraph.GetDependents(name);
-
-            dents.Add(name);
-
-            foreach (string el in tempDents)
-            {
-                dents.Add(el);
-            }
-
-            return dents;
         }
 
         /// <summary>
@@ -225,39 +196,6 @@ namespace SS
             }
 
 
-
-
-
-
-
-
-
-
-
-
-
-            //cell tempCell = new cell();
-            tempCell.content = text;
-
-            cells.Remove(name);
-
-            cells.Add(name, tempCell);
-
-            IEnumerable<string> tempDents;
-
-            HashSet<string> dents = new HashSet<string>();
-
-            tempDents = dependencyGraph.GetDependents(name);
-
-            dents.Add(name);
-
-            foreach (string el in tempDents)
-            {
-                dents.Add(el);
-            }
-
-            return dents;
-
         }
 
 
@@ -304,7 +242,7 @@ namespace SS
             if(cells.ContainsKey(name))
             {
                 int count = 0;
-                IEnumerable<string> cellsToRecalculateEnumerator = GetCellsToRecalculate(name);
+                IEnumerable<string> cellsToRecalculateEnumerator = GetCellsToRecalculate(variables);
                 
                 foreach(string el in cellsToRecalculateEnumerator)
                 {
@@ -343,51 +281,6 @@ namespace SS
                 return dependentCells;
             }
 
-
-
-
-
-
-
-
-
-            //cell tempCell = new cell();
-
-            //tempCell.content = formula;
-
-            //ISet<string> variables = formula.GetVariables();
-
-            //GetCellsToRecalculate(variables);
-         
-
-            foreach (string el in formula.GetVariables())
-            {
-                dependencyGraph.AddDependency(el, name);
-            }
-
-              
-            foreach(string el in GetDirectDependents(name))
-            {
-                GetCellsToRecalculate(el);
-            }
-
-            cells.Add(name, tempCell);
-           
-
-            IEnumerable<string> tempDents;
-
-            HashSet<string> dents = new HashSet<string>();
-
-            dents.Add(name);
-
-            tempDents = dependencyGraph.GetDependents(name);
-
-            foreach(string el in tempDents)
-            {
-                dents.Add(el);
-            }
-
-            return dents;
         }
 
         /// <summary>
