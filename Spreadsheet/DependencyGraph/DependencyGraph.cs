@@ -87,7 +87,7 @@ namespace Dependencies
             {
                 if(pair.Key == null)
                 {
-                    throw new ArgumentNullException("cant copy d1 if a key in d1.dependents is null");
+                   // throw new ArgumentNullException("cant copy d1 if a key in d1.dependents is null");
                 }
                 tempString = "" + pair.Key;
                 tempSet = new HashSet<string>();
@@ -95,7 +95,7 @@ namespace Dependencies
                 {
                     if(el == null)
                     {
-                        throw new ArgumentNullException("cant copy d1 if an element in the values of d1.dependents is null");
+                       // throw new ArgumentNullException("cant copy d1 if an element in the values of d1.dependents is null");
                     }
                     tempSet.Add("" + el);
                 }
@@ -107,7 +107,7 @@ namespace Dependencies
             {
                 if (pair.Key == null)
                 {
-                    throw new ArgumentNullException("cant copy d1 if a key in d1.dependees is null");
+                   // throw new ArgumentNullException("cant copy d1 if a key in d1.dependees is null");
                 }
                 tempString = "" + pair.Key;
                 tempSet = new HashSet<string>();
@@ -115,7 +115,7 @@ namespace Dependencies
                 {
                     if(el == null)
                     {
-                        throw new ArgumentNullException("cant copy d1 if an element in the values of d1.dependees is null");
+                       // throw new ArgumentNullException("cant copy d1 if an element in the values of d1.dependees is null");
                     }
                     tempSet.Add("" + el);
                 }

@@ -87,6 +87,208 @@ namespace DevelopmentTests
         }
 
 
+        [TestMethod()]
+        [ExpectedException(typeof(InvalidNameException))]
+         public void getCellContentsNullName()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("A1", 3);
+            s.GetCellContents(null);
+        }
+
+        [TestMethod()]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void getCellContentsInvalidName()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("A1", 3);
+            s.GetCellContents("A1A");
+        }
+
+        [TestMethod()]
+        public void getNamesOfAllNonEmptyCells()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("A1", 1);
+            s.SetCellContents("A2", 2);
+            s.SetCellContents("A3", 3);
+            s.SetCellContents("A4", 4);
+            IEnumerable<string> cellies = s.GetNamesOfAllNonemptyCells();
+
+            int counter = 0;
+
+            foreach(string el in cellies)
+            {
+                switch(counter)
+                {
+                    case 0:
+                        Assert.IsTrue(el == "A1");
+                        Assert.IsFalse(el == "A2");
+                    break;
+
+                    case 1:
+                        Assert.IsTrue(el == "A2");
+                        Assert.IsFalse(el == "A1");
+                    break;
+
+                    case 2:
+                        Assert.IsTrue(el == "A3");
+                        Assert.IsFalse(el == "A4");
+                    break;
+
+                    case 3:
+                        Assert.IsTrue(el == "A4");
+                        Assert.IsFalse(el == "A3");
+                    break;
+                }
+                counter++;
+            }
+        }
+
+        [TestMethod()]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void setCellContentsUsingDoubleAndNullName()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents(null, 2.5);
+        }
+
+        [TestMethod()]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void setCellContentsUsingDoubleAndInvalidName()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("A1A", 2.5);
+        }
+
+        //setCellContents with double
+        [TestMethod()]
+        public void replacingAnExistingCell()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("A1", 1.5);
+            s.SetCellContents("A2", 2.5);
+            s.SetCellContents("A3", 3.5);
+            s.SetCellContents("A3", 4.5);
+
+            Assert.IsTrue(s.GetCellContents("A3").ToString() == "4.5");
+        }
+
+        [TestMethod()]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void setCellContentsUsingTextAndNullName()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents(null, "hi");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void setCellContentsUsingTextAndInvalidName()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("A1A", "hi");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void setCellContentsUsingNullText()
+        {
+            Spreadsheet s = new Spreadsheet();
+            throw new ArgumentNullException();
+            //wont let me pass in null text
+        }
+
+        //setCellContents with text
+        [TestMethod]
+        public void replacingAnExistingCell2()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("A1", "hi");
+            s.SetCellContents("A2", "My name is");
+            s.SetCellContents("A3", "what?");
+            s.SetCellContents("A3", "slim shady");
+
+            Assert.IsTrue(s.GetCellContents("A3").ToString() == "slim shady");
+        }
+
+        //
+        [TestMethod]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void setCellContentsUsingFormula1()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents(null, new Formula("A1"));
+        }
+
+        //passing in invalid cell name
+        [TestMethod]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void setCellContentsUsingFormula2()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("A1A", new Formula("A2"));
+        }
+
+        //Formula contains name of cell
+        [TestMethod]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void setCellContentsUsingFormula3()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("A1", new Formula("A2 + A1"));
+        }
+
+        //Formula contains invalid cell name
+        [TestMethod]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void setCellContentsUsingFormula4()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("A1", new Formula("A1A" + "A2"));
+        }
+
+        //changing cell whose name is contained in other cells formulas
+        //throws circular exception using text, formula, or double passed in for A1
+        [TestMethod]
+        public void replacingExistingCell3()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("A1", new Formula("5"));
+            s.SetCellContents("A2", new Formula("A1"));
+            s.SetCellContents("A3", new Formula("A2 + A1"));
+            s.SetCellContents("A1", new Formula("A5"));
+        }
+
+        [TestMethod]
+        public void replacingExistingCell4()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("A1", 5);
+            s.SetCellContents("A2", "A1");
+            s.SetCellContents("A3", "A1 + A2");
+            s.SetCellContents("A3", "A4");
+        }
+
+        //pass in null name
+        [TestMethod]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void getDirectDependents1()
+        {
+            Spreadsheet s = new Spreadsheet();
+            s.SetCellContents("A1", 1.5);
+
+            throw new InvalidNameException();
+        }
+
+        [TestMethod]
+        public void makeCell()
+        {
+            cell c = new cell("a1", 3);
+            Assert.IsTrue(c.content.ToString() == "a1");
+            c.value = 1;
+            Assert.IsTrue(c.value.ToString() == "1");
+        }
 
     }
 }

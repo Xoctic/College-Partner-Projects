@@ -5,8 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SS
-{
-    
+{  
         public struct cell
         {
             public object content { get; set; }
@@ -17,9 +16,5 @@ namespace SS
                 content = _content;
                 value = _value;
             }
-
-
         }
-
-    
 }

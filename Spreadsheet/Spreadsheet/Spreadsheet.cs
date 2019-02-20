@@ -10,13 +10,15 @@ using System.Text.RegularExpressions;
 
 namespace SS
 {
+    //spreadsheet class that implements the abstract class AbstractSpreadsheet
     public class Spreadsheet : AbstractSpreadsheet
     {
         Dictionary<string, cell> cells;
         DependencyGraph dependencyGraph;
-
-        
-        
+      
+        //constructor which initializes a new dictionary of cells and a new dependency
+        //graph to keep track of the cells which contain formulas of other cells and their 
+        //relationship to one another
         public Spreadsheet()
         {
             cells = new Dictionary<string, cell>();
@@ -31,34 +33,25 @@ namespace SS
         /// </summary>
         public override object GetCellContents(string name)
         {  
+            //Ensures name is not null
             if(name == null)
             {
                 throw new InvalidNameException();
             }
-            //Change to validate the name
+            //Ensures a valid name
             else if(!validName(name))
             {
                 throw new InvalidNameException();
             }
-            //
+            //If the cell name passed in has not been initialized yet, returns an
+            //empty string for its contents
             else if(!cells.ContainsKey(name))
             {
                 return "";
             }
 
-            
 
-            Type t = cells[name].content.GetType();
-
-            if((t == typeof(Formula)) || (t == typeof(string)) || (t == typeof(double)))
-            {
-                return cells[name].content;
-            }
-            else
-            {
-                return new Exception("oops"); 
-            } 
-
+            return cells[name].content;
         }
 
         /// <summary>
@@ -66,8 +59,10 @@ namespace SS
         /// </summary>
         public override IEnumerable<string> GetNamesOfAllNonemptyCells()
         {
+            //initialize a hashSet used to return the names of all nonEmptyCells
             HashSet<string> returner = new HashSet<string>();
 
+            //returns the name of all cells contained in the cells dictionary
             foreach(KeyValuePair<string, cell> cell in cells)
             {
                 if(cell.Value.content != null && cell.Value.content != "")
@@ -92,37 +87,58 @@ namespace SS
         /// </summary>
         public override ISet<string> SetCellContents(string name, double number)
         {
-            if(name == null)
+            //Ensures name is not null and is valid
+            if (name == null)
             {
                 throw new InvalidNameException();
             }
-            //Use validator
             else if(!validName(name))
             {
                 throw new InvalidNameException();
             }
-            //
+
+            //Initialize a temporary cell used to hold the content of the new cell or replacements cell
             cell tempCell = new cell();
+
+            //if the name of the cell passed in already exists in the dictionary, its contents will need to be replaced
+            //and this may affect the values of other cells
+
+            //create an enumerator which traverses through all the cells whos value depends on
+            //the value of the cell being changed
+            //also create a hashSet to contain the names of these cells
+
+            //set the content of the temporary cell to the content
+            //that is to be used for replacing the named cell
+
+            //remove the named cell
+
+            //re-add the named cell using the data from temp cell
+
+            //add all the names of cells that will need to be recalculated to hashSet cellsToRecalculate
+
+            //return the cellsToRecalculate
             if (cells.ContainsKey(name))
-            {
+            { 
                 IEnumerable<string> cellsToRecalculateEnumerator = GetCellsToRecalculate(name);
                 ISet<string> cellsToRecalculate = new HashSet<string>();
                 
-
                 tempCell.content = number;
 
                 cells.Remove(name);
-
+                
                 cells.Add(name, tempCell);
-
                
                 foreach(string el in cellsToRecalculateEnumerator)
                 {
                     cellsToRecalculate.Add(el);
                 }
-
+                
                 return cellsToRecalculate;
             }
+            //if the name of the cell does not exist in the dictionary
+            //add content to temp cell
+            //add to dictionary the name of the cell and the data contained in temp cell
+            //return an empty hashSet as no other cells will have depended on this cell yet
             else
             {
                 tempCell.content = number;
@@ -131,8 +147,6 @@ namespace SS
 
                 return new HashSet<string>();
             }
-
-
 
         }
 
@@ -150,7 +164,8 @@ namespace SS
         /// </summary>
         public override ISet<string> SetCellContents(string name, string text)
         {
-           
+            //Ensures that the text, & name is not null as well that the name is valid
+            //Creates a new temporary cell to hold data of the new cell
             if(text == null)
             {
                 throw new ArgumentNullException();
@@ -159,13 +174,24 @@ namespace SS
             {
                 throw new InvalidNameException();
             }
-            //Use validator here
             else if(!validName(name))
             {
                 throw new InvalidNameException();
             }
-            //
             cell tempCell = new cell();
+
+            //if the cell already exists in the dictionary
+
+            //Create an enumerator which can iterate through the names of all the cells whose value
+            //depends on the named cell. Also create an HashSet to hold all the names of these dependent cells
+
+            //set the content of the temp cell to the text to be used for the content of the new cell
+
+            //remove the named cell from the dictionary
+
+            //re-add the cell to the dictionary with the data contained in tempCell
+
+            //add all the cells that will have to be recalculated into the HashSet and return it
             if (cells.ContainsKey(name))
             {
                 IEnumerable<string> cellsToRecalculateEnumerator = GetCellsToRecalculate(name);
@@ -186,6 +212,13 @@ namespace SS
 
                 return cellsToRecalculate;
             }
+            //if the cell does not exist in the dictionary
+
+            //set the content of the temporary cell to the text
+
+            //add the cell to the dictionary using the data contained in tempCell
+
+            //return an empty hashSet since no other cells depend on it yet
             else
             {
                 tempCell.content = text;
@@ -194,8 +227,6 @@ namespace SS
 
                 return new HashSet<string>();
             }
-
-
         }
 
 
@@ -216,6 +247,8 @@ namespace SS
         /// </summary>
         public override ISet<string> SetCellContents(string name, Formula formula)
         {
+            //Ensures that the name is not null or invalid as well as any name contained
+            //in the formula passed in
             if(name == null)
             {
                 throw new InvalidNameException();
@@ -231,17 +264,49 @@ namespace SS
                 {
                     throw new InvalidNameException();
                 }
+                if(el == name)
+                {
+                    throw new InvalidNameException();
+                }
             }
+
+            //creates a new temporary cell to hold the new formula passed in
+
+            //sets the content of the tempCell to formula
+
+            //creates an ISet of strings which contain the names of all the cells within the formula
+
+            //creates a new HashSet of strings which will contain the names of all the
+            //cells which will need to be recalculated after changing the contents of 
+            //the current cell
+
+            //calls GetCellsToRecalculate to check if a circularException will occur after changing the 
+            //contents of the current cell to the new formula
             cell tempCell = new cell();
             tempCell.content = formula;
             ISet<string> variables = formula.GetVariables();
             ISet<string> dependentCells = new HashSet<string>();
             GetCellsToRecalculate(variables);
 
+            //if the dictionary contains the current cell
 
+            //Create an IEnumerable cellsToRecalculateEnumerator which will contain all the cells that will need to be recalculated
+            //after changing the contents of the current cell
+
+            //Iterate through the cellsToRecalculateEnumerator and remove any dependency which will be affected by
+            //changing the contents of the cell
+
+            //iterate through the variables contained in the new formula and add the name of the cell to their dependencies
+
+            //replace the current cell with tempCell, while keeping the name of the cell
+
+            //add the name of the cell to the HashSet of dependentCells
+
+            //iterate through the cellsToRecalculateEnumerator and add all the cell names to dependentCells
+
+            //return dependent cells
             if(cells.ContainsKey(name))
-            {
-                int count = 0;
+            { 
                 IEnumerable<string> cellsToRecalculateEnumerator = GetCellsToRecalculate(variables);
                 
                 foreach(string el in cellsToRecalculateEnumerator)
@@ -267,6 +332,17 @@ namespace SS
 
                 return dependentCells;
             }
+            //if the dictionary does not contain the name of the current cell
+            
+            //Iterate through the variables contained in the formula passed in and
+            //add the name of the current cell to the dependencis of these variables
+
+            //add the name of the cell and its contents to the dictionary
+
+            //call getCellsToRecalculate using the new variables in the formula to ensure a 
+            //circularException will not occur
+
+            //add the name of the cell to dependentCells and return dependentCells
             else
             {
                 foreach(string el in formula.GetVariables())
@@ -275,6 +351,8 @@ namespace SS
                 }
 
                 cells.Add(name, tempCell);
+
+                GetCellsToRecalculate(variables);
 
                 dependentCells.Add(name);
 
@@ -302,6 +380,13 @@ namespace SS
         /// </summary>
         protected override IEnumerable<string> GetDirectDependents(string name)
         {
+            //ensures name is not null or invalid
+            
+            //if the dictionary does not contain the named cell, return an empty hashSet
+            
+            //if the named cells content is the name of the cell, throw a circularException
+
+            //return the dependents of the named cell
             if(name == null)
             {
                 throw new ArgumentNullException();
@@ -319,52 +404,21 @@ namespace SS
                 throw new CircularException();
             }
 
-            ISet<string> directDependents = new HashSet<string>();
-
-            Formula f;
-
-            directDependents.Add(name);
-
-            foreach(KeyValuePair<string, cell> pair in cells)
-            {
-                if(pair.Value.content == typeof(Formula))
-                {
-                    f = (Formula)pair.Value.content;
-                    foreach(string el in f.GetVariables())
-                    {
-                        if(el == name)
-                        {
-                            directDependents.Add(pair.Key);
-                        }
-                    }
-                }
-            }
-
-
-            return directDependents;
+            return dependencyGraph.GetDependents(name);
         }
 
 
-        private bool validFormula(string name, Formula _formula)
-        {
-            String formula = _formula.ToString();
-            Regex nameRegex = new Regex(name);
-            Match nameMatch = nameRegex.Match(formula);
+        //Ensures the name of the cell passed in is in the correct format
 
-            if(nameMatch.Success)
-            {
-                return false;
-            }
+        //uses a regex which contains the pattern of a cell name
+        //this pattern is one or more letters which are upper or lowercase followed by one number 1-9 followed by
+        //0 or more numbers 1-9
 
-            return true;
-        }
+        //creates a match to determine whether the name of the cell matches the regex pattern
 
-
-
+        //returns true of there is a match and false otherwise
         public bool validName(String name)
         {
-            //string namePattern = "([a-z]?[A-Z])*[0-9]*";
-            //string namePattern = "[a-zA-Z][a-zA-Z]*[1-9][0-9]*$";
             string namePattern = "^([a-z]{1}[a-z]*)?([a-z]{1}[A-Z]*)?([A-Z]{1}[a-z]*)?([A-Z]{1}[A-Z]*)([1-9]{1}[0-9]*)\\z";
 
             Regex nameRegex = new Regex(namePattern);
