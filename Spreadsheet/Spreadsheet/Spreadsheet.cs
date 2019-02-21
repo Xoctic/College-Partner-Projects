@@ -488,6 +488,26 @@ namespace SS
             
         }
 
+        // ADDED FOR PS6
+        /// <summary>
+        /// Writes the contents of this spreadsheet to dest using an XML format.
+        /// The XML elements should be structured as follows:
+        ///
+        /// <spreadsheet IsValid="IsValid regex goes here">
+        ///   <cell name="cell name goes here" contents="cell contents go here"></cell>
+        ///   <cell name="cell name goes here" contents="cell contents go here"></cell>
+        ///   <cell name="cell name goes here" contents="cell contents go here"></cell>
+        /// </spreadsheet>
+        ///
+        /// The value of the IsValid attribute should be IsValid.ToString()
+        /// 
+        /// There should be one cell element for each non-empty cell in the spreadsheet.
+        /// If the cell contains a string, the string (without surrounding double quotes) should be written as the contents.
+        /// If the cell contains a double d, d.ToString() should be written as the contents.
+        /// If the cell contains a Formula f, f.ToString() with "=" prepended should be written as the contents.
+        ///
+        /// If there are any problems writing to dest, the method should throw an IOException.
+        /// </summary>
         public override void Save(TextWriter dest)
         {
             throw new NotImplementedException();
@@ -560,20 +580,65 @@ namespace SS
                 throw new InvalidNameException();
             }
 
+            cell tempCell;
+
             bool isDouble = Double.TryParse(content, out double result);
 
             if(isDouble)
             {
-                cell tempCell = new cell(content, Double.Parse(content));
+                tempCell = new cell(content, Double.Parse(content));
+                cells[name] = tempCell;
             }
             else if(content.Substring(0,1) == "=")
             {
+                //HOW DO I DO THE RIGHT FORMULA INSTANTIATION
+                //CANT MAKE THE CORRECT VALIDATOR
+                //CANT MAKE THE RIGHT NORMALIZER
 
+                string namePattern = "^([a-z]{1}[a-z]*)?([a-z]{1}[A-Z]*)?([A-Z]{1}[a-z]*)?([A-Z]{1}[A-Z]*)([1-9]{1}[0-9]*)\\z";
+                Regex valid = new Regex(namePattern);
+                int lengthOfString = content.Length;
+                string substring = content.Substring(1, lengthOfString - 1);
+                valid.IsMatch(substring.ToUpper());
+
+                Validator isValid = new Validator(validName(substring));
+
+                Formula f;
+                try
+                {
+                    f = new Formula(substring, substring => substring.ToUpper(), new Validator(namePattern));
+                }
+                catch(Exception e)
+                {
+                    throw new FormulaFormatException("Can't parse content into a formula");
+                }
+
+                tempCell = new cell();
+                tempCell.content = f;
+
+                cells[name] = tempCell;
+
+                GetCellsToRecalculate(name);
             }
-            
+            else
+            {
+                tempCell = new cell;
+                tempCell.content = content;
+
+                cells[name] = tempCell;
+            }
 
 
-            throw new NotImplementedException();
+            ISet<string> dents = new HashSet<string>();
+
+            dents.Add(name);
+
+            foreach(string el in dependencyGraph.GetDependents(name))
+            {
+                dents.Add(el);
+            }
+
+            return dents;
         }
     }
 }
