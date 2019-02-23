@@ -659,17 +659,25 @@ namespace SS
         /// </summary>
         public override object GetCellValue(string name)
         {
+            cell TempCell;
             if(name == null || !validName(name))
             {
                 throw new InvalidNameException();
             }
             if(cells.ContainsKey(name))
             {
+                
+                if(cells[name].value == null)
+                {
+                    TempCell = cells[name];
+                    TempCell.value = "";
+                    cells[name] = TempCell;
+                }
                 return cells[name].value;
             }
             else
             {
-                return null;
+                return "";
             }
             
         }
