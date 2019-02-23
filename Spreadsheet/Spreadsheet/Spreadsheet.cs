@@ -21,23 +21,7 @@ namespace SS
         Regex isValid;
         bool changedVariable;
 
-        // ADDED FOR PS6
-        /// <summary>
-        /// True if this spreadsheet has been modified since it was created or saved
-        /// (whichever happened most recently); false otherwise.
-        /// </summary>
-        //if I succesfully change something set CHANGED to true, if saved, set back to false
-        public override bool Changed
-        {
-            get
-            {
-                return changedVariable;
-            }
-            protected set
-            {
-                changedVariable = value;
-            }
-        }
+      
 
         //constructor which initializes a new dictionary of cells and a new dependency
         //graph to keep track of the cells which contain formulas of other cells and their 
@@ -145,15 +129,25 @@ namespace SS
 
         }
 
-        // Display any validation errors.
-        private static void ValidationCallback(object sender, ValidationEventArgs e)
+
+        // ADDED FOR PS6
+        /// <summary>
+        /// True if this spreadsheet has been modified since it was created or saved
+        /// (whichever happened most recently); false otherwise.
+        /// </summary>
+        //if I succesfully change something set CHANGED to true, if saved, set back to false
+        public override bool Changed
         {
-            Console.WriteLine(" *** Validation Error: {0}", e.Message);
+            get
+            {
+                return changedVariable;
+            }
+            protected set
+            {
+                changedVariable = value;
+            }
         }
 
-
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
         /// <summary>
@@ -184,6 +178,90 @@ namespace SS
 
             return cells[name].content;
         }
+       
+    
+
+        // ADDED FOR PS6
+        /// <summary>
+        /// If name is null or invalid, throws an InvalidNameException.
+        ///
+        /// Otherwise, returns the value (as opposed to the contents) of the named cell.  The return
+        /// value should be either a string, a double, or a FormulaError.
+        /// </summary>
+        public override object GetCellValue(string name)
+        {
+            cell TempCell;
+            if (name == null || !validName(name))
+            {
+                throw new InvalidNameException();
+            }
+            if (cells.ContainsKey(name))
+            {
+                if (cells[name].value == null)
+                {
+                    TempCell = cells[name];
+                    TempCell.value = "";
+                    cells[name] = TempCell;
+                }
+                return cells[name].value;
+            }
+            else
+            {
+                return "";
+            }
+
+        }
+
+
+
+        /// <summary>
+        /// If name is null, throws an ArgumentNullException.
+        /// 
+        /// Otherwise, if name isn't a valid cell name, throws an InvalidNameException.
+        /// 
+        /// Otherwise, returns an enumeration, without duplicates, of the names of all cells whose
+        /// values depend directly on the value of the named cell.  In other words, returns
+        /// an enumeration, without duplicates, of the names of all cells that contain
+        /// formulas containing name.
+        /// 
+        /// For example, suppose that
+        /// A1 contains 3
+        /// B1 contains the formula A1 * A1
+        /// C1 contains the formula B1 + A1
+        /// D1 contains the formula B1 - C1
+        /// The direct dependents of A1 are B1 and C1
+        /// </summary>
+        protected override IEnumerable<string> GetDirectDependents(string name)
+        {
+            //ensures name is not null or invalid
+
+            //if the dictionary does not contain the named cell, return an empty hashSet
+
+            //if the named cells content is the name of the cell, throw a circularException
+
+            //return the dependents of the named cell
+            if (name == null)
+            {
+                throw new ArgumentNullException();
+            }
+            else if (!validName(name))
+            {
+                throw new InvalidNameException();
+            }
+            else if (!cells.ContainsKey(name))
+            {
+                return new HashSet<string>();
+            }
+            else if (cells[name].content == name)
+            {
+                throw new CircularException();
+            }
+
+            return dependencyGraph.GetDependents(name);
+        }
+
+
+
 
         /// <summary>
         /// Enumerates the names of all the non-empty cells in the spreadsheet.
@@ -205,6 +283,98 @@ namespace SS
             return returner;
 
         }
+
+
+
+
+        public double looker(string name)
+        {
+            bool tryParse;
+            try
+            {
+                tryParse = Double.TryParse(cells[name].content.ToString(), out double result);
+            }
+            catch (Exception e)
+            {
+                tryParse = false;
+            }
+            if (tryParse == true)
+            {
+                return Double.Parse(cells[name].content.ToString());
+            }
+            else
+            {
+                throw new UndefinedVariableException("no content that is a double");
+            }
+        }
+
+
+
+
+
+        // ADDED FOR PS6
+        /// <summary>
+        /// Writes the contents of this spreadsheet to dest using an XML format.
+        /// The XML elements should be structured as follows:
+        ///
+        /// <spreadsheet IsValid="IsValid regex goes here">
+        ///   <cell name="cell name goes here" contents="cell contents go here"></cell>
+        ///   <cell name="cell name goes here" contents="cell contents go here"></cell>
+        ///   <cell name="cell name goes here" contents="cell contents go here"></cell>
+        /// </spreadsheet>
+        ///
+        /// The value of the IsValid attribute should be IsValid.ToString()
+        /// 
+        /// There should be one cell element for each non-empty cell in the spreadsheet.
+        /// If the cell contains a string, the string (without surrounding double quotes) should be written as the contents.
+        /// If the cell contains a double d, d.ToString() should be written as the contents.
+        /// If the cell contains a Formula f, f.ToString() with "=" prepended should be written as the contents.
+        ///
+        /// If there are any problems writing to dest, the method should throw an IOException.
+        /// </summary>
+        public override void Save(TextWriter dest)
+        {
+            //Console.Write(dest.ToString());
+            try
+            {
+                using (XmlWriter writer = XmlWriter.Create(dest))
+                {
+                    writer.WriteStartDocument();
+                    writer.WriteStartElement("spreadsheet");
+                    writer.WriteAttributeString("IsValid", isValid.ToString());
+                    writer.WriteString(Environment.NewLine);
+                    foreach (KeyValuePair<string, cell> el in cells)
+                    {
+                        writer.WriteString("/t");
+                        writer.WriteStartElement("cell");
+                        writer.WriteAttributeString("name", el.Key.ToString());
+                        if (el.Value.content.GetType() == typeof(Formula))
+                        {
+                            writer.WriteAttributeString("contents", "=" + el.Value.content.ToString());
+                        }
+                        else
+                        {
+                            writer.WriteAttributeString("contents", el.Value.content.ToString());
+                        }
+                        writer.WriteEndElement();
+                        writer.WriteString(Environment.NewLine);
+                    }
+                    writer.WriteEndElement();
+                    //writer.WriteEndElement();
+                    writer.WriteEndDocument();
+                }
+
+            }
+            catch (IOException e)
+            {
+                throw e;
+            }
+
+            Changed = false;
+
+        }
+
+
 
         /// <summary>
         /// If name is null or invalid, throws an InvalidNameException.
@@ -510,178 +680,7 @@ namespace SS
 
         }
 
-        /// <summary>
-        /// If name is null, throws an ArgumentNullException.
-        /// 
-        /// Otherwise, if name isn't a valid cell name, throws an InvalidNameException.
-        /// 
-        /// Otherwise, returns an enumeration, without duplicates, of the names of all cells whose
-        /// values depend directly on the value of the named cell.  In other words, returns
-        /// an enumeration, without duplicates, of the names of all cells that contain
-        /// formulas containing name.
-        /// 
-        /// For example, suppose that
-        /// A1 contains 3
-        /// B1 contains the formula A1 * A1
-        /// C1 contains the formula B1 + A1
-        /// D1 contains the formula B1 - C1
-        /// The direct dependents of A1 are B1 and C1
-        /// </summary>
-        protected override IEnumerable<string> GetDirectDependents(string name)
-        {
-            //ensures name is not null or invalid
 
-            //if the dictionary does not contain the named cell, return an empty hashSet
-
-            //if the named cells content is the name of the cell, throw a circularException
-
-            //return the dependents of the named cell
-            if (name == null)
-            {
-                throw new ArgumentNullException();
-            }
-            else if (!validName(name))
-            {
-                throw new InvalidNameException();
-            }
-            else if (!cells.ContainsKey(name))
-            {
-                return new HashSet<string>();
-            }
-            else if (cells[name].content == name)
-            {
-                throw new CircularException();
-            }
-
-            return dependencyGraph.GetDependents(name);
-        }
-
-
-        //Ensures the name of the cell passed in is in the correct format
-
-        //uses a regex which contains the pattern of a cell name
-        //this pattern is one or more letters which are upper or lowercase followed by one number 1-9 followed by
-        //0 or more numbers 1-9
-
-        //creates a match to determine whether the name of the cell matches the regex pattern
-
-        //returns true of there is a match and false otherwise
-        public bool validName(String name)
-        {
-            string namePattern = "^([a-z]{1}[a-z]*)?([a-z]{1}[A-Z]*)?([A-Z]{1}[a-z]*)?([A-Z]{1}[A-Z]*)([1-9]{1}[0-9]*)\\z";
-
-            Regex nameRegex = new Regex(namePattern);
-
-            Match match = nameRegex.Match(name);
-
-            bool check = match.Success;
-
-            return check;
-
-        }
-
-        public bool validName(string name, Regex r)
-        {
-            Match match = r.Match(name);
-
-            bool check = match.Success;
-
-            return check;
-        }
-
-
-        // ADDED FOR PS6
-        /// <summary>
-        /// Writes the contents of this spreadsheet to dest using an XML format.
-        /// The XML elements should be structured as follows:
-        ///
-        /// <spreadsheet IsValid="IsValid regex goes here">
-        ///   <cell name="cell name goes here" contents="cell contents go here"></cell>
-        ///   <cell name="cell name goes here" contents="cell contents go here"></cell>
-        ///   <cell name="cell name goes here" contents="cell contents go here"></cell>
-        /// </spreadsheet>
-        ///
-        /// The value of the IsValid attribute should be IsValid.ToString()
-        /// 
-        /// There should be one cell element for each non-empty cell in the spreadsheet.
-        /// If the cell contains a string, the string (without surrounding double quotes) should be written as the contents.
-        /// If the cell contains a double d, d.ToString() should be written as the contents.
-        /// If the cell contains a Formula f, f.ToString() with "=" prepended should be written as the contents.
-        ///
-        /// If there are any problems writing to dest, the method should throw an IOException.
-        /// </summary>
-        public override void Save(TextWriter dest)
-        {
-            //Console.Write(dest.ToString());
-            try
-            {
-                using (XmlWriter writer = XmlWriter.Create(dest))
-                {
-                    writer.WriteStartDocument();
-                    writer.WriteStartElement("spreadsheet");
-                    writer.WriteAttributeString("IsValid", isValid.ToString());
-                    writer.WriteString(Environment.NewLine);
-                    foreach (KeyValuePair<string, cell> el in cells)
-                    {
-                        writer.WriteString("/t");
-                        writer.WriteStartElement("cell");
-                        writer.WriteAttributeString("name", el.Key.ToString());
-                        if (el.Value.content.GetType() == typeof(Formula))
-                        {
-                            writer.WriteAttributeString("contents", "=" + el.Value.content.ToString());
-                        }
-                        else
-                        {
-                            writer.WriteAttributeString("contents", el.Value.content.ToString());
-                        }
-                        writer.WriteEndElement();
-                        writer.WriteString(Environment.NewLine);
-                    }
-                    writer.WriteEndElement();
-                    //writer.WriteEndElement();
-                    writer.WriteEndDocument();
-                }
-
-            }
-            catch (IOException e)
-            {
-                throw e;
-            }
-
-            Changed = false;
-
-        }
-
-        // ADDED FOR PS6
-        /// <summary>
-        /// If name is null or invalid, throws an InvalidNameException.
-        ///
-        /// Otherwise, returns the value (as opposed to the contents) of the named cell.  The return
-        /// value should be either a string, a double, or a FormulaError.
-        /// </summary>
-        public override object GetCellValue(string name)
-        {
-            cell TempCell;
-            if (name == null || !validName(name))
-            {
-                throw new InvalidNameException();
-            }
-            if (cells.ContainsKey(name))
-            {
-                if (cells[name].value == null)
-                {
-                    TempCell = cells[name];
-                    TempCell.value = "";
-                    cells[name] = TempCell;
-                }
-                return cells[name].value;
-            }
-            else
-            {
-                return "";
-            }
-
-        }
 
         // ADDED FOR PS6
         /// <summary>
@@ -769,27 +768,46 @@ namespace SS
 
 
 
-
-        public double looker(string name)
+        // Display any validation errors.
+        private static void ValidationCallback(object sender, ValidationEventArgs e)
         {
-            bool tryParse;
-            try
-            {
-                tryParse = Double.TryParse(cells[name].content.ToString(), out double result);
-            }
-            catch (Exception e)
-            {
-                tryParse = false;
-            }
-            if (tryParse == true)
-            {
-                return Double.Parse(cells[name].content.ToString());
-            }
-            else
-            {
-                throw new UndefinedVariableException("no content that is a double");
-            }
+            Console.WriteLine(" *** Validation Error: {0}", e.Message);
         }
+
+
+
+        //Ensures the name of the cell passed in is in the correct format
+
+        //uses a regex which contains the pattern of a cell name
+        //this pattern is one or more letters which are upper or lowercase followed by one number 1-9 followed by
+        //0 or more numbers 1-9
+
+        //creates a match to determine whether the name of the cell matches the regex pattern
+
+        //returns true of there is a match and false otherwise
+        public bool validName(String name)
+        {
+            string namePattern = "^([a-z]{1}[a-z]*)?([a-z]{1}[A-Z]*)?([A-Z]{1}[a-z]*)?([A-Z]{1}[A-Z]*)([1-9]{1}[0-9]*)\\z";
+
+            Regex nameRegex = new Regex(namePattern);
+
+            Match match = nameRegex.Match(name);
+
+            bool check = match.Success;
+
+            return check;
+
+        }
+
+        public bool validName(string name, Regex r)
+        {
+            Match match = r.Match(name);
+
+            bool check = match.Success;
+
+            return check;
+        }
+
 
 
     }
