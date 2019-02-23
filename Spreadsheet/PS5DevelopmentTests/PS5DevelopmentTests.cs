@@ -25,7 +25,7 @@ namespace DevelopmentTests
         public void Test6()
         {
             AbstractSpreadsheet s = new Spreadsheet();
-            s.SetCellContents("Z7", 1.5);
+            s.SetContentsOfCell("Z7", "1.5");
             Assert.AreEqual(1.5, (double)s.GetCellContents("Z7"), 1e-9);
         }
 
@@ -34,7 +34,7 @@ namespace DevelopmentTests
         public void Test10()
         {
             AbstractSpreadsheet s = new Spreadsheet();
-            s.SetCellContents("Z7", "hello");
+            s.SetContentsOfCell("Z7", "hello");
             Assert.AreEqual("hello", s.GetCellContents("Z7"));
         }
 
@@ -43,7 +43,7 @@ namespace DevelopmentTests
         public void Test13()
         {
             AbstractSpreadsheet s = new Spreadsheet();
-            s.SetCellContents("Z7", new Formula("3"));
+            s.SetContentsOfCell("Z7", "=3");
             Formula f = (Formula)s.GetCellContents("Z7");
             Assert.AreEqual(3, f.Evaluate(x => 0), 1e-6);
         }
@@ -54,20 +54,20 @@ namespace DevelopmentTests
         public void Test14()
         {
             AbstractSpreadsheet s = new Spreadsheet();
-            s.SetCellContents("A1", new Formula("A2"));
-            s.SetCellContents("A2", new Formula("A1"));
+            s.SetContentsOfCell("A1", "=A2");
+            s.SetContentsOfCell("A2", "=A1");
         }
 
         [TestMethod()]
         public void getCellsToRecalculateSingleStringTest()
         {
             AbstractSpreadsheet s = new Spreadsheet();
-            s.SetCellContents("A1", new Formula("3"));
-            s.SetCellContents("A2", new Formula("A11"));
-            s.SetCellContents("A3", new Formula("3"));
-            s.SetCellContents("A4", new Formula("A10"));
+            s.SetContentsOfCell("A1", "=3");
+            s.SetContentsOfCell("A2", "=A11");
+            s.SetContentsOfCell("A3", "=3");
+            s.SetContentsOfCell("A4", "=A10");
 
-            s.SetCellContents("A4", new Formula("3"));
+            s.SetContentsOfCell("A4", "=3");
 
             Assert.IsTrue(s.GetCellContents("A4").ToString() == "3");
         }
@@ -92,7 +92,7 @@ namespace DevelopmentTests
          public void getCellContentsNullName()
         {
             Spreadsheet s = new Spreadsheet();
-            s.SetCellContents("A1", 3);
+            s.SetContentsOfCell("A1", "3");
             s.GetCellContents(null);
         }
 
@@ -101,7 +101,7 @@ namespace DevelopmentTests
         public void getCellContentsInvalidName()
         {
             Spreadsheet s = new Spreadsheet();
-            s.SetCellContents("A1", 3);
+            s.SetContentsOfCell("A1", "3");
             s.GetCellContents("A1A");
         }
 
@@ -109,10 +109,10 @@ namespace DevelopmentTests
         public void getNamesOfAllNonEmptyCells()
         {
             Spreadsheet s = new Spreadsheet();
-            s.SetCellContents("A1", 1);
-            s.SetCellContents("A2", 2);
-            s.SetCellContents("A3", 3);
-            s.SetCellContents("A4", 4);
+            s.SetContentsOfCell("A1", "1");
+            s.SetContentsOfCell("A2", "2");
+            s.SetContentsOfCell("A3", "3");
+            s.SetContentsOfCell("A4", "4");
             IEnumerable<string> cellies = s.GetNamesOfAllNonemptyCells();
 
             int counter = 0;
@@ -150,7 +150,7 @@ namespace DevelopmentTests
         public void setCellContentsUsingDoubleAndNullName()
         {
             Spreadsheet s = new Spreadsheet();
-            s.SetCellContents(null, 2.5);
+            s.SetContentsOfCell(null, "2.5");
         }
 
         [TestMethod()]
@@ -158,7 +158,7 @@ namespace DevelopmentTests
         public void setCellContentsUsingDoubleAndInvalidName()
         {
             Spreadsheet s = new Spreadsheet();
-            s.SetCellContents("A1A", 2.5);
+            s.SetContentsOfCell("A1A", "2.5");
         }
 
         //setCellContents with double
@@ -166,10 +166,10 @@ namespace DevelopmentTests
         public void replacingAnExistingCell()
         {
             Spreadsheet s = new Spreadsheet();
-            s.SetCellContents("A1", 1.5);
-            s.SetCellContents("A2", 2.5);
-            s.SetCellContents("A3", 3.5);
-            s.SetCellContents("A3", 4.5);
+            s.SetContentsOfCell("A1", "1.5");
+            s.SetContentsOfCell("A2", "2.5");
+            s.SetContentsOfCell("A3", "3.5");
+            s.SetContentsOfCell("A3", "4.5");
 
             Assert.IsTrue(s.GetCellContents("A3").ToString() == "4.5");
         }
@@ -179,7 +179,7 @@ namespace DevelopmentTests
         public void setCellContentsUsingTextAndNullName()
         {
             Spreadsheet s = new Spreadsheet();
-            s.SetCellContents(null, "hi");
+            s.SetContentsOfCell(null, "hi");
         }
 
         [TestMethod]
@@ -187,7 +187,7 @@ namespace DevelopmentTests
         public void setCellContentsUsingTextAndInvalidName()
         {
             Spreadsheet s = new Spreadsheet();
-            s.SetCellContents("A1A", "hi");
+            s.SetContentsOfCell("A1A", "hi");
         }
 
         [TestMethod]
@@ -204,10 +204,10 @@ namespace DevelopmentTests
         public void replacingAnExistingCell2()
         {
             Spreadsheet s = new Spreadsheet();
-            s.SetCellContents("A1", "hi");
-            s.SetCellContents("A2", "My name is");
-            s.SetCellContents("A3", "what?");
-            s.SetCellContents("A3", "slim shady");
+            s.SetContentsOfCell("A1", "hi");
+            s.SetContentsOfCell("A2", "My name is");
+            s.SetContentsOfCell("A3", "what?");
+            s.SetContentsOfCell("A3", "slim shady");
 
             Assert.IsTrue(s.GetCellContents("A3").ToString() == "slim shady");
         }
@@ -218,7 +218,7 @@ namespace DevelopmentTests
         public void setCellContentsUsingFormula1()
         {
             Spreadsheet s = new Spreadsheet();
-            s.SetCellContents(null, new Formula("A1"));
+            s.SetContentsOfCell(null, "=A1");
         }
 
         //passing in invalid cell name
@@ -227,7 +227,7 @@ namespace DevelopmentTests
         public void setCellContentsUsingFormula2()
         {
             Spreadsheet s = new Spreadsheet();
-            s.SetCellContents("A1A", new Formula("A2"));
+            s.SetContentsOfCell("A1A", "=A2");
         }
 
         //Formula contains name of cell
@@ -236,7 +236,7 @@ namespace DevelopmentTests
         public void setCellContentsUsingFormula3()
         {
             Spreadsheet s = new Spreadsheet();
-            s.SetCellContents("A1", new Formula("A2 + A1"));
+            s.SetContentsOfCell("A1", "=A2 + A1");
         }
 
         //Formula contains invalid cell name
@@ -245,7 +245,7 @@ namespace DevelopmentTests
         public void setCellContentsUsingFormula4()
         {
             Spreadsheet s = new Spreadsheet();
-            s.SetCellContents("A1", new Formula("A1A" + "A2"));
+            s.SetContentsOfCell("A1", "=A1A + A2");
         }
 
         //changing cell whose name is contained in other cells formulas
@@ -254,20 +254,20 @@ namespace DevelopmentTests
         public void replacingExistingCell3()
         {
             Spreadsheet s = new Spreadsheet();
-            s.SetCellContents("A1", new Formula("5"));
-            s.SetCellContents("A2", new Formula("A1"));
-            s.SetCellContents("A3", new Formula("A2 + A1"));
-            s.SetCellContents("A1", new Formula("A5"));
+            s.SetContentsOfCell("A1", "=5");
+            s.SetContentsOfCell("A2", "=A1");
+            s.SetContentsOfCell("A3", "=A2 + A1");
+            s.SetContentsOfCell("A1", "=A5");
         }
 
         [TestMethod]
         public void replacingExistingCell4()
         {
             Spreadsheet s = new Spreadsheet();
-            s.SetCellContents("A1", 5);
-            s.SetCellContents("A2", "A1");
-            s.SetCellContents("A3", "A1 + A2");
-            s.SetCellContents("A3", "A4");
+            s.SetContentsOfCell("A1", "5");
+            s.SetContentsOfCell("A2", "A1");
+            s.SetContentsOfCell("A3", "A1 + A2");
+            s.SetContentsOfCell("A3", "A4");
         }
 
         //pass in null name
@@ -276,7 +276,7 @@ namespace DevelopmentTests
         public void getDirectDependents1()
         {
             Spreadsheet s = new Spreadsheet();
-            s.SetCellContents("A1", 1.5);
+            s.SetContentsOfCell("A1", "1.5");
 
             throw new InvalidNameException();
         }
@@ -284,7 +284,7 @@ namespace DevelopmentTests
         [TestMethod]
         public void makeCell()
         {
-            cell c = new cell("a1", 3);
+            cell c = new cell("a1", 3, typeof(double));
             Assert.IsTrue(c.content.ToString() == "a1");
             c.value = 1;
             Assert.IsTrue(c.value.ToString() == "1");

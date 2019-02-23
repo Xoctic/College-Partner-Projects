@@ -162,6 +162,18 @@ namespace DevelopmentTests
         }
 
         [TestMethod()]
+        public void saver()
+        {
+            AbstractSpreadsheet ss = new Spreadsheet();
+            Set(ss, "A1", "hello");
+            Set(ss, "A2", "5.0");
+            Set(ss, "A3", "4.0");
+            Set(ss, "A4", "= A2 + A3");
+            StringWriter sw = new StringWriter();
+            ss.Save(sw);
+        }
+
+        [TestMethod()]
         public void SaveTest4()
         {
             AbstractSpreadsheet ss = new Spreadsheet();

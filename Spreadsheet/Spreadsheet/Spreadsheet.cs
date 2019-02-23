@@ -8,6 +8,8 @@ using Dependencies;
 using static SS.cell;
 using System.Text.RegularExpressions;
 using System.IO;
+using System.Xml;
+using System.Xml.Schema;
 
 namespace SS
 {
@@ -16,31 +18,46 @@ namespace SS
     {
         Dictionary<string, cell> cells;
         DependencyGraph dependencyGraph;
+        Regex isValid;
+        bool changedVariable;
 
-        public override bool Changed { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
+        // ADDED FOR PS6
+        /// <summary>
+        /// True if this spreadsheet has been modified since it was created or saved
+        /// (whichever happened most recently); false otherwise.
+        /// </summary>
+        //if I succesfully change something set CHANGED to true, if saved, set back to false
+        public override bool Changed
+        {
+            get
+            {
+                return changedVariable;
+            }
+            protected set
+            {
+                changedVariable = value;
+            }
+        }
 
         //constructor which initializes a new dictionary of cells and a new dependency
         //graph to keep track of the cells which contain formulas of other cells and their 
         //relationship to one another
+        //its isValid regular expression accepts every string
         public Spreadsheet()
         {
             cells = new Dictionary<string, cell>();
             dependencyGraph = new DependencyGraph();
+            //CREATE A NEW REGEX THAT ACCEPTS EVERY STRING
+            isValid = new Regex("(/S?/s)*");
         }
 
-        //NEW CONSTRUCTORS
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// Creates an empty Spreadsheet whose IsValid regular expression accepts every string.
-        public Spreadsheet(string d)
-        {
-
-        }
-
-
+        
         /// Creates an empty Spreadsheet whose IsValid regular expression is provided as the parameter
-        public Spreadsheet(Regex isValid)
+        public Spreadsheet(Regex _isValid)
         {
-
+            isValid = _isValid;
+            cells = new Dictionary<string, cell>();
+            dependencyGraph = new DependencyGraph();
         }
 
 
@@ -75,20 +92,75 @@ namespace SS
         /// the new Spreadsheet's IsValid regular expression should be newIsValid.
         public Spreadsheet(TextReader source, Regex newIsValid)
         {
+            XmlSchemaSet sc = new XmlSchemaSet();
+            sc.Add(null, "Spreadsheet.xsd");
+            XmlReaderSettings settings = new XmlReaderSettings();
+            settings.ValidationType = ValidationType.Schema;
+            settings.Schemas = sc;
+            settings.ValidationEventHandler += ValidationCallback;
+
+
+            cells = new Dictionary<string, cell>();
+            dependencyGraph = new DependencyGraph();
+            string name;
+            string contents;
+            Regex oldIsValid;
+
+            isValid = newIsValid;
+
+
+            try
+            {
+                using (XmlReader reader = XmlReader.Create(source))
+                {
+                    while (reader.Read())
+                    {
+                        if (reader.IsStartElement())
+                        {
+                            switch (reader.Name)
+                            {
+                                case "spreadsheet":
+                                    oldIsValid = new Regex(reader["IsValid"]);
+                                    break;
+                                case "cell":
+                                    name = reader["name"];
+                                    contents = reader["contents"];
+                                    SetContentsOfCell(name, contents);
+                                    break;
+
+                            }
+                        }
+                    }
+                }
+            }
+            catch(IOException e)
+            {
+                throw e;
+            }
+
+                isValid = newIsValid;
+
 
         }
 
+        // Display any validation errors.
+        private static void ValidationCallback(object sender, ValidationEventArgs e)
+        {
+            Console.WriteLine(" *** Validation Error: {0}", e.Message);
+        }
+    
 
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-        /// <summary>
-        /// If name is null or invalid, throws an InvalidNameException.
-        /// 
-        /// Otherwise, returns the contents (as opposed to the value) of the named cell.  The return
-        /// value should be either a string, a double, or a Formula.
-        /// </summary>
-        public override object GetCellContents(string name)
+    /// <summary>
+    /// If name is null or invalid, throws an InvalidNameException.
+    /// 
+    /// Otherwise, returns the contents (as opposed to the value) of the named cell.  The return
+    /// value should be either a string, a double, or a Formula.
+    /// </summary>
+    public override object GetCellContents(string name)
         {  
             //Ensures name is not null
             if(name == null)
@@ -180,6 +252,8 @@ namespace SS
                 ISet<string> cellsToRecalculate = new HashSet<string>();
                 
                 tempCell.content = number;
+                tempCell.type = typeof(double);
+                tempCell.value = number;
 
                 cells.Remove(name);
                 
@@ -199,6 +273,7 @@ namespace SS
             else
             {
                 tempCell.content = number;
+                tempCell.type = typeof(double);
 
                 cells.Add(name, tempCell);
 
@@ -236,6 +311,7 @@ namespace SS
                 throw new InvalidNameException();
             }
             cell tempCell = new cell();
+            ISet<string> cellsToRecalculate;
 
             //if the cell already exists in the dictionary
 
@@ -252,10 +328,12 @@ namespace SS
             if (cells.ContainsKey(name))
             {
                 IEnumerable<string> cellsToRecalculateEnumerator = GetCellsToRecalculate(name);
-                ISet<string> cellsToRecalculate = new HashSet<string>();
+                cellsToRecalculate = new HashSet<string>();
 
 
                 tempCell.content = text;
+                tempCell.value = text;
+                tempCell.type = typeof(string);
 
                 cells.Remove(name);
 
@@ -279,10 +357,12 @@ namespace SS
             else
             {
                 tempCell.content = text;
+                tempCell.type = typeof(string);
 
                 cells.Add(name, tempCell);
-
-                return new HashSet<string>();
+                cellsToRecalculate = new HashSet<string>();
+                cellsToRecalculate.Add(name);
+                return cellsToRecalculate;
             }
         }
 
@@ -341,6 +421,16 @@ namespace SS
             //contents of the current cell to the new formula
             cell tempCell = new cell();
             tempCell.content = formula;
+            tempCell.type = typeof(Formula);
+            try
+            {
+                tempCell.value = formula.Evaluate(looker);
+
+            }
+            catch(FormulaEvaluationException e)
+            {
+                tempCell.value = new FormulaError();
+            }
             ISet<string> variables = formula.GetVariables();
             ISet<string> dependentCells = new HashSet<string>();
             GetCellsToRecalculate(variables);
@@ -488,6 +578,16 @@ namespace SS
             
         }
 
+        public bool validName(string name, Regex r)
+        {
+            Match match = r.Match(name);
+
+            bool check = match.Success;
+
+            return check;
+        }
+        
+
         // ADDED FOR PS6
         /// <summary>
         /// Writes the contents of this spreadsheet to dest using an XML format.
@@ -510,7 +610,44 @@ namespace SS
         /// </summary>
         public override void Save(TextWriter dest)
         {
-            throw new NotImplementedException();
+            //Console.Write(dest.ToString());
+            try
+            {
+                using (XmlWriter writer = XmlWriter.Create(dest))
+                {
+                    writer.WriteStartDocument();
+                    writer.WriteStartElement("spreadsheet");
+                    writer.WriteAttributeString("IsValid", isValid.ToString());
+                    writer.WriteString(Environment.NewLine);
+                    foreach (KeyValuePair<string, cell> el in cells)
+                    {
+                        writer.WriteString("/t");
+                        writer.WriteStartElement("cell");
+                        writer.WriteAttributeString("name", el.Key.ToString());
+                        if (el.Value.content.GetType() == typeof(Formula))
+                        {
+                            writer.WriteAttributeString("contents", "=" + el.Value.content.ToString());
+                        }
+                        else
+                        {
+                            writer.WriteAttributeString("contents", el.Value.content.ToString());
+                        }
+                        writer.WriteEndElement();
+                        writer.WriteString(Environment.NewLine);
+                    }
+                    writer.WriteEndElement();
+                    //writer.WriteEndElement();
+                    writer.WriteEndDocument();
+                }
+
+            }
+            catch(IOException e)
+            {
+                throw e;
+            }
+
+            Changed = false;
+            
         }
 
         // ADDED FOR PS6
@@ -532,7 +669,7 @@ namespace SS
             }
             else
             {
-                return 0;
+                return null;
             }
             
         }
@@ -582,63 +719,73 @@ namespace SS
 
             cell tempCell;
 
+            ISet<string> cellsToRecalculate;
+
             bool isDouble = Double.TryParse(content, out double result);
 
             if(isDouble)
             {
-                tempCell = new cell(content, Double.Parse(content));
-                cells[name] = tempCell;
+                cellsToRecalculate = SetCellContents(name, Double.Parse(content));
             }
             else if(content.Substring(0,1) == "=")
-            {
-                //HOW DO I DO THE RIGHT FORMULA INSTANTIATION
-                //CANT MAKE THE CORRECT VALIDATOR
-                //CANT MAKE THE RIGHT NORMALIZER
-
-                string namePattern = "^([a-z]{1}[a-z]*)?([a-z]{1}[A-Z]*)?([A-Z]{1}[a-z]*)?([A-Z]{1}[A-Z]*)([1-9]{1}[0-9]*)\\z";
-                Regex valid = new Regex(namePattern);
+            {   
                 int lengthOfString = content.Length;
-                string substring = content.Substring(1, lengthOfString - 1);
-                valid.IsMatch(substring.ToUpper());
-
-                Validator isValid = new Validator(validName(substring));
+                string substring = content.Substring(1);
 
                 Formula f;
+
                 try
                 {
-                    f = new Formula(substring, substring => substring.ToUpper(), new Validator(namePattern));
+                   f = new Formula(substring, s => s.ToUpper(), s=> isValid.IsMatch(s.ToUpper()));
                 }
+                //catch a specific exception
                 catch(Exception e)
                 {
-                    throw new FormulaFormatException("Can't parse content into a formula");
+                    throw e;
                 }
 
-                tempCell = new cell();
-                tempCell.content = f;
-
-                cells[name] = tempCell;
-
-                GetCellsToRecalculate(name);
+                cellsToRecalculate = SetCellContents(name, f);
             }
             else
             {
-                tempCell = new cell;
-                tempCell.content = content;
-
-                cells[name] = tempCell;
+                
+                cellsToRecalculate = SetCellContents(name, content);
             }
 
+            Changed = true;
 
-            ISet<string> dents = new HashSet<string>();
-
-            dents.Add(name);
-
-            foreach(string el in dependencyGraph.GetDependents(name))
-            {
-                dents.Add(el);
-            }
-
-            return dents;
+            return cellsToRecalculate;
         }
+
+
+
+
+
+        public double looker(string name)
+        {
+            bool tryParse;
+            try
+            {
+                tryParse = Double.TryParse(cells[name].content.ToString(), out double result);
+            }
+            catch(Exception e)
+            {
+                tryParse = false;
+            }
+            if(tryParse == true)
+            {
+                return Double.Parse(cells[name].content.ToString());
+            }
+            else
+            {
+                throw new UndefinedVariableException("no content that is a double");
+            }
+        }
+
+
     }
+
+
+
+    
 }
