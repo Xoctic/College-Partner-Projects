@@ -447,10 +447,10 @@ namespace Formulas
         private static IEnumerable<Token> GetTokens(String formula)
         {
 
-            if(formula == null)
-            {
-                throw new ArgumentNullException("formula passed into GetTokens was null");
-            }
+            //if(formula == null)
+            //{
+            //    throw new ArgumentNullException("formula passed into GetTokens was null");
+            //}
 
             // Patterns for individual tokens.
             String lpPattern = @"\(";

@@ -20,9 +20,7 @@ namespace SS
         DependencyGraph dependencyGraph;
         Regex isValid;
         bool changedVariable;
-
       
-
         //constructor which initializes a new dictionary of cells and a new dependency
         //graph to keep track of the cells which contain formulas of other cells and their 
         //relationship to one another
@@ -35,17 +33,15 @@ namespace SS
             isValid = new Regex("(/S?/s)*");
         }
 
-
         /// Creates an empty Spreadsheet whose IsValid regular expression is provided as the parameter
         public Spreadsheet(Regex _isValid)
         {
-            //string regX = _isValid.ToString();
+            isValid = _isValid;
 
 
             cells = new Dictionary<string, cell>();
             dependencyGraph = new DependencyGraph();
         }
-
 
         /// Creates a Spreadsheet that is a duplicate of the spreadsheet saved in source.
         ///
@@ -76,7 +72,7 @@ namespace SS
         ///
         /// Else, create a Spreadsheet that is a duplicate of the one encoded in source except that
         /// the new Spreadsheet's IsValid regular expression should be newIsValid.
-        public Spreadsheet(TextReader source, Regex newIsValid)
+        public  Spreadsheet(TextReader source, Regex newIsValid)
         {
             XmlSchemaSet sc = new XmlSchemaSet();
             sc.Add(null, "Spreadsheet.xsd");
@@ -85,19 +81,19 @@ namespace SS
             settings.Schemas = sc;
             settings.ValidationEventHandler += ValidationCallback;
 
-
             cells = new Dictionary<string, cell>();
             dependencyGraph = new DependencyGraph();
             string name;
             string contents;
-            Regex oldIsValid;
+            Regex oldIsValid = new Regex("");
+
+
 
             isValid = newIsValid;
 
-
             try
             {
-                using (XmlReader reader = XmlReader.Create(source))
+                using (XmlReader reader = XmlReader.Create(source, settings))
                 {
                     while (reader.Read())
                     {
@@ -106,12 +102,60 @@ namespace SS
                             switch (reader.Name)
                             {
                                 case "spreadsheet":
-                                    oldIsValid = new Regex(reader["IsValid"]);
+                                    try
+                                    {
+                                        oldIsValid = new Regex(reader["IsValid"]);
+                                    }
+                                    catch(Exception e)
+                                    {
+                                        throw new SpreadsheetReadException("IsValid string contained in source is not a valid c# regex");
+                                    }
                                     break;
                                 case "cell":
                                     name = reader["name"];
                                     contents = reader["contents"];
+                                    //if(!oldIsValid.IsMatch(name))
+                                    //{
+                                       // throw new SpreadsheetReadException("old validator failed validation of call name: " + name);
+                                    //}
+                                    //try
+                                    //{
+                                       // Formula f = new Formula(contents, s => s.ToUpper(), s => oldIsValid.IsMatch(s.ToUpper()));
+                                    //}
+                                    //catch(FormulaFormatException e)
+                                    //{
+                                    //    throw new SpreadsheetReadException("formula in contents of cell " + name + " using old validator failed");
+                                    //}
+
+                                    name = name.ToUpper();
+
+                                    if(!newIsValid.IsMatch(name))
+                                    {
+                                        throw new SpreadsheetReadException("new validator failed validation of cell name:" + name);
+                                    }
+                                    //try
+                                    //{
+                                     //   Formula f = new Formula(contents, s => s.ToUpper(), s => newIsValid.IsMatch(s.ToUpper()));
+                                   // }
+                                    //catch (FormulaFormatException e)
+                                    //{
+                                    //    throw new SpreadsheetReadException("formula in contents of cell " + name + " using new validator failed");
+                                    //}
+                                    if (cells.ContainsKey(name))
+                                    {
+                                        throw new SpreadsheetReadException("Oops you got duplicate cells in here");
+                                    }
+
                                     SetContentsOfCell(name, contents);
+
+                                    try
+                                    {
+                                        GetCellsToRecalculate(name);
+                                    }
+                                    catch(CircularException e)
+                                    {
+                                        throw e;
+                                    }
                                     break;
 
                             }
@@ -125,7 +169,6 @@ namespace SS
             }
 
             isValid = newIsValid;
-
 
         }
 
@@ -175,11 +218,9 @@ namespace SS
                 return "";
             }
 
-
             return cells[name].content;
         }
        
-    
 
         // ADDED FOR PS6
         /// <summary>
@@ -197,12 +238,7 @@ namespace SS
             }
             if (cells.ContainsKey(name))
             {
-                if (cells[name].value == null)
-                {
-                    TempCell = cells[name];
-                    TempCell.value = "";
-                    cells[name] = TempCell;
-                }
+                
                 return cells[name].value;
             }
             else
@@ -211,8 +247,6 @@ namespace SS
             }
 
         }
-
-
 
         /// <summary>
         /// If name is null, throws an ArgumentNullException.
@@ -261,8 +295,6 @@ namespace SS
         }
 
 
-
-
         /// <summary>
         /// Enumerates the names of all the non-empty cells in the spreadsheet.
         /// </summary>
@@ -285,8 +317,6 @@ namespace SS
         }
 
 
-
-
         public double looker(string name)
         {
             bool tryParse;
@@ -307,9 +337,6 @@ namespace SS
                 throw new UndefinedVariableException("no content that is a double");
             }
         }
-
-
-
 
 
         // ADDED FOR PS6
@@ -360,7 +387,6 @@ namespace SS
                         writer.WriteString(Environment.NewLine);
                     }
                     writer.WriteEndElement();
-                    //writer.WriteEndElement();
                     writer.WriteEndDocument();
                 }
 
@@ -373,8 +399,6 @@ namespace SS
             Changed = false;
 
         }
-
-
 
         /// <summary>
         /// If name is null or invalid, throws an InvalidNameException.
@@ -389,14 +413,14 @@ namespace SS
         protected override ISet<string> SetCellContents(string name, double number)
         {
             //Ensures name is not null and is valid
-            if (name == null)
-            {
-                throw new InvalidNameException();
-            }
-            else if (!validName(name))
-            {
-                throw new InvalidNameException();
-            }
+           // if (name == null)
+            //{
+            //    throw new InvalidNameException();
+            //}
+           // else if (!validName(name))
+           // {
+            //    throw new InvalidNameException();
+           // }
 
             //Initialize a temporary cell used to hold the content of the new cell or replacements cell
             cell tempCell = new cell();
@@ -446,6 +470,7 @@ namespace SS
             {
                 tempCell.content = number;
                 tempCell.type = typeof(double);
+                tempCell.value = number;
 
                 cells.Add(name, tempCell);
 
@@ -470,18 +495,18 @@ namespace SS
         {
             //Ensures that the text, & name is not null as well that the name is valid
             //Creates a new temporary cell to hold data of the new cell
-            if (text == null)
-            {
-                throw new ArgumentNullException();
-            }
-            else if (name == null)
-            {
-                throw new InvalidNameException();
-            }
-            else if (!validName(name))
-            {
-                throw new InvalidNameException();
-            }
+            //if (text == null)
+            //{
+            //    throw new ArgumentNullException();
+           // }
+           // else if (name == null)
+           // {
+           //     throw new InvalidNameException();
+            //}
+           // else if (!validName(name))
+           // {
+            //    throw new InvalidNameException();
+            //}
             cell tempCell = new cell();
             ISet<string> cellsToRecalculate;
 
@@ -530,6 +555,7 @@ namespace SS
             {
                 tempCell.content = text;
                 tempCell.type = typeof(string);
+                tempCell.value = text;
 
                 cells.Add(name, tempCell);
                 cellsToRecalculate = new HashSet<string>();
@@ -537,7 +563,6 @@ namespace SS
                 return cellsToRecalculate;
             }
         }
-
 
         /// <summary>
         /// Requires that all of the variables in formula are valid cell names.
@@ -558,14 +583,14 @@ namespace SS
         {
             //Ensures that the name is not null or invalid as well as any name contained
             //in the formula passed in
-            if (name == null)
-            {
-                throw new InvalidNameException();
-            }
-            else if (!validName(name))
-            {
-                throw new InvalidNameException();
-            }
+            //if (name == null)
+            //{
+            //    throw new InvalidNameException();
+            //}
+            //else if (!validName(name))
+            //{
+            //    throw new InvalidNameException();
+            //}
 
             foreach (string el in formula.GetVariables())
             {
@@ -680,8 +705,6 @@ namespace SS
 
         }
 
-
-
         // ADDED FOR PS6
         /// <summary>
         /// If content is null, throws an ArgumentNullException.
@@ -720,10 +743,17 @@ namespace SS
             {
                 throw new ArgumentNullException();
             }
-            else if (name == null || !validName(name))
+            else if (name == null)    
             {
                 throw new InvalidNameException();
             }
+            name = name.ToUpper();
+            if(!validName(name) || !isValid.IsMatch(name))
+            {
+                throw new InvalidNameException();
+            }
+
+            
 
             cell tempCell;
 
@@ -744,7 +774,7 @@ namespace SS
 
                 try
                 {
-                    f = new Formula(substring, s => s.ToUpper(), s => isValid.IsMatch(s.ToUpper()));
+                    f = new Formula(substring, s => s.ToUpper(), s => isValid.IsMatch(s));
                 }
                 //catch a specific exception
                 catch (Exception e)
@@ -765,16 +795,12 @@ namespace SS
             return cellsToRecalculate;
         }
 
-
-
-
         // Display any validation errors.
         private static void ValidationCallback(object sender, ValidationEventArgs e)
         {
-            Console.WriteLine(" *** Validation Error: {0}", e.Message);
+            throw new SpreadsheetReadException(e.Message);
+            //Console.WriteLine(" *** Validation Error: {0}", e.Message);
         }
-
-
 
         //Ensures the name of the cell passed in is in the correct format
 
@@ -801,13 +827,8 @@ namespace SS
 
         public bool validName(string name, Regex r)
         {
-            Match match = r.Match(name);
-
-            bool check = match.Success;
-
-            return check;
+            return r.IsMatch(name);
         }
-
 
 
     }

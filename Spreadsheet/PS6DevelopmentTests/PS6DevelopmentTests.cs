@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Xml;
 using System.Threading.Tasks;
+using Formulas;
 
 namespace DevelopmentTests
 {
@@ -161,6 +162,44 @@ namespace DevelopmentTests
             VV(ss, "A1", "hello", "A2", 5.0, "A3", 4.0, "A4", 9.0);
         }
 
+
+
+        [TestMethod()]
+        public void SaveTestSimple()
+        {
+            StringWriter sw = new StringWriter();
+            using (XmlWriter writer = XmlWriter.Create(sw))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("spreadsheet");
+                writer.WriteAttributeString("IsValid", "^.*$");
+
+
+                writer.WriteStartElement("cell");
+                writer.WriteAttributeString("name", "A1");
+                writer.WriteAttributeString("contents", "5.0");
+                writer.WriteEndElement();
+
+                writer.WriteStartElement("cell");
+                writer.WriteAttributeString("name", "A2");
+                writer.WriteAttributeString("contents", "4.0");
+                writer.WriteEndElement();
+
+                writer.WriteStartElement("cell");
+                writer.WriteAttributeString("name", "A3");
+                writer.WriteAttributeString("contents", "= A1 + A2");
+                writer.WriteEndElement();
+
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
+            }
+            AbstractSpreadsheet ss = new Spreadsheet(new StringReader(sw.ToString()), new Regex(""));
+            VV(ss, "A1", 5.0, "A2", 4.0, "A3", 9.0);
+        }
+
+
+
+
         [TestMethod()]
         public void saver()
         {
@@ -217,5 +256,89 @@ namespace DevelopmentTests
                 Assert.AreEqual(4, cellCount);
             }
         }
+
+        //Tests passing in null name
+        [TestMethod()]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void getCellValue1()
+        {
+            AbstractSpreadsheet ss = new Spreadsheet();
+            ss.GetCellValue(null);
+        }
+
+
+        [TestMethod()]
+        [ExpectedException(typeof(InvalidNameException))]
+        public void getCellValue2()
+        {
+            AbstractSpreadsheet ss = new Spreadsheet();
+            ss.GetCellValue("A1A");
+        }
+
+
+        [TestMethod()]
+        public void getNamesOfAllNonEmptyCells()
+        {
+            AbstractSpreadsheet ss = new Spreadsheet();
+            ss.SetContentsOfCell("A1", "5");
+            ss.SetContentsOfCell("A2", "6");
+            ss.SetContentsOfCell("A3", "7");
+
+            IEnumerable<string> enumerator = ss.GetNamesOfAllNonemptyCells();
+            HashSet<string> cells = new HashSet<string>();
+            cells.Add("A1");
+            cells.Add("A2");
+            cells.Add("A3");
+
+            foreach(string el in enumerator)
+            {
+                Assert.IsTrue(cells.Contains(el));
+            }
+            
+        }
+
+        //Testing replacement of contents of a cell that contains text
+        [TestMethod()]
+        public void setContentsOfCell1()
+        {
+            AbstractSpreadsheet ss = new Spreadsheet();
+            ss.SetContentsOfCell("A1", "HI");
+            ss.SetContentsOfCell("A2", "my");
+            ss.SetContentsOfCell("A3", "names");
+            ss.SetContentsOfCell("A4", "yark");
+
+            ss.SetContentsOfCell("A4", "cusion");
+
+            Assert.IsTrue(ss.GetCellContents("A4") == "cusion");
+        }
+
+        [TestMethod()]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void setContentsOfCell2()
+        {
+            AbstractSpreadsheet ss = new Spreadsheet();
+            ss.SetContentsOfCell("A1", null);
+            
+        }
+
+        [TestMethod()]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void setContentsOfCell3()
+        {
+            Spreadsheet ss = new Spreadsheet();
+            ss.SetContentsOfCell("A1", "=A3 + A4A");
+        }
+
+
+        [TestMethod()]
+        public void validName1()
+        {
+            Regex r = new Regex("^([a-z]{1}[a-z]*)?([a-z]{1}[A-Z]*)?([A-Z]{1}[a-z]*)?([A-Z]{1}[A-Z]*)([1-9]{1}[0-9]*)\\z");
+            Spreadsheet ss = new Spreadsheet();
+            Assert.IsTrue(ss.validName("A1", r));
+            Assert.IsFalse(ss.validName("A1A", r));
+        }
+
+
     }
 }
