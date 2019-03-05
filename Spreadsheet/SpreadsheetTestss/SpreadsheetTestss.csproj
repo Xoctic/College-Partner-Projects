@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B796C577-FB69-4EA7-86E9-AD5CE1703346}</ProjectGuid>
+    <ProjectGuid>{B557A135-DF7B-4E9B-A8A6-DE7BD6B85048}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>SpreadsheetTests</RootNamespace>
-    <AssemblyName>SpreadsheetTests</AssemblyName>
+    <RootNamespace>SpreadsheetTestss</RootNamespace>
+    <AssemblyName>SpreadsheetTestss</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -33,7 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -49,16 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Formula\Formula.csproj">
-      <Project>{D43D998C-9797-4CF4-9BB0-6DE22753849A}</Project>
-      <Name>Formula</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Spreadsheet\Spreadsheet.csproj">
-      <Project>{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}</Project>
-      <Name>Spreadsheet</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
