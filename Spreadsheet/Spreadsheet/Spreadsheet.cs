@@ -20,7 +20,7 @@ namespace SS
         DependencyGraph dependencyGraph;
         Regex isValid;
         bool changedVariable;
-      
+
         //constructor which initializes a new dictionary of cells and a new dependency
         //graph to keep track of the cells which contain formulas of other cells and their 
         //relationship to one another
@@ -72,7 +72,7 @@ namespace SS
         ///
         /// Else, create a Spreadsheet that is a duplicate of the one encoded in source except that
         /// the new Spreadsheet's IsValid regular expression should be newIsValid.
-        public  Spreadsheet(TextReader source, Regex newIsValid)
+        public Spreadsheet(TextReader source, Regex newIsValid)
         {
             XmlSchemaSet sc = new XmlSchemaSet();
             sc.Add(null, "Spreadsheet.xsd");
@@ -106,7 +106,7 @@ namespace SS
                                     {
                                         oldIsValid = new Regex(reader["IsValid"]);
                                     }
-                                    catch(Exception e)
+                                    catch (Exception e)
                                     {
                                         throw new SpreadsheetReadException("IsValid string contained in source is not a valid c# regex");
                                     }
@@ -116,11 +116,11 @@ namespace SS
                                     contents = reader["contents"];
                                     //if(!oldIsValid.IsMatch(name))
                                     //{
-                                       // throw new SpreadsheetReadException("old validator failed validation of call name: " + name);
+                                    // throw new SpreadsheetReadException("old validator failed validation of call name: " + name);
                                     //}
                                     //try
                                     //{
-                                       // Formula f = new Formula(contents, s => s.ToUpper(), s => oldIsValid.IsMatch(s.ToUpper()));
+                                    // Formula f = new Formula(contents, s => s.ToUpper(), s => oldIsValid.IsMatch(s.ToUpper()));
                                     //}
                                     //catch(FormulaFormatException e)
                                     //{
@@ -129,14 +129,14 @@ namespace SS
 
                                     name = name.ToUpper();
 
-                                    if(!newIsValid.IsMatch(name))
+                                    if (!newIsValid.IsMatch(name))
                                     {
                                         throw new SpreadsheetReadException("new validator failed validation of cell name:" + name);
                                     }
                                     //try
                                     //{
-                                     //   Formula f = new Formula(contents, s => s.ToUpper(), s => newIsValid.IsMatch(s.ToUpper()));
-                                   // }
+                                    //   Formula f = new Formula(contents, s => s.ToUpper(), s => newIsValid.IsMatch(s.ToUpper()));
+                                    // }
                                     //catch (FormulaFormatException e)
                                     //{
                                     //    throw new SpreadsheetReadException("formula in contents of cell " + name + " using new validator failed");
@@ -152,7 +152,7 @@ namespace SS
                                     {
                                         GetCellsToRecalculate(name);
                                     }
-                                    catch(CircularException e)
+                                    catch (CircularException e)
                                     {
                                         throw e;
                                     }
@@ -191,7 +191,31 @@ namespace SS
             }
         }
 
+        private void ChangeCellContents(string name, object obj)
+        {
+            cell tempCell = new cell();
+            if (cells.ContainsKey(name))
+            {
+                tempCell.content = obj;
+                tempCell.type = obj.GetType();
+                cells[name] = tempCell;
+            }
+            else
+            {
+                tempCell.content = obj;
+                tempCell.type = typeof(double);
+                cells.Add(name, tempCell);
+            }
+        }
 
+        private void ChangeCellValue(string name, object obj)
+        {
+            cell tempCell = new cell();
+            tempCell = cells[name];
+            tempCell.value = obj;
+            cells[name] = tempCell;
+
+        }
 
         /// <summary>
         /// If name is null or invalid, throws an InvalidNameException.
@@ -206,21 +230,25 @@ namespace SS
             {
                 throw new InvalidNameException();
             }
+
+            name = name.ToUpper();
+        
             //Ensures a valid name
-            else if (!validName(name))
+            if (!validName(name))
             {
                 throw new InvalidNameException();
             }
+
             //If the cell name passed in has not been initialized yet, returns an
             //empty string for its contents
-            else if (!cells.ContainsKey(name))
+            if (!(cells.ContainsKey(name)))
             {
                 return "";
             }
 
             return cells[name].content;
         }
-       
+
 
         // ADDED FOR PS6
         /// <summary>
@@ -238,7 +266,7 @@ namespace SS
             }
             if (cells.ContainsKey(name))
             {
-                
+
                 return cells[name].value;
             }
             else
@@ -278,20 +306,17 @@ namespace SS
             {
                 throw new ArgumentNullException();
             }
-            else if (!validName(name))
+            if (!validName(name))
             {
                 throw new InvalidNameException();
             }
-            else if (!cells.ContainsKey(name))
+            HashSet<string> toReturn = new HashSet<string>();
+            foreach(string s in dependencyGraph.GetDependees(name))
             {
-                return new HashSet<string>();
-            }
-            else if (cells[name].content == name)
-            {
-                throw new CircularException();
+                toReturn.Add(s);
             }
 
-            return dependencyGraph.GetDependents(name);
+            return toReturn;
         }
 
 
@@ -304,11 +329,11 @@ namespace SS
             HashSet<string> returner = new HashSet<string>();
 
             //returns the name of all cells contained in the cells dictionary
-            foreach (KeyValuePair<string, cell> cell in cells)
+            foreach (string s in cells.Keys)
             {
-                if (cell.Value.content != null && cell.Value.content != "")
+                if (!((object)cells[s].content == ""))
                 {
-                    returner.Add(cell.Key);
+                    returner.Add(s);
                 }
             }
 
@@ -414,7 +439,6 @@ namespace SS
         {
 
             //Initialize a temporary cell used to hold the content of the new cell or replacements cell
-            cell tempCell = new cell();
 
             //if the name of the cell passed in already exists in the dictionary, its contents will need to be replaced
             //and this may affect the values of other cells
@@ -433,40 +457,19 @@ namespace SS
             //add all the names of cells that will need to be recalculated to hashSet cellsToRecalculate
 
             //return the cellsToRecalculate
-            if (cells.ContainsKey(name))
+
+
+            ISet<string> cellsToRecalculate = new HashSet<string>();
+            cellsToRecalculate.Add(name);
+            ChangeCellContents(name, number);
+            ChangeCellValue(name, number);
+
+            foreach (string el in GetCellsToRecalculate(name))
             {
-                IEnumerable<string> cellsToRecalculateEnumerator = GetCellsToRecalculate(name);
-                ISet<string> cellsToRecalculate = new HashSet<string>();
-
-                tempCell.content = number;
-                tempCell.type = typeof(double);
-                tempCell.value = number;
-
-                cells.Remove(name);
-
-                cells.Add(name, tempCell);
-
-                foreach (string el in cellsToRecalculateEnumerator)
-                {
-                    cellsToRecalculate.Add(el);
-                }
-
-                return cellsToRecalculate;
+                cellsToRecalculate.Add(el);
             }
-            //if the name of the cell does not exist in the dictionary
-            //add content to temp cell
-            //add to dictionary the name of the cell and the data contained in temp cell
-            //return an empty hashSet as no other cells will have depended on this cell yet
-            else
-            {
-                tempCell.content = number;
-                tempCell.type = typeof(double);
-                tempCell.value = number;
 
-                cells.Add(name, tempCell);
-
-                return new HashSet<string>();
-            }
+            return cellsToRecalculate;
 
         }
 
@@ -486,9 +489,8 @@ namespace SS
         {
             //Ensures that the text, & name is not null as well that the name is valid
             //Creates a new temporary cell to hold data of the new cell
-            
-            cell tempCell = new cell();
-            ISet<string> cellsToRecalculate;
+
+            HashSet<string> cellsToRecalculate = new HashSet<string>();
 
             //if the cell already exists in the dictionary
 
@@ -502,46 +504,17 @@ namespace SS
             //re-add the cell to the dictionary with the data contained in tempCell
 
             //add all the cells that will have to be recalculated into the HashSet and return it
-            //if (cells.ContainsKey(name))
-            //{
-                //IEnumerable<string> cellsToRecalculateEnumerator = GetCellsToRecalculate(name);
-                cellsToRecalculate = new HashSet<string>();
-                cellsToRecalculate.Add(name);
+            cellsToRecalculate.Add(name);
+           
+            ChangeCellContents(name, text);
+            ChangeCellValue(name, text);
+            
+            foreach (string el in GetCellsToRecalculate(name))
+            {
+                cellsToRecalculate.Add(el);
+            }
 
-                tempCell.content = text;
-                tempCell.value = text;
-                tempCell.type = typeof(string);
-
-                cells.Remove(name);
-
-                cells.Add(name, tempCell);
-
-
-                foreach (string el in GetCellsToRecalculate(name))
-                {
-                    cellsToRecalculate.Add(el);
-                }
-
-                return cellsToRecalculate;
-          
-            //if the cell does not exist in the dictionary
-
-            //set the content of the temporary cell to the text
-
-            //add the cell to the dictionary using the data contained in tempCell
-
-            //return an empty hashSet since no other cells depend on it yet
-            //else
-            //{
-            //    tempCell.content = text;
-            //    tempCell.type = typeof(string);
-            //    tempCell.value = text;
-
-            //    cells.Add(name, tempCell);
-            //    cellsToRecalculate = new HashSet<string>();
-            //    cellsToRecalculate.Add(name);
-            //    return cellsToRecalculate;
-            //}
+            return cellsToRecalculate;
         }
 
         /// <summary>
@@ -586,21 +559,6 @@ namespace SS
 
             //calls GetCellsToRecalculate to check if a circularException will occur after changing the 
             //contents of the current cell to the new formula
-            cell tempCell = new cell();
-            tempCell.content = formula;
-            tempCell.type = typeof(Formula);
-            try
-            {
-                tempCell.value = formula.Evaluate(looker);
-
-            }
-            catch (FormulaEvaluationException e)
-            {
-                tempCell.value = new FormulaError();
-            }
-            ISet<string> variables = formula.GetVariables();
-            ISet<string> dependentCells = new HashSet<string>();
-            GetCellsToRecalculate(variables);
 
             //if the dictionary contains the current cell
 
@@ -619,59 +577,53 @@ namespace SS
             //iterate through the cellsToRecalculateEnumerator and add all the cell names to dependentCells
 
             //return dependent cells
-            if (cells.ContainsKey(name))
+            HashSet<string> cellsToRecalculate = new HashSet<string>();
+            cellsToRecalculate.Add(name);
+            Double result;
+
+            foreach (string el in formula.GetVariables())
             {
-                IEnumerable<string> cellsToRecalculateEnumerator = GetCellsToRecalculate(variables);
-
-                foreach (string el in cellsToRecalculateEnumerator)
-                {
-                    if (el != name)
-                        dependencyGraph.RemoveDependency(el, name);
-                }
-
-                foreach (string el in formula.GetVariables())
-                {
-                    if (el != name)
-                        dependencyGraph.AddDependency(el, name);
-                }
-
-                cells[name] = tempCell;
-
-                dependentCells.Add(name);
-
-                foreach (string el in cellsToRecalculateEnumerator)
-                {
-                    dependentCells.Add(el);
-                }
-
-                return dependentCells;
+                dependencyGraph.AddDependency(name, el);
             }
-            //if the dictionary does not contain the name of the current cell
 
-            //Iterate through the variables contained in the formula passed in and
-            //add the name of the current cell to the dependencis of these variables
-
-            //add the name of the cell and its contents to the dictionary
-
-            //call getCellsToRecalculate using the new variables in the formula to ensure a 
-            //circularException will not occur
-
-            //add the name of the cell to dependentCells and return dependentCells
-            else
+            try
             {
-                foreach (string el in formula.GetVariables())
-                {
-                    dependencyGraph.AddDependency(el, name);
-                }
-
-                cells.Add(name, tempCell);
-
-                GetCellsToRecalculate(variables);
-
-                dependentCells.Add(name);
-
-                return dependentCells;
+                result = formula.Evaluate(looker);
+                ChangeCellValue(name, result);
             }
+            catch (Exception e)
+            {
+                //ChangeCellValue(name, new FormulaError());
+            }
+
+
+            foreach (string el in GetCellsToRecalculate(name))
+            {
+
+                //try
+                //{
+                //    cell tempCell = new cell();
+                //    Formula f = new Formula(cells[el].content.ToString());
+                //    tempCell.value = f.Evaluate(looker);
+                //    tempCell.content = cells[el].content.ToString();
+                //    tempCell.type = cells[el].type;
+
+                //    cells[el] = tempCell;
+
+
+                //}
+                //catch (FormulaEvaluationException e)
+                //{
+                //    ChangeCellValue(el, new FormulaError());
+                //}
+
+
+                cellsToRecalculate.Add(el);
+            }
+
+            ChangeCellContents(name, formula);
+
+            return cellsToRecalculate;
 
         }
 
@@ -713,29 +665,24 @@ namespace SS
             {
                 throw new ArgumentNullException();
             }
-            else if (name == null)    
+            else if (name == null)
             {
                 throw new InvalidNameException();
             }
             name = name.ToUpper();
-            if(!validName(name) || !isValid.IsMatch(name))
+            if (!validName(name) || !isValid.IsMatch(name))
             {
                 throw new InvalidNameException();
             }
-
-            
-
-            cell tempCell;
-
-            ISet<string> cellsToRecalculate;
+            Changed = true;
 
             bool isDouble = Double.TryParse(content, out double result);
 
             if (isDouble)
             {
-                cellsToRecalculate = SetCellContents(name, Double.Parse(content));
+                return SetCellContents(name, Double.Parse(content));
             }
-            else if (content.Substring(0, 1) == "=")
+            else if (content.Length > 0 && content.Substring(0, 1) == "=")
             {
                 int lengthOfString = content.Length;
                 string substring = content.Substring(1);
@@ -752,17 +699,13 @@ namespace SS
                     throw e;
                 }
 
-                cellsToRecalculate = SetCellContents(name, f);
+                return SetCellContents(name, f);
             }
             else
             {
 
-                cellsToRecalculate = SetCellContents(name, content);
+                return SetCellContents(name, content);
             }
-
-            Changed = true;
-
-            return cellsToRecalculate;
         }
 
         // Display any validation errors.
@@ -799,7 +742,7 @@ namespace SS
         {
             return r.IsMatch(name);
         }
-
+    
 
     }
 

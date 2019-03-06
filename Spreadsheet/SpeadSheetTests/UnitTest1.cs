@@ -1,6 +1,7 @@
 ﻿using System;
 using Formulas;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SS;
 
 namespace SpeadSheetTests
 {
@@ -8,9 +9,15 @@ namespace SpeadSheetTests
     public class UnitTest1
     {
         [TestMethod]
-        public void Formula1()
+        public void lookerTest()
         {
-            Formula f = new Formula("");
+            AbstractSpreadsheet s = new Spreadsheet();
+
+            s.SetContentsOfCell("A1", "100");
+            s.SetContentsOfCell("A2", "=A1+50");
+            Assert.AreEqual(s.GetCellValue("A2"), 150);
+
+            
         }
     }
 }
