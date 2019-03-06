@@ -153,6 +153,14 @@ namespace Formulas
                 {
                     tempText = norm(token.Text);
 
+                    foreach(Token possibleBadToken in GetTokens(tempText))
+                    {
+                        if(possibleBadToken.Type != Var)
+                        {
+                            throw new FormulaFormatException("cant normalize using invalid variable");
+                        }
+                    }
+
                     if(!valid(tempText))
                     {
                         throw new FormulaFormatException("Validation failed");

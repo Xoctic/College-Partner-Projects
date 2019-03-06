@@ -412,15 +412,6 @@ namespace SS
         /// </summary>
         protected override ISet<string> SetCellContents(string name, double number)
         {
-            //Ensures name is not null and is valid
-           // if (name == null)
-            //{
-            //    throw new InvalidNameException();
-            //}
-           // else if (!validName(name))
-           // {
-            //    throw new InvalidNameException();
-           // }
 
             //Initialize a temporary cell used to hold the content of the new cell or replacements cell
             cell tempCell = new cell();
@@ -495,18 +486,7 @@ namespace SS
         {
             //Ensures that the text, & name is not null as well that the name is valid
             //Creates a new temporary cell to hold data of the new cell
-            //if (text == null)
-            //{
-            //    throw new ArgumentNullException();
-           // }
-           // else if (name == null)
-           // {
-           //     throw new InvalidNameException();
-            //}
-           // else if (!validName(name))
-           // {
-            //    throw new InvalidNameException();
-            //}
+            
             cell tempCell = new cell();
             ISet<string> cellsToRecalculate;
 
@@ -522,11 +502,11 @@ namespace SS
             //re-add the cell to the dictionary with the data contained in tempCell
 
             //add all the cells that will have to be recalculated into the HashSet and return it
-            if (cells.ContainsKey(name))
-            {
-                IEnumerable<string> cellsToRecalculateEnumerator = GetCellsToRecalculate(name);
+            //if (cells.ContainsKey(name))
+            //{
+                //IEnumerable<string> cellsToRecalculateEnumerator = GetCellsToRecalculate(name);
                 cellsToRecalculate = new HashSet<string>();
-
+                cellsToRecalculate.Add(name);
 
                 tempCell.content = text;
                 tempCell.value = text;
@@ -537,13 +517,13 @@ namespace SS
                 cells.Add(name, tempCell);
 
 
-                foreach (string el in cellsToRecalculateEnumerator)
+                foreach (string el in GetCellsToRecalculate(name))
                 {
                     cellsToRecalculate.Add(el);
                 }
 
                 return cellsToRecalculate;
-            }
+          
             //if the cell does not exist in the dictionary
 
             //set the content of the temporary cell to the text
@@ -551,17 +531,17 @@ namespace SS
             //add the cell to the dictionary using the data contained in tempCell
 
             //return an empty hashSet since no other cells depend on it yet
-            else
-            {
-                tempCell.content = text;
-                tempCell.type = typeof(string);
-                tempCell.value = text;
+            //else
+            //{
+            //    tempCell.content = text;
+            //    tempCell.type = typeof(string);
+            //    tempCell.value = text;
 
-                cells.Add(name, tempCell);
-                cellsToRecalculate = new HashSet<string>();
-                cellsToRecalculate.Add(name);
-                return cellsToRecalculate;
-            }
+            //    cells.Add(name, tempCell);
+            //    cellsToRecalculate = new HashSet<string>();
+            //    cellsToRecalculate.Add(name);
+            //    return cellsToRecalculate;
+            //}
         }
 
         /// <summary>
@@ -581,16 +561,6 @@ namespace SS
         /// </summary>
         protected override ISet<string> SetCellContents(string name, Formula formula)
         {
-            //Ensures that the name is not null or invalid as well as any name contained
-            //in the formula passed in
-            //if (name == null)
-            //{
-            //    throw new InvalidNameException();
-            //}
-            //else if (!validName(name))
-            //{
-            //    throw new InvalidNameException();
-            //}
 
             foreach (string el in formula.GetVariables())
             {
