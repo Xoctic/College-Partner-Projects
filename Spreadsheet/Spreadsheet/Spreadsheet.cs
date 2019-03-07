@@ -200,6 +200,7 @@ namespace SS
             {
                 tempCell.content = obj;
                 tempCell.type = obj.GetType();
+                
                 cells[name] = tempCell;
             }
             else
@@ -575,6 +576,7 @@ namespace SS
 
             //return dependent cells
             HashSet<string> cellsToRecalculate = new HashSet<string>();
+            
             cellsToRecalculate.Add(name);
             foreach (string el in formula.GetVariables())
             {
