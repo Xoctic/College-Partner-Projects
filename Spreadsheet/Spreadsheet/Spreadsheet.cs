@@ -297,16 +297,6 @@ namespace SS
             //if the dictionary does not contain the named cell, return an empty hashSet
 
             //if the named cells content is the name of the cell, throw a circularException
-
-            //return the dependents of the named cell
-            //if (name == null)
-            //{
-            //    throw new ArgumentNullException();
-            //}
-            //if (!validName(name))
-            //{
-            //    throw new InvalidNameException();
-            //}
             HashSet<string> toReturn = new HashSet<string>();
             foreach(string s in dependencyGraph.GetDependees(name))
             {
@@ -342,23 +332,24 @@ namespace SS
         /// </summary>
         public double looker(string name)
         {
-            bool tryParse;
-            try
-            {
-                tryParse = Double.TryParse(cells[name].content.ToString(), out double result);
-            }
-            catch (Exception e)
-            {
-                tryParse = false;
-            }
-            if (tryParse == true)
-            {
-                return Double.Parse(cells[name].content.ToString());
-            }
-            else
-            {
-                throw new UndefinedVariableException("no content that is a double");
-            }
+            return (double)GetCellValue(name);
+            //bool tryParse;
+            //try
+            //{
+            //    tryParse = Double.TryParse(cells[name].value.ToString(), out double result);
+            //}
+            //catch (Exception e)
+            //{
+            //    tryParse = false;
+            //}
+            //if (tryParse == true)
+            //{
+            //    return Double.Parse(cells[name].value.ToString());
+            //}
+            //else
+            //{
+            //    throw new UndefinedVariableException("no content that is a double");
+            //}
         }
 
 
@@ -462,11 +453,47 @@ namespace SS
             ChangeCellContents(name, number);
             ChangeCellValue(name, number);
 
+            Formula f = new Formula("H");
+            cell tempCell;
+            //string toBeEvaluated;
             foreach (string el in GetCellsToRecalculate(name))
             {
+
+                //if (cells[el].content.GetType() == f.GetType())
+                //{
+                //    tempCell = cells[el];
+                //    f = (Formula)tempCell.content;
+                //    try
+                //    {
+                //        toBeEvaluated = f.ToString();
+                //        foreach (string s in f.GetVariables())
+                //        {
+                //            toBeEvaluated = toBeEvaluated.Replace(s, GetCellValue(s).ToString());
+                //        }
+                //        //f = new Formula(toBeEvaluated);
+                //        ChangeCellValue(el, new Formula(toBeEvaluated).Evaluate(s => 0));
+                //    }
+                //    catch
+                //    {
+                //        ChangeCellValue(el, new FormulaError());
+                //    }
+                //}
+                if (cells[el].content.GetType() == f.GetType())
+                {
+                    tempCell = cells[el];
+                    f = (Formula)tempCell.content;
+                    try
+                    {
+
+                        ChangeCellValue(el, f.Evaluate(looker));
+                    }
+                    catch
+                    {
+                        ChangeCellValue(el, new FormulaError());
+                    }
+                }
                 cellsToRecalculate.Add(el);
             }
-
             return cellsToRecalculate;
 
         }
@@ -506,12 +533,48 @@ namespace SS
            
             ChangeCellContents(name, text);
             ChangeCellValue(name, text);
-            
+
+            Formula f = new Formula("H");
+            cell tempCell;
+            //string toBeEvaluated;
             foreach (string el in GetCellsToRecalculate(name))
             {
+
+                //if (cells[el].content.GetType() == f.GetType())
+                //{
+                //    tempCell = cells[el];
+                //    f = (Formula)tempCell.content;
+                //    try
+                //    {
+                //        toBeEvaluated = f.ToString();
+                //        foreach (string s in f.GetVariables())
+                //        {
+                //            toBeEvaluated = toBeEvaluated.Replace(s, GetCellValue(s).ToString());
+                //        }
+                //        //f = new Formula(toBeEvaluated);
+                //        ChangeCellValue(el, new Formula(toBeEvaluated).Evaluate(s => 0));
+                //    }
+                //    catch
+                //    {
+                //        ChangeCellValue(el, new FormulaError());
+                //    }
+                //}
+                if (cells[el].content.GetType() == f.GetType())
+                {
+                    tempCell = cells[el];
+                    f = (Formula)tempCell.content;
+                    try
+                    {
+
+                        ChangeCellValue(el, f.Evaluate(looker));
+                    }
+                    catch
+                    {
+                        ChangeCellValue(el, new FormulaError());
+                    }
+                }
                 cellsToRecalculate.Add(el);
             }
-
             return cellsToRecalculate;
         }
 
@@ -581,49 +644,51 @@ namespace SS
             ChangeCellContents(name, formula);
             try
             {
-                ChangeCellValue(name, formula.Evaluate(looker));
+                ChangeCellValue(name, formula.Evaluate(s => (double)GetCellValue(s)));
             }
             catch
             {
                 ChangeCellValue(name, new FormulaError());
             }
-            Formula f;
-            //cell tempCell;
+            Formula f = new Formula("H");
+            cell tempCell;
+            //string toBeEvaluated;
             foreach (string el in GetCellsToRecalculate(name))
             {
-                if(cells[el].type == typeof(Formula))
-                {
-                    f = (Formula)cells[el].content;
-                    try
-                    {
-                        ChangeCellValue(el, f.Evaluate(looker));
-                    }
-                    catch
-                    {
-                        ChangeCellValue(name, new FormulaError());
-                    }
-                }
-                //tempCell = cells[el];
 
-                //if (tempCell.content.GetType() == typeof(Formula))
+                //if (cells[el].content.GetType() == f.GetType())
                 //{
+                //    tempCell = cells[el];
                 //    f = (Formula)tempCell.content;
                 //    try
                 //    {
-                //        string toBeEvaluated = f.ToString();
+                //        toBeEvaluated = f.ToString();
                 //        foreach (string s in f.GetVariables())
                 //        {
                 //            toBeEvaluated = toBeEvaluated.Replace(s, GetCellValue(s).ToString());
                 //        }
-                //        f = new Formula(toBeEvaluated);
-                //        ChangeCellValue(el, f.Evaluate(s => 0));
+                //        //f = new Formula(toBeEvaluated);
+                //        ChangeCellValue(el, new Formula(toBeEvaluated).Evaluate(s => 0));
                 //    }
-                //    catch (Exception e)
+                //    catch
                 //    {
                 //        ChangeCellValue(el, new FormulaError());
                 //    }
-
                 //}
+                if (cells[el].content.GetType() == f.GetType())
+                {
+                    tempCell = cells[el];
+                    f = (Formula)tempCell.content;
+                    try
+                    {
+
+                        ChangeCellValue(el, f.Evaluate(looker));
+                    }
+                    catch
+                    {
+                        ChangeCellValue(el, new FormulaError());
+                    }
+                }
                 cellsToRecalculate.Add(el);
             }
             return cellsToRecalculate;

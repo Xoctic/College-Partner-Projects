@@ -374,7 +374,8 @@ namespace ps5GradingTestss
         {
             Test35();
         }
-        [TestMethod, Timeout(3000)]
+        //[TestMethod, Timeout(3000)]
+        [TestMethod]
         public void Test39()
         {
             AbstractSpreadsheet s = new Spreadsheet();
