@@ -582,7 +582,7 @@ namespace SS
             HashSet<string> cellsToRecalculate = new HashSet<string>();
             
             cellsToRecalculate.Add(name);
-            ChangeCellContents(name, formula);
+ 
             Double result;
             foreach (string el in formula.GetVariables())
             {
@@ -597,6 +597,12 @@ namespace SS
             {
                 //ChangeCellValue(name, new FormulaError());
             }
+            foreach (string el in GetCellsToRecalculate(name))
+            {
+
+            }
+            ChangeCellContents(name, formula);
+            Formula f = new Formula("test");
             Formula f;
             foreach (string el in GetCellsToRecalculate(name))
             {
