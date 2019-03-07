@@ -200,6 +200,7 @@ namespace SS
             {
                 tempCell.content = obj;
                 tempCell.type = obj.GetType();
+                
                 cells[name] = tempCell;
             }
             else
@@ -579,6 +580,7 @@ namespace SS
 
             //return dependent cells
             HashSet<string> cellsToRecalculate = new HashSet<string>();
+            
             cellsToRecalculate.Add(name);
             ChangeCellContents(name, formula);
             Double result;
@@ -595,11 +597,11 @@ namespace SS
             {
                 //ChangeCellValue(name, new FormulaError());
             }
-            Formula f = new Formula("test");
+            Formula f;
             foreach (string el in GetCellsToRecalculate(name))
             {
                 cell tempCell = cells[el];
-                if (tempCell.content.GetType() == f.GetType())
+                if (tempCell.content.GetType() == typeof(Formula))
                 {
                     f = (Formula)tempCell.content;
                     try
