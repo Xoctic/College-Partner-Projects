@@ -214,11 +214,7 @@ namespace SS
         /// </summary>
         private void ChangeCellValue(string name, object obj)
         {
-            cell tempCell = new cell();
-            tempCell = cells[name];
-            tempCell.value = obj;
-            cells[name] = tempCell;
-
+            cells[name] = new cell(cells[name].content, obj, obj.GetType());
         }
 
         /// <summary>
@@ -580,35 +576,36 @@ namespace SS
             //return dependent cells
             HashSet<string> cellsToRecalculate = new HashSet<string>();
             cellsToRecalculate.Add(name);
- 
-            Double result;
             foreach (string el in formula.GetVariables())
             {
                 dependencyGraph.AddDependency(name, el);
             }
+            GetCellsToRecalculate(name);
             try
             {
-                result = formula.Evaluate(looker);
-                ChangeCellValue(name, result);
+                ChangeCellValue(name, formula.Evaluate(looker));
             }
             catch (Exception e)
             {
                 //ChangeCellValue(name, new FormulaError());
             }
-            foreach (string el in GetCellsToRecalculate(name))
-            {
-
-            }
             ChangeCellContents(name, formula);
-            Formula f = new Formula("test");
+            Formula f;
+            cell tempCell;
             foreach (string el in GetCellsToRecalculate(name))
             {
-                cell tempCell = cells[el];
-                if (tempCell.content.GetType() == f.GetType())
+                tempCell = cells[el];
+                if (tempCell.content.GetType() == typeof(Formula))
                 {
                     f = (Formula)tempCell.content;
                     try
                     {
+                        //string toBeEvaluated = "";
+                        //foreach(string s in f.GetVariables())
+                        //{
+                        //    if(s)
+                        //    toBeEvaluated += GetCellValue(s);
+                        //}
                         ChangeCellValue(el, f.Evaluate(looker));
                     }
                     catch (Exception e)
@@ -665,7 +662,7 @@ namespace SS
             {
                 throw new InvalidNameException();
             }
-            //name = name.ToUpper();
+            name = name.ToUpper();
             if (!validName(name) || !isValid.IsMatch(name))
             {
                 throw new InvalidNameException();
@@ -722,7 +719,7 @@ namespace SS
         //returns true of there is a match and false otherwise
         public bool validName(String name)
         {
-            string namePattern = "^([a-z]{1}[a-z]*)?([a-z]{1}[A-Z]*)?([A-Z]{1}[a-z]*)?([A-Z]{1}[A-Z]*)([1-9]{1}[0-9]*)\\z";
+            string namePattern = "^([a-zA-Z][a-zA-Z]*[1-9][0-9]*)$"; ;
 
             Regex nameRegex = new Regex(namePattern);
 
