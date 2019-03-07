@@ -603,7 +603,7 @@ namespace SS
             }
             ChangeCellContents(name, formula);
             Formula f = new Formula("test");
-            Formula f;
+           
             foreach (string el in GetCellsToRecalculate(name))
             {
                 cell tempCell = cells[el];
@@ -668,7 +668,7 @@ namespace SS
             {
                 throw new InvalidNameException();
             }
-            //name = name.ToUpper();
+            name = name.ToUpper();
             if (!validName(name) || !isValid.IsMatch(name))
             {
                 throw new InvalidNameException();
