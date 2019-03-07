@@ -322,15 +322,6 @@ namespace DevelopmentTests
         }
 
         [TestMethod()]
-        [ExpectedException(typeof(FormulaFormatException))]
-        public void setContentsOfCell3()
-        {
-            Spreadsheet ss = new Spreadsheet();
-            ss.SetContentsOfCell("A1", "=A3 + A4A");
-        }
-
-
-        [TestMethod()]
         public void validName1()
         {
             Regex r = new Regex("^([a-z]{1}[a-z]*)?([a-z]{1}[A-Z]*)?([A-Z]{1}[a-z]*)?([A-Z]{1}[A-Z]*)([1-9]{1}[0-9]*)\\z");

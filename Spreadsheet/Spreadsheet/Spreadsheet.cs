@@ -190,7 +190,9 @@ namespace SS
                 changedVariable = value;
             }
         }
-
+        /// <summary>
+        /// Helper method to change the contents of the given cell.
+        /// </summary>
         private void ChangeCellContents(string name, object obj)
         {
             cell tempCell = new cell();
@@ -207,7 +209,9 @@ namespace SS
                 cells.Add(name, tempCell);
             }
         }
-
+        /// <summary>
+        /// Helper method to change the value of the given cell.
+        /// </summary>
         private void ChangeCellValue(string name, object obj)
         {
             cell tempCell = new cell();
@@ -229,16 +233,13 @@ namespace SS
             if (name == null)
             {
                 throw new InvalidNameException();
-            }
-
-            name = name.ToUpper();
-        
+            }      
             //Ensures a valid name
             if (!validName(name))
             {
                 throw new InvalidNameException();
             }
-
+            name = name.ToUpper();
             //If the cell name passed in has not been initialized yet, returns an
             //empty string for its contents
             if (!(cells.ContainsKey(name)))
@@ -259,11 +260,11 @@ namespace SS
         /// </summary>
         public override object GetCellValue(string name)
         {
-            cell TempCell;
             if (name == null || !validName(name))
             {
                 throw new InvalidNameException();
             }
+            name = name.ToUpper();
             if (cells.ContainsKey(name))
             {
 
@@ -340,8 +341,9 @@ namespace SS
             return returner;
 
         }
-
-
+        /// <summary>
+        /// 
+        /// </summary>
         public double looker(string name)
         {
             bool tryParse;
@@ -459,7 +461,7 @@ namespace SS
             //return the cellsToRecalculate
 
 
-            ISet<string> cellsToRecalculate = new HashSet<string>();
+            HashSet<string> cellsToRecalculate = new HashSet<string>();
             cellsToRecalculate.Add(name);
             ChangeCellContents(name, number);
             ChangeCellValue(name, number);
@@ -534,7 +536,6 @@ namespace SS
         /// </summary>
         protected override ISet<string> SetCellContents(string name, Formula formula)
         {
-
             foreach (string el in formula.GetVariables())
             {
                 if (!validName(el))
@@ -579,13 +580,12 @@ namespace SS
             //return dependent cells
             HashSet<string> cellsToRecalculate = new HashSet<string>();
             cellsToRecalculate.Add(name);
+            ChangeCellContents(name, formula);
             Double result;
-
             foreach (string el in formula.GetVariables())
             {
                 dependencyGraph.AddDependency(name, el);
             }
-
             try
             {
                 result = formula.Evaluate(looker);
@@ -595,34 +595,25 @@ namespace SS
             {
                 //ChangeCellValue(name, new FormulaError());
             }
-
-
+            Formula f = new Formula("test");
             foreach (string el in GetCellsToRecalculate(name))
             {
+                cell tempCell = cells[el];
+                if (tempCell.content.GetType() == f.GetType())
+                {
+                    f = (Formula)tempCell.content;
+                    try
+                    {
+                        ChangeCellValue(el, f.Evaluate(looker));
+                    }
+                    catch (Exception e)
+                    {
+                        ChangeCellValue(el, new FormulaError());
+                    }
 
-                //try
-                //{
-                //    cell tempCell = new cell();
-                //    Formula f = new Formula(cells[el].content.ToString());
-                //    tempCell.value = f.Evaluate(looker);
-                //    tempCell.content = cells[el].content.ToString();
-                //    tempCell.type = cells[el].type;
-
-                //    cells[el] = tempCell;
-
-
-                //}
-                //catch (FormulaEvaluationException e)
-                //{
-                //    ChangeCellValue(el, new FormulaError());
-                //}
-
-
+                }
                 cellsToRecalculate.Add(el);
             }
-
-            ChangeCellContents(name, formula);
-
             return cellsToRecalculate;
 
         }
@@ -665,16 +656,16 @@ namespace SS
             {
                 throw new ArgumentNullException();
             }
-            else if (name == null)
+            if (name == null)
             {
                 throw new InvalidNameException();
             }
-            name = name.ToUpper();
+            //name = name.ToUpper();
             if (!validName(name) || !isValid.IsMatch(name))
             {
                 throw new InvalidNameException();
             }
-            Changed = true;
+            changedVariable = true;
 
             bool isDouble = Double.TryParse(content, out double result);
 
