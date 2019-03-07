@@ -320,16 +320,5 @@ namespace DevelopmentTests
             ss.SetContentsOfCell("A1", null);
             
         }
-
-        [TestMethod()]
-        public void validName1()
-        {
-            Regex r = new Regex("^([a-z]{1}[a-z]*)?([a-z]{1}[A-Z]*)?([A-Z]{1}[a-z]*)?([A-Z]{1}[A-Z]*)([1-9]{1}[0-9]*)\\z");
-            Spreadsheet ss = new Spreadsheet();
-            Assert.IsTrue(ss.validName("A1", r));
-            Assert.IsFalse(ss.validName("A1A", r));
-        }
-
-
     }
 }

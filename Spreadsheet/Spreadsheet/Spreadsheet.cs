@@ -30,7 +30,7 @@ namespace SS
             cells = new Dictionary<string, cell>();
             dependencyGraph = new DependencyGraph();
             //CREATE A NEW REGEX THAT ACCEPTS EVERY STRING
-            isValid = new Regex("(/S?/s)*");
+            isValid = new Regex("");
         }
 
         /// Creates an empty Spreadsheet whose IsValid regular expression is provided as the parameter
@@ -264,7 +264,6 @@ namespace SS
             name = name.ToUpper();
             if (cells.ContainsKey(name))
             {
-
                 return cells[name].value;
             }
             else
@@ -300,14 +299,14 @@ namespace SS
             //if the named cells content is the name of the cell, throw a circularException
 
             //return the dependents of the named cell
-            if (name == null)
-            {
-                throw new ArgumentNullException();
-            }
-            if (!validName(name))
-            {
-                throw new InvalidNameException();
-            }
+            //if (name == null)
+            //{
+            //    throw new ArgumentNullException();
+            //}
+            //if (!validName(name))
+            //{
+            //    throw new InvalidNameException();
+            //}
             HashSet<string> toReturn = new HashSet<string>();
             foreach(string s in dependencyGraph.GetDependees(name))
             {
@@ -533,18 +532,6 @@ namespace SS
         /// </summary>
         protected override ISet<string> SetCellContents(string name, Formula formula)
         {
-            foreach (string el in formula.GetVariables())
-            {
-                if (!validName(el))
-                {
-                    throw new InvalidNameException();
-                }
-                if (el == name)
-                {
-                    throw new InvalidNameException();
-                }
-            }
-
             //creates a new temporary cell to hold the new formula passed in
 
             //sets the content of the tempCell to formula
@@ -576,49 +563,71 @@ namespace SS
 
             //return dependent cells
             HashSet<string> cellsToRecalculate = new HashSet<string>();
-            
+
             cellsToRecalculate.Add(name);
             foreach (string el in formula.GetVariables())
             {
+                if (!validName(el))
+                {
+                    throw new InvalidNameException();
+                }
+                if (el == name)
+                {
+                    throw new InvalidNameException();
+                }
                 dependencyGraph.AddDependency(name, el);
             }
             GetCellsToRecalculate(name);
+            ChangeCellContents(name, formula);
             try
             {
                 ChangeCellValue(name, formula.Evaluate(looker));
             }
-            catch (Exception e)
+            catch
             {
-                //ChangeCellValue(name, new FormulaError());
+                ChangeCellValue(name, new FormulaError());
             }
-            ChangeCellContents(name, formula);
             Formula f;
-            cell tempCell;
+            //cell tempCell;
             foreach (string el in GetCellsToRecalculate(name))
             {
-                tempCell = cells[el];
-                if (tempCell.content.GetType() == typeof(Formula))
+                if(cells[el].type == typeof(Formula))
                 {
-                    f = (Formula)tempCell.content;
+                    f = (Formula)cells[el].content;
                     try
                     {
-                        //string toBeEvaluated = "";
-                        //foreach(string s in f.GetVariables())
-                        //{
-                        //    if(s)
-                        //    toBeEvaluated += GetCellValue(s);
-                        //}
                         ChangeCellValue(el, f.Evaluate(looker));
                     }
-                    catch (Exception e)
+                    catch
                     {
-                        ChangeCellValue(el, new FormulaError());
+                        ChangeCellValue(name, new FormulaError());
                     }
-
                 }
+                //tempCell = cells[el];
+
+                //if (tempCell.content.GetType() == typeof(Formula))
+                //{
+                //    f = (Formula)tempCell.content;
+                //    try
+                //    {
+                //        string toBeEvaluated = f.ToString();
+                //        foreach (string s in f.GetVariables())
+                //        {
+                //            toBeEvaluated = toBeEvaluated.Replace(s, GetCellValue(s).ToString());
+                //        }
+                //        f = new Formula(toBeEvaluated);
+                //        ChangeCellValue(el, f.Evaluate(s => 0));
+                //    }
+                //    catch (Exception e)
+                //    {
+                //        ChangeCellValue(el, new FormulaError());
+                //    }
+
+                //}
                 cellsToRecalculate.Add(el);
             }
             return cellsToRecalculate;
+
 
         }
 
@@ -721,7 +730,7 @@ namespace SS
         //returns true of there is a match and false otherwise
         public bool validName(String name)
         {
-            string namePattern = "^([a-zA-Z][a-zA-Z]*[1-9][0-9]*)$"; ;
+            string namePattern = "^([a-zA-Z][a-zA-Z]*[1-9][0-9]*)$"; 
 
             Regex nameRegex = new Regex(namePattern);
 
@@ -732,13 +741,6 @@ namespace SS
             return check;
 
         }
-
-        public bool validName(string name, Regex r)
-        {
-            return r.IsMatch(name);
-        }
-    
-
     }
 
 
