@@ -281,14 +281,14 @@ namespace DevelopmentTests
             throw new InvalidNameException();
         }
 
-        [TestMethod]
-        public void makeCell()
-        {
-            cell c = new cell("a1", 3, typeof(double));
-            Assert.IsTrue(c.content.ToString() == "a1");
-            c.value = 1;
-            Assert.IsTrue(c.value.ToString() == "1");
-        }
+        //[TestMethod]
+        //public void makeCell()
+        //{
+        //    cell c = new cell("a1", 3, typeof(double));
+        //    Assert.IsTrue(c.content.ToString() == "a1");
+        //    c.value = 1;
+        //    Assert.IsTrue(c.value.ToString() == "1");
+        //}
 
     }
 }

@@ -195,18 +195,17 @@ namespace SS
         /// </summary>
         private void ChangeCellContents(string name, object obj)
         {
-            cell tempCell = new cell();
+            cell tempCell;
             if (cells.ContainsKey(name))
             {
+                tempCell = cells[name];
                 tempCell.content = obj;
-                tempCell.type = obj.GetType();
-                
                 cells[name] = tempCell;
             }
             else
             {
+                tempCell = new cell();
                 tempCell.content = obj;
-                tempCell.type = typeof(double);
                 cells.Add(name, tempCell);
             }
         }
@@ -215,7 +214,10 @@ namespace SS
         /// </summary>
         private void ChangeCellValue(string name, object obj)
         {
-            cells[name] = new cell(cells[name].content, obj, obj.GetType());
+            cell tempCell = cells[name];
+            tempCell.value = obj;
+            cells[name] = tempCell;
+            
         }
 
         /// <summary>
@@ -230,7 +232,7 @@ namespace SS
             if (name == null)
             {
                 throw new InvalidNameException();
-            }      
+            }
             //Ensures a valid name
             if (!validName(name))
             {
@@ -256,12 +258,7 @@ namespace SS
         /// value should be either a string, a double, or a FormulaError.
         /// </summary>
         public override object GetCellValue(string name)
-        {
-            if (name == null || !validName(name))
-            {
-                throw new InvalidNameException();
-            }
-            name = name.ToUpper();
+        {     
             if (cells.ContainsKey(name))
             {
                 return cells[name].value;
@@ -297,13 +294,8 @@ namespace SS
             //if the dictionary does not contain the named cell, return an empty hashSet
 
             //if the named cells content is the name of the cell, throw a circularException
-            HashSet<string> toReturn = new HashSet<string>();
-            foreach(string s in dependencyGraph.GetDependees(name))
-            {
-                toReturn.Add(s);
-            }
 
-            return toReturn;
+            return dependencyGraph.GetDependees(name);
         }
 
 
@@ -453,39 +445,20 @@ namespace SS
             ChangeCellContents(name, number);
             ChangeCellValue(name, number);
 
-            Formula f = new Formula("H");
+            Formula f;
             cell tempCell;
             //string toBeEvaluated;
             foreach (string el in GetCellsToRecalculate(name))
             {
 
-                //if (cells[el].content.GetType() == f.GetType())
-                //{
-                //    tempCell = cells[el];
-                //    f = (Formula)tempCell.content;
-                //    try
-                //    {
-                //        toBeEvaluated = f.ToString();
-                //        foreach (string s in f.GetVariables())
-                //        {
-                //            toBeEvaluated = toBeEvaluated.Replace(s, GetCellValue(s).ToString());
-                //        }
-                //        //f = new Formula(toBeEvaluated);
-                //        ChangeCellValue(el, new Formula(toBeEvaluated).Evaluate(s => 0));
-                //    }
-                //    catch
-                //    {
-                //        ChangeCellValue(el, new FormulaError());
-                //    }
-                //}
-                if (cells[el].content.GetType() == f.GetType())
+                if (cells[el].content.GetType() == typeof(Formula))
                 {
                     tempCell = cells[el];
                     f = (Formula)tempCell.content;
                     try
                     {
 
-                        ChangeCellValue(el, f.Evaluate(looker));
+                        ChangeCellValue(el, f.Evaluate(s => (double)GetCellValue(s)));
                     }
                     catch
                     {
@@ -566,7 +539,7 @@ namespace SS
                     try
                     {
 
-                        ChangeCellValue(el, f.Evaluate(looker));
+                        ChangeCellValue(el, f.Evaluate(s => (double)GetCellValue(s)));
                     }
                     catch
                     {
@@ -630,17 +603,10 @@ namespace SS
             cellsToRecalculate.Add(name);
             foreach (string el in formula.GetVariables())
             {
-                if (!validName(el))
-                {
-                    throw new InvalidNameException();
-                }
-                if (el == name)
-                {
-                    throw new InvalidNameException();
-                }
                 dependencyGraph.AddDependency(name, el);
             }
-            GetCellsToRecalculate(name);
+            IEnumerable<string> getCs = GetCellsToRecalculate(name);
+            
             ChangeCellContents(name, formula);
             try
             {
@@ -650,39 +616,16 @@ namespace SS
             {
                 ChangeCellValue(name, new FormulaError());
             }
-            Formula f = new Formula("H");
-            cell tempCell;
-            //string toBeEvaluated;
-            foreach (string el in GetCellsToRecalculate(name))
+           
+            foreach (string el in getCs)
             {
-
-                //if (cells[el].content.GetType() == f.GetType())
-                //{
-                //    tempCell = cells[el];
-                //    f = (Formula)tempCell.content;
-                //    try
-                //    {
-                //        toBeEvaluated = f.ToString();
-                //        foreach (string s in f.GetVariables())
-                //        {
-                //            toBeEvaluated = toBeEvaluated.Replace(s, GetCellValue(s).ToString());
-                //        }
-                //        //f = new Formula(toBeEvaluated);
-                //        ChangeCellValue(el, new Formula(toBeEvaluated).Evaluate(s => 0));
-                //    }
-                //    catch
-                //    {
-                //        ChangeCellValue(el, new FormulaError());
-                //    }
-                //}
-                if (cells[el].content.GetType() == f.GetType())
+                if (cells[el].content.GetType() == typeof(Formula))
                 {
-                    tempCell = cells[el];
-                    f = (Formula)tempCell.content;
+                    cell tempCell = cells[el];
+                    Formula f = (Formula)tempCell.content;
                     try
                     {
-
-                        ChangeCellValue(el, f.Evaluate(looker));
+                        ChangeCellValue(el, f.Evaluate(s=>(double)GetCellValue(s)));
                     }
                     catch
                     {
@@ -749,30 +692,19 @@ namespace SS
 
             if (isDouble)
             {
-                return SetCellContents(name, Double.Parse(content));
+                return SetCellContents(name, result);
             }
             else if (content.Length > 0 && content.Substring(0, 1) == "=")
             {
-                int lengthOfString = content.Length;
+               
                 string substring = content.Substring(1);
-
-                Formula f;
-
-                try
-                {
-                    f = new Formula(substring, s => s.ToUpper(), s => isValid.IsMatch(s));
-                }
-                //catch a specific exception
-                catch (Exception e)
-                {
-                    throw e;
-                }
-
+                
+                   Formula f = new Formula(substring, s => s.ToUpper(), s => isValid.IsMatch(s));
+  
                 return SetCellContents(name, f);
             }
             else
             {
-
                 return SetCellContents(name, content);
             }
         }
@@ -795,16 +727,9 @@ namespace SS
         //returns true of there is a match and false otherwise
         public bool validName(String name)
         {
-            string namePattern = "^([a-zA-Z][a-zA-Z]*[1-9][0-9]*)$"; 
+            Regex nameRegex = new Regex("^([a-zA-Z][a-zA-Z]*[1-9][0-9]*)$");
 
-            Regex nameRegex = new Regex(namePattern);
-
-            Match match = nameRegex.Match(name);
-
-            bool check = match.Success;
-
-            return check;
-
+            return nameRegex.IsMatch(name);
         }
     }
 
