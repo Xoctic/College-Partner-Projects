@@ -43,7 +43,8 @@ namespace ps4aGradingTestss
             Assert.AreEqual(3, f.Evaluate(s => (s == "x") ? 1 : 2));
         }
 
-        [TestMethod, Timeout(1000)]
+        //[TestMethod, Timeout(1000)]
+        [TestMethod]
         [ExpectedException(typeof(FormulaFormatException))]
         public void ThreeArg2()
         {

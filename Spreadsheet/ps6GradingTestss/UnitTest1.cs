@@ -517,7 +517,8 @@ namespace ps6GradingTestss
         }
 
         // Violates schema: has an attribute "content" instead of "contents"
-        [TestMethod, Timeout(1000)]
+        //[TestMethod, Timeout(1000)]
+        [TestMethod]
         [ExpectedException(typeof(SpreadsheetReadException))]
         public void SaveTest5()
         {
@@ -631,7 +632,8 @@ namespace ps6GradingTestss
         }
 
         // IsValid doesn't match A4
-        [TestMethod, Timeout(1000)]
+        //[TestMethod, Timeout(1000)]
+        [TestMethod]
         [ExpectedException(typeof(SpreadsheetReadException))]
         public void SaveTest8()
         {
@@ -864,7 +866,7 @@ namespace ps6GradingTestss
             MediumSheet();
         }
 
-
+        //[TestMethod]
         [TestMethod, Timeout(1000)]
         public void MediumSave()
         {

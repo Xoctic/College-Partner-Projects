@@ -114,6 +114,10 @@ namespace SS
                                 case "cell":
                                     name = reader["name"];
                                     contents = reader["contents"];
+                                    if(name == null || contents == null || !oldIsValid.IsMatch(name))
+                                    {
+                                        throw new SpreadsheetReadException("bad contents or name");
+                                    }
                                     //if(!oldIsValid.IsMatch(name))
                                     //{
                                     // throw new SpreadsheetReadException("old validator failed validation of call name: " + name);
@@ -129,9 +133,9 @@ namespace SS
 
                                     name = name.ToUpper();
 
-                                    if (!newIsValid.IsMatch(name))
+                                    if (!isValid.IsMatch(name))
                                     {
-                                        throw new SpreadsheetReadException("new validator failed validation of cell name:" + name);
+                                        throw new SpreadsheetVersionException("new validator failed validation of cell name:" + name);
                                     }
                                     //try
                                     //{
@@ -610,6 +614,10 @@ namespace SS
             cellsToRecalculate.Add(name);
             foreach (string el in formula.GetVariables())
             {
+                if(el == name || !validName(el))
+                {
+                    throw new InvalidNameException();
+                }
                 dependencyGraph.AddDependency(name, el);
             }
             IEnumerable<string> getCs = GetCellsToRecalculate(name);
@@ -719,8 +727,8 @@ namespace SS
         // Display any validation errors.
         private static void ValidationCallback(object sender, ValidationEventArgs e)
         {
-            throw new SpreadsheetReadException(e.Message);
-            //Console.WriteLine(" *** Validation Error: {0}", e.Message);
+            //throw new SpreadsheetReadException(e.Message);
+            Console.WriteLine(" *** Validation Error: {0}", e.Message);
         }
 
         //Ensures the name of the cell passed in is in the correct format

@@ -157,6 +157,7 @@ namespace Formulas
                     {
                         throw new FormulaFormatException("Validation failed");
                     }
+                    
                     tokens.Add(new Token(tempText, token.Type));
                 }
                 else
