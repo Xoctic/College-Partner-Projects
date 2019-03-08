@@ -218,9 +218,19 @@ namespace SS
         /// </summary>
         private void ChangeCellValue(string name, object obj)
         {
-            cell tempCell = cells[name];
-            tempCell.value = obj;
-            cells[name] = tempCell;
+            if (cells.ContainsKey(name))
+            {
+                cell tempCell = cells[name];
+                tempCell.value = obj;
+                cells[name] = tempCell;
+            }
+            else
+            {
+                ChangeCellContents(name, obj.ToString());
+                cell tempCell = cells[name];
+                tempCell.value = obj;
+                cells[name] = tempCell;
+            }
             
         }
 
@@ -306,6 +316,7 @@ namespace SS
             //if the dictionary does not contain the named cell, return an empty hashSet
 
             //if the named cells content is the name of the cell, throw a circularException
+
 
             return dependencyGraph.GetDependees(name);
         }
@@ -612,17 +623,24 @@ namespace SS
             HashSet<string> cellsToRecalculate = new HashSet<string>();
 
             cellsToRecalculate.Add(name);
+
+
+
             foreach (string el in formula.GetVariables())
             {
                 if(el == name || !validName(el))
                 {
                     throw new InvalidNameException();
                 }
-                dependencyGraph.AddDependency(name, el);
+                
             }
-            IEnumerable<string> getCs = GetCellsToRecalculate(name);
+
             
+            dependencyGraph.ReplaceDependents(name, formula.GetVariables());
+            IEnumerable<string> getCs = GetCellsToRecalculate(name);
+
             ChangeCellContents(name, formula);
+
             try
             {
                 ChangeCellValue(name, formula.Evaluate(s => (double)GetCellValue(s)));
@@ -634,6 +652,7 @@ namespace SS
            
             foreach (string el in getCs)
             {
+                
                 if (cells[el].content.GetType() == typeof(Formula))
                 {
                     cell tempCell = cells[el];

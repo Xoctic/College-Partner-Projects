@@ -342,6 +342,8 @@ namespace Formulas
                         break;
 
                     case TokenType.Var:
+                        
+                        
                         if (operators.Count != 0 && operators.Peek() == "*")
                         {
                             
