@@ -157,7 +157,6 @@ namespace Formulas
                     {
                         throw new FormulaFormatException("Validation failed");
                     }
-                    
                     tokens.Add(new Token(tempText, token.Type));
                 }
                 else
@@ -342,21 +341,17 @@ namespace Formulas
                         break;
 
                     case TokenType.Var:
-                        if (operators.Count != 0 && operators.Peek() == "*")
+                        try
                         {
-                            
-
-                            try
-                            {
-                                val = values.Pop() * lookup(t.Text);
-                            }
-                            catch (UndefinedVariableException e)
-                            {
-
-                                throw new FormulaEvaluationException("Undefined variable: " + t.Text);
-                            }
-
-
+                            val = lookup(t.Text);
+                        }
+                        catch (UndefinedVariableException e)
+                        {
+                            throw new FormulaEvaluationException("Undefined variable: " + t.Text);
+                        }
+                        if (operators.Count != 0 && operators.Peek() == "*")
+                        {                           
+                            val = values.Pop() * val;
                             values.Push(val);
                             operators.Pop();
 
@@ -367,43 +362,24 @@ namespace Formulas
 
                             lVal = values.Pop();
 
-                            try
+                            if (lookup(t.Text) == 0)
                             {
-                                if (lookup(t.Text) == 0)
-                                {
-                                    throw new FormulaEvaluationException("Division by 0");
-                                }
-                                val = lVal / lookup(t.Text);
-                                values.Push(val);
-                                operators.Pop();
+                                throw new FormulaEvaluationException("Division by 0");
                             }
-                            catch (UndefinedVariableException e)
-                            {
-
-                                throw new FormulaEvaluationException("Undefined variable: " + t.Text);
-                            }
-
-
-
+                            val = lVal / val;
+                            values.Push(val);
+                            operators.Pop();
                         }
                         else
                         {
-
-                            try
-                            {
-                                values.Push(lookup(t.Text));
-                            }
-                            catch (UndefinedVariableException e)
-                            {
-
-                                throw new FormulaEvaluationException("Undefined variable: " + t.Text);
-                            }
+                            values.Push(val);                          
                         }
 
                         break;
                     default:
                         break;
                 }
+
             }
 
 

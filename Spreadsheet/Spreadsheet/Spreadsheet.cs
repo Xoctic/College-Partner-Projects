@@ -470,7 +470,7 @@ namespace SS
                     try
                     {
 
-                        ChangeCellValue(el, f.Evaluate(s => (double)GetCellValue(s)));
+                        ChangeCellValue(el, f.Evaluate(s => (double)cells[name].value));
                     }
                     catch
                     {
@@ -550,7 +550,7 @@ namespace SS
                     f = (Formula)tempCell.content;
                     try
                     {
-                        ChangeCellValue(el, f.Evaluate(s => (double)GetCellValue(s)));
+                        ChangeCellValue(el, f.Evaluate(s => (double)cells[name].value));
                     }
                     catch
                     {
@@ -625,22 +625,23 @@ namespace SS
             ChangeCellContents(name, formula);
             try
             {
-                ChangeCellValue(name, formula.Evaluate(s => (double)GetCellValue(s)));
+                ChangeCellValue(name, formula.Evaluate(s => (double)cells[name].value));
             }
             catch
             {
                 ChangeCellValue(name, new FormulaError());
             }
-           
+            cell tempCell;
+            Formula f;
             foreach (string el in getCs)
             {
                 if (cells[el].content.GetType() == typeof(Formula))
                 {
-                    cell tempCell = cells[el];
-                    Formula f = (Formula)tempCell.content;
+                    tempCell = cells[el];
+                    f = (Formula)tempCell.content;
                     try
                     {
-                        ChangeCellValue(el, f.Evaluate(s=>(double)GetCellValue(s)));
+                        ChangeCellValue(el, f.Evaluate(s => (double)cells[name].value));
                     }
                     catch
                     {
@@ -714,7 +715,7 @@ namespace SS
                
                 string substring = content.Substring(1);
                 
-                   Formula f = new Formula(substring, s => s.ToUpper(), s => isValid.IsMatch(s));
+                Formula f = new Formula(substring, s => s.ToUpper(), s => isValid.IsMatch(s));
   
                 return SetCellContents(name, f);
             }
