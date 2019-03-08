@@ -9,12 +9,6 @@ namespace SS
         public struct cell
         {
             public object content { get; set; }
-            public object value { get; set; }
-
-         
-
-            
-
-            
+            public object value { get; set; }                       
         }
 }

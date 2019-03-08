@@ -65,19 +65,10 @@ namespace Formulas
 
         public Formula(string formula, Normalizer norm, Validator valid)
         {
-            if (formula == null)
+            if (formula == null || norm == null || valid == null)
             {
                 throw new ArgumentNullException("formula passed in was null");
             }
-            else if (norm == null)
-            {
-                throw new ArgumentNullException("normalizer passed in was null");
-            }
-            else if (valid == null)
-            {
-                throw new ArgumentNullException("validator passed in was null");
-            }
-
             tokens = new List<Token>(GetTokens(formula));
 
             int numOfLeftParen = 0;
@@ -152,7 +143,13 @@ namespace Formulas
                 if (token.Type == TokenType.Var)
                 {
                     tempText = norm(token.Text);
-
+                    foreach(Token possibleBadToken in GetTokens(tempText))
+                    {
+                        if(possibleBadToken.Type != Var)
+                        {
+                            throw new FormulaFormatException("Cannot normalize using an Invalid variable");
+                        }
+                    }
                     if (!valid(tempText))
                     {
                         throw new FormulaFormatException("Validation failed");
@@ -341,38 +338,48 @@ namespace Formulas
                         break;
 
                     case TokenType.Var:
-                        try
-                        {
-                            val = lookup(t.Text);
-                        }
-                        catch (UndefinedVariableException e)
-                        {
-                            throw new FormulaEvaluationException("Undefined variable: " + t.Text);
-                        }
                         if (operators.Count != 0 && operators.Peek() == "*")
-                        {                           
-                            val = values.Pop() * val;
+                        {         
+                            try
+                            {
+                                val = values.Pop() * lookup(t.Text);
+                            }
+                            catch
+                            {
+                                throw new FormulaEvaluationException("Undefined variable: " + t.Text);
+                            }
                             values.Push(val);
                             operators.Pop();
-
-
                         }
                         else if (operators.Count != 0 && operators.Peek() == "/")
                         {
-
                             lVal = values.Pop();
-
-                            if (lookup(t.Text) == 0)
+                            try
                             {
-                                throw new FormulaEvaluationException("Division by 0");
+                                if (lookup(t.Text) == 0)
+                                {
+                                    throw new FormulaEvaluationException("Division by 0");
+                                }
+                                val = lVal / lookup(t.Text);
+                                values.Push(val);
+                                operators.Pop();
                             }
-                            val = lVal / val;
-                            values.Push(val);
-                            operators.Pop();
+                            catch
+                            {
+                                throw new FormulaEvaluationException("Undefined variable: " + t.Text);
+                            }
+                           
                         }
                         else
                         {
-                            values.Push(val);                          
+                            try
+                            {
+                                values.Push(lookup(t.Text));
+                            }
+                            catch
+                            {
+                                throw new FormulaEvaluationException("Undefined variable: " + t.Text);
+                            }                       
                         }
 
                         break;

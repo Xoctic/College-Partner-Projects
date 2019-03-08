@@ -226,7 +226,7 @@ namespace SS
             }
             else
             {
-                ChangeCellContents(name, obj.ToString());
+                //ChangeCellContents(name, obj.ToString());
                 cell tempCell = cells[name];
                 tempCell.value = obj;
                 cells[name] = tempCell;
@@ -342,30 +342,6 @@ namespace SS
             return returner;
 
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        public double looker(string name)
-        {
-            return (double)GetCellValue(name);
-            //bool tryParse;
-            //try
-            //{
-            //    tryParse = Double.TryParse(cells[name].value.ToString(), out double result);
-            //}
-            //catch (Exception e)
-            //{
-            //    tryParse = false;
-            //}
-            //if (tryParse == true)
-            //{
-            //    return Double.Parse(cells[name].value.ToString());
-            //}
-            //else
-            //{
-            //    throw new UndefinedVariableException("no content that is a double");
-            //}
-        }
 
 
         // ADDED FOR PS6
@@ -470,7 +446,6 @@ namespace SS
 
             Formula f;
             cell tempCell;
-            //string toBeEvaluated;
             foreach (string el in GetCellsToRecalculate(name))
             {
 
@@ -481,7 +456,7 @@ namespace SS
                     try
                     {
 
-                        ChangeCellValue(el, f.Evaluate(s => (double)cells[name].value));
+                        ChangeCellValue(el, f.Evaluate(s => (double)GetCellValue(s)));
                     }
                     catch
                     {
@@ -529,39 +504,17 @@ namespace SS
            
             ChangeCellContents(name, text);
             ChangeCellValue(name, text);
-            IEnumerable<string> getCs = GetCellsToRecalculate(name);
             Formula f;
             cell tempCell;
-            //string toBeEvaluated;
-            foreach (string el in getCs)
+            foreach (string el in GetCellsToRecalculate(name))
             {
-
-                //if (cells[el].content.GetType() == f.GetType())
-                //{
-                //    tempCell = cells[el];
-                //    f = (Formula)tempCell.content;
-                //    try
-                //    {
-                //        toBeEvaluated = f.ToString();
-                //        foreach (string s in f.GetVariables())
-                //        {
-                //            toBeEvaluated = toBeEvaluated.Replace(s, GetCellValue(s).ToString());
-                //        }
-                //        //f = new Formula(toBeEvaluated);
-                //        ChangeCellValue(el, new Formula(toBeEvaluated).Evaluate(s => 0));
-                //    }
-                //    catch
-                //    {
-                //        ChangeCellValue(el, new FormulaError());
-                //    }
-                //}
                 if (cells[el].content.GetType() == typeof(Formula))
                 {
                     tempCell = cells[el];
                     f = (Formula)tempCell.content;
                     try
                     {
-                        ChangeCellValue(el, f.Evaluate(s => (double)cells[name].value));
+                        ChangeCellValue(el, f.Evaluate(s => (double)GetCellValue(s)));
                     }
                     catch
                     {
@@ -632,18 +585,15 @@ namespace SS
                 {
                     throw new InvalidNameException();
                 }
-                
+                dependencyGraph.AddDependency(name, el);
             }
-
-            
-            dependencyGraph.ReplaceDependents(name, formula.GetVariables());
             IEnumerable<string> getCs = GetCellsToRecalculate(name);
 
             ChangeCellContents(name, formula);
 
             try
             {
-                ChangeCellValue(name, formula.Evaluate(s => (double)cells[name].value));
+                ChangeCellValue(name, formula.Evaluate(s => (double)GetCellValue(s)));
             }
             catch
             {
@@ -660,7 +610,7 @@ namespace SS
                     f = (Formula)tempCell.content;
                     try
                     {
-                        ChangeCellValue(el, f.Evaluate(s => (double)cells[name].value));
+                        ChangeCellValue(el, f.Evaluate(s => (double)GetCellValue(s)));
                     }
                     catch
                     {
