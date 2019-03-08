@@ -437,5 +437,7 @@ namespace SSGui
                 Invalidate();
             }
         }
+
+      
     }
 }
