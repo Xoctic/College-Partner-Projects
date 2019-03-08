@@ -1118,13 +1118,15 @@ namespace ps6GradingTestss
             }
         }
 
-        [TestMethod, Timeout(10000)]
+        //[TestMethod, Timeout(10000)]
+        [TestMethod]
         public void Stress5WithTimeout10()
         {
             Stress5();
         }
 
-        [TestMethod, Timeout(20000)]
+        //[TestMethod, Timeout(20000)]
+        [TestMethod]
         public void Stress5WithTimeout20()
         {
             Stress5();
