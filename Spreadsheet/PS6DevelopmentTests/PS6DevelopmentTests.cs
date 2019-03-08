@@ -257,23 +257,23 @@ namespace DevelopmentTests
             }
         }
 
-        //Tests passing in null name
-        [TestMethod()]
-        [ExpectedException(typeof(InvalidNameException))]
-        public void getCellValue1()
-        {
-            AbstractSpreadsheet ss = new Spreadsheet();
-            ss.GetCellValue(null);
-        }
+        ////Tests passing in null name
+        //[TestMethod()]
+        //[ExpectedException(typeof(InvalidNameException))]
+        //public void getCellValue1()
+        //{
+        //    AbstractSpreadsheet ss = new Spreadsheet();
+        //    ss.GetCellValue(null);
+        //}
 
 
-        [TestMethod()]
-        [ExpectedException(typeof(InvalidNameException))]
-        public void getCellValue2()
-        {
-            AbstractSpreadsheet ss = new Spreadsheet();
-            ss.GetCellValue("A1A");
-        }
+        //[TestMethod()]
+        //[ExpectedException(typeof(InvalidNameException))]
+        //public void getCellValue2()
+        //{
+        //    AbstractSpreadsheet ss = new Spreadsheet();
+        //    ss.GetCellValue("A1A");
+        //}
 
 
         [TestMethod()]

@@ -230,7 +230,9 @@ namespace Formulas
 
             Stack<string> operators = new Stack<string>();
             Stack<double> values = new Stack<double>();
-
+            double val;
+            double rVal;
+            double lVal;
 
             foreach (Token t in tokens)
             {
@@ -243,7 +245,7 @@ namespace Formulas
 
                         if (operators.Count != 0 && operators.Peek() == "+")
                         {
-                            double val;
+                            
 
                             val = values.Pop() + values.Pop();
 
@@ -253,9 +255,9 @@ namespace Formulas
                         }
                         else if (operators.Count != 0 && operators.Peek() == "-")
                         {
-                            double rVal = values.Pop();
-                            double lVal = values.Pop();
-                            double val = lVal - rVal;
+                            rVal = values.Pop();
+                            lVal = values.Pop();
+                            val = lVal - rVal;
                             values.Push(val);
                             operators.Pop();
                         }
@@ -265,7 +267,7 @@ namespace Formulas
 
                         if (operators.Count != 0 && operators.Peek() == "*")
                         {
-                            double val;
+                            
 
                             val = values.Pop() * values.Pop();
 
@@ -275,13 +277,13 @@ namespace Formulas
                         }
                         else if (operators.Count != 0 && operators.Peek() == "/")
                         {
-                            double rVal = values.Pop();
-                            double lVal = values.Pop();
+                            rVal = values.Pop();
+                            lVal = values.Pop();
                             if (rVal == 0)
                             {
                                 throw new FormulaEvaluationException("Division by 0");
                             }
-                            double val = lVal / rVal;
+                            val = lVal / rVal;
                             values.Push(val);
                             operators.Pop();
                         }
@@ -289,9 +291,9 @@ namespace Formulas
                     case TokenType.Number:
                         if (operators.Count != 0 && operators.Peek() == "*")
                         {
-                            double val;
+                            
 
-                            val = values.Pop() * Double.Parse(t.Text);
+                            val = values.Pop() * Convert.ToDouble(t.Text);
 
                             values.Push(val);
 
@@ -299,18 +301,18 @@ namespace Formulas
                         }
                         else if (operators.Count != 0 && operators.Peek() == "/")
                         {
-                            double lVal = values.Pop();
+                            lVal = values.Pop();
                             if (Double.Parse(t.Text) == 0)
                             {
                                 throw new FormulaEvaluationException("Division by 0");
                             }
-                            double val = lVal / Double.Parse(t.Text);
+                            val = lVal / Convert.ToDouble(t.Text);
                             values.Push(val);
                             operators.Pop();
                         }
                         else
                         {
-                            values.Push(Double.Parse(t.Text));
+                            values.Push(Convert.ToDouble(t.Text));
                         }
                         break;
                     case TokenType.Oper:
@@ -318,7 +320,7 @@ namespace Formulas
                         {
                             if (operators.Count != 0 && operators.Peek() == "+")
                             {
-                                double val;
+                               
 
                                 val = values.Pop() + values.Pop();
 
@@ -328,9 +330,9 @@ namespace Formulas
                             }
                             else if (operators.Count != 0 && operators.Peek() == "-")
                             {
-                                double rVal = values.Pop();
-                                double lVal = values.Pop();
-                                double val = lVal - rVal;
+                                rVal = values.Pop();
+                                lVal = values.Pop();
+                                val = lVal - rVal;
                                 values.Push(val);
                                 operators.Pop();
                             }
@@ -341,7 +343,7 @@ namespace Formulas
                     case TokenType.Var:
                         if (operators.Count != 0 && operators.Peek() == "*")
                         {
-                            double val;
+                            
 
                             try
                             {
@@ -362,7 +364,7 @@ namespace Formulas
                         else if (operators.Count != 0 && operators.Peek() == "/")
                         {
 
-                            double lVal = values.Pop();
+                            lVal = values.Pop();
 
                             try
                             {
@@ -370,7 +372,7 @@ namespace Formulas
                                 {
                                     throw new FormulaEvaluationException("Division by 0");
                                 }
-                                double val = lVal / lookup(t.Text);
+                                val = lVal / lookup(t.Text);
                                 values.Push(val);
                                 operators.Pop();
                             }
@@ -411,11 +413,11 @@ namespace Formulas
 
             if (operators.Count == 1)
             {
-                double rVal = values.Pop();
-                double lVal = values.Pop();
+                rVal = values.Pop();
+                lVal = values.Pop();
                 if (operators.Count != 0 && operators.Peek() == "+")
                 {
-                    double val;
+                   
 
                     val = rVal + lVal;
 
@@ -426,7 +428,7 @@ namespace Formulas
                 else if (operators.Count != 0 && operators.Peek() == "-")
                 {
 
-                    double val = lVal - rVal;
+                    val = lVal - rVal;
 
                     operators.Pop();
 

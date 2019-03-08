@@ -258,7 +258,15 @@ namespace SS
         /// value should be either a string, a double, or a FormulaError.
         /// </summary>
         public override object GetCellValue(string name)
-        {     
+        {   
+            //if(name == null)
+            //{
+            //    throw new InvalidNameException();
+            //}
+            //if(!validName(name))
+            //{
+            //    throw new InvalidNameException();
+            //}
             if (cells.ContainsKey(name))
             {
                 return cells[name].value;
@@ -506,11 +514,11 @@ namespace SS
            
             ChangeCellContents(name, text);
             ChangeCellValue(name, text);
-
-            Formula f = new Formula("H");
+            IEnumerable<string> getCs = GetCellsToRecalculate(name);
+            Formula f;
             cell tempCell;
             //string toBeEvaluated;
-            foreach (string el in GetCellsToRecalculate(name))
+            foreach (string el in getCs)
             {
 
                 //if (cells[el].content.GetType() == f.GetType())
@@ -532,13 +540,12 @@ namespace SS
                 //        ChangeCellValue(el, new FormulaError());
                 //    }
                 //}
-                if (cells[el].content.GetType() == f.GetType())
+                if (cells[el].content.GetType() == typeof(Formula))
                 {
                     tempCell = cells[el];
                     f = (Formula)tempCell.content;
                     try
                     {
-
                         ChangeCellValue(el, f.Evaluate(s => (double)GetCellValue(s)));
                     }
                     catch
