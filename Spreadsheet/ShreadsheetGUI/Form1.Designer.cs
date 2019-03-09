@@ -1,4 +1,4 @@
-﻿namespace SpreadsheetGUI
+﻿namespace ShreadsheetGUI
 {
     partial class Form1
     {

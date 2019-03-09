@@ -44,6 +44,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetPanel", "SpreadsheetPanel\SpreadsheetPanel.csproj", "{F31299DC-288F-4E46-A3AF-6BF461B21C79}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShreadsheetGUI", "ShreadsheetGUI\ShreadsheetGUI.csproj", "{44469A8F-96D8-4C3E-8925-4853ED69AD0D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -181,6 +183,14 @@ Global
 		{F31299DC-288F-4E46-A3AF-6BF461B21C79}.Debug|x86.ActiveCfg = Debug|x86
 		{F31299DC-288F-4E46-A3AF-6BF461B21C79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F31299DC-288F-4E46-A3AF-6BF461B21C79}.Release|x86.ActiveCfg = Release|x86
+		{44469A8F-96D8-4C3E-8925-4853ED69AD0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44469A8F-96D8-4C3E-8925-4853ED69AD0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44469A8F-96D8-4C3E-8925-4853ED69AD0D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{44469A8F-96D8-4C3E-8925-4853ED69AD0D}.Debug|x86.Build.0 = Debug|Any CPU
+		{44469A8F-96D8-4C3E-8925-4853ED69AD0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44469A8F-96D8-4C3E-8925-4853ED69AD0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44469A8F-96D8-4C3E-8925-4853ED69AD0D}.Release|x86.ActiveCfg = Release|Any CPU
+		{44469A8F-96D8-4C3E-8925-4853ED69AD0D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

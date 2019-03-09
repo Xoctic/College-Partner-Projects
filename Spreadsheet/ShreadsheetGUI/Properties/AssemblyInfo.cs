@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SpreadsheetGUI")]
+[assembly: AssemblyTitle("ShreadsheetGUI")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SpreadsheetGUI")]
+[assembly: AssemblyProduct("ShreadsheetGUI")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("34906a62-b003-4e47-89b8-1da2374ea18d")]
+[assembly: Guid("44469a8f-96d8-4c3e-8925-4853ed69ad0d")]
 
 // Version information for an assembly consists of the following four values:
 //

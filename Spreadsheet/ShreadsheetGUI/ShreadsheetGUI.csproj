@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{34906A62-B003-4E47-89B8-1DA2374EA18D}</ProjectGuid>
+    <ProjectGuid>{44469A8F-96D8-4C3E-8925-4853ED69AD0D}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>SpreadsheetGUI</RootNamespace>
-    <AssemblyName>SpreadsheetGUI</AssemblyName>
+    <RootNamespace>ShreadsheetGUI</RootNamespace>
+    <AssemblyName>ShreadsheetGUI</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
