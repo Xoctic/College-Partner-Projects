@@ -10,14 +10,19 @@ using System.Windows.Forms;
 
 namespace ShreadsheetGUI
 {
-    public partial class Form1 : Form
+    public partial class SpreadSheetGui : Form
     {
-        public Form1()
+        public SpreadSheetGui()
         {
             InitializeComponent();
         }
 
         private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void spreadsheetPanel1_Load(object sender, EventArgs e)
         {
 
         }

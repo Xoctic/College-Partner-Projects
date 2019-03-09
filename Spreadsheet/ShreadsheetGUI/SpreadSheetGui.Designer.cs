@@ -1,6 +1,6 @@
 ﻿namespace ShreadsheetGUI
 {
-    partial class Form1
+    partial class SpreadSheetGui
     {
         /// <summary>
         /// Required designer variable.
@@ -46,6 +46,7 @@
             this.spreadsheetPanel1.Name = "spreadsheetPanel1";
             this.spreadsheetPanel1.Size = new System.Drawing.Size(2135, 1117);
             this.spreadsheetPanel1.TabIndex = 0;
+            this.spreadsheetPanel1.Load += new System.EventHandler(this.spreadsheetPanel1_Load);
             // 
             // menuStrip1
             // 
@@ -74,19 +75,19 @@
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(252, 30);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(163, 36);
             this.openToolStripMenuItem.Text = "Open";
             // 
             // newToolStripMenuItem
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(252, 30);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(163, 36);
             this.newToolStripMenuItem.Text = "New";
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(252, 30);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(163, 36);
             this.saveToolStripMenuItem.Text = "Save";
             // 
             // helpToolStripMenuItem
