@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReaderWriterUnitTests", "ReaderWriterUnitTests\ReaderWriterUnitTests.csproj", "{AE9AFB0E-CCD5-43BE-94F0-61EF649A7590}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReaderWriterLockClasses", "ReaderWriterLockClasses\ReaderWriterLockClasses.csproj", "{DADF3064-87D6-4AF3-B8F9-F1A1B7EDDD07}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{AE9AFB0E-CCD5-43BE-94F0-61EF649A7590}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE9AFB0E-CCD5-43BE-94F0-61EF649A7590}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE9AFB0E-CCD5-43BE-94F0-61EF649A7590}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DADF3064-87D6-4AF3-B8F9-F1A1B7EDDD07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DADF3064-87D6-4AF3-B8F9-F1A1B7EDDD07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DADF3064-87D6-4AF3-B8F9-F1A1B7EDDD07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DADF3064-87D6-4AF3-B8F9-F1A1B7EDDD07}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

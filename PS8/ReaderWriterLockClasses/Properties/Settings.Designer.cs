@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ReaderWriterUnitTests.Properties {
+namespace ReaderWriterLockClasses.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -25,7 +25,7 @@ namespace ReaderWriterUnitTests.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("System.Threading.ReaderWriterLockSlim")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ReaderWriterLockClasses.ReaderWriterLockSlimWrapper")]
         public string LockType {
             get {
                 return ((string)(this["LockType"]));
