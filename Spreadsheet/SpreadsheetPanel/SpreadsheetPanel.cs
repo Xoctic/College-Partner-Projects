@@ -435,7 +435,12 @@ namespace SSGui
                     }
                 }
                 Invalidate();
+
+                
             }
+
+
+            
         }
 
       
