@@ -439,8 +439,31 @@ namespace SSGui
                 
             }
 
+            protected override void OnKeyDown(KeyEventArgs e)
+            {
+                base.OnKeyDown(e);
+                if(e.KeyData == Keys.Down)
+                {
+                    int newRow = _selectedRow - 1;
 
-            
+                    if (!InvalidAddress(_selectedCol, newRow))
+                    {
+                        _selectedRow--;
+
+                        if(_ssp.SelectionChanged != null)
+                        {
+                            _ssp.SelectionChanged(_ssp);
+                            
+
+                        }
+                    }
+                }
+                Invalidate();
+                
+            }
+
+
+
         }
 
       

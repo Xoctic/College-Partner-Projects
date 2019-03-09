@@ -26,5 +26,10 @@ namespace ShreadsheetGUI
         {
 
         }
+
+        private void spreadsheetPanel2_DoubleClick(object sender, EventArgs e)
+        {
+
+        }
     }
 }

@@ -37,6 +37,7 @@
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.spreadsheetPanel2 = new SSGui.SpreadsheetPanel();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -117,17 +118,27 @@
             this.label2.TabIndex = 3;
             this.label2.Text = "yo momma so fat";
             // 
-            // Form1
+            // spreadsheetPanel2
+            // 
+            this.spreadsheetPanel2.Location = new System.Drawing.Point(12, 87);
+            this.spreadsheetPanel2.Name = "spreadsheetPanel2";
+            this.spreadsheetPanel2.Size = new System.Drawing.Size(2135, 1117);
+            this.spreadsheetPanel2.TabIndex = 0;
+            this.spreadsheetPanel2.Load += new System.EventHandler(this.spreadsheetPanel1_Load);
+            this.spreadsheetPanel2.DoubleClick += new System.EventHandler(this.spreadsheetPanel2_DoubleClick);
+            // 
+            // SpreadSheetGui
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2159, 1216);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
+            this.Controls.Add(this.spreadsheetPanel2);
             this.Controls.Add(this.spreadsheetPanel1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Name = "Form1";
+            this.Name = "SpreadSheetGui";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
@@ -148,6 +159,7 @@
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
+        private SSGui.SpreadsheetPanel spreadsheetPanel2;
     }
 }
 
