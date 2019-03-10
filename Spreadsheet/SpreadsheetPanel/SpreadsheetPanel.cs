@@ -439,25 +439,44 @@ namespace SSGui
                 
             }
 
+
+            /// <summary>
+            /// The purpose of the superclass <see cref="Panel"/> is to be a
+            /// container. As such, it was not designed to be available for
+            /// focus when selected by mouse; this way it does not steal the
+            /// focus from a child control. To change that behavior, we force
+            /// this <see cref="DrawingPanel"/> class to take focus when
+            /// selected.
+            /// </summary>
+            /// <param name="e"></param>
+            protected override void OnMouseDown(MouseEventArgs e)
+            {
+                Focus();
+                base.OnMouseDown(e);
+            }
+
+
             protected override void OnKeyDown(KeyEventArgs e)
             {
                 base.OnKeyDown(e);
-                if(e.KeyData == Keys.Down)
-                {
-                    int newRow = _selectedRow - 1;
+                _selectedRow--;
+                _ssp.SelectionChanged(_ssp);
 
-                    if (!InvalidAddress(_selectedCol, newRow))
-                    {
-                        _selectedRow--;
+                //if(e.KeyData == Keys.Down)
+                //{
+                //    int newRow = _selectedRow - 1;
 
-                        if(_ssp.SelectionChanged != null)
-                        {
-                            _ssp.SelectionChanged(_ssp);
+                //    if (InvalidAddress(_selectedCol, newRow))
+                //    {
+                //        _selectedRow--;
+
+                      
+                //            _ssp.SelectionChanged(_ssp);
                             
 
-                        }
-                    }
-                }
+                        
+                //    }
+                //}
                 Invalidate();
                 
             }

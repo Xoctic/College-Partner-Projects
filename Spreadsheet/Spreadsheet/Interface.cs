@@ -27,6 +27,8 @@ namespace SS
         void DoClose();
 
         void DoOpen();
+
+        void changeValueOfCell(string name, string ContentsOfCell);
         
     }
 }

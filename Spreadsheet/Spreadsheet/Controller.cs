@@ -41,6 +41,8 @@ namespace SS
 
         private void HnadleCellSelected()
         {
+
+
             throw new NotImplementedException();
         }
 
