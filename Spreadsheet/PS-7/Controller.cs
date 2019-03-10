@@ -26,10 +26,7 @@ namespace PS_7
 
         private void HandleUpdateCell(string _cellName, string _cellContents)
         {
-            foreach(string el in model.SetContentsOfCell(_cellName, _cellContents))
-            {
-
-            }
+            
            
         }
 
@@ -50,10 +47,11 @@ namespace PS_7
 
         private void HandleCellSelected(string _cellName)
         {
-            
-            
+            string contents = model.GetCellContents(_cellName).ToString();
 
-            throw new NotImplementedException();
+            window.updateCell(_cellName, contents);
+
+            
         }
 
         private void HandleHelp()

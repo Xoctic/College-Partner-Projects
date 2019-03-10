@@ -458,7 +458,7 @@ namespace SSGui
 
             protected override void OnKeyDown(KeyEventArgs e)
             {
-                base.OnKeyDown(e);
+                base.OnKeyDown(e); 
                 _selectedRow--;
                 _ssp.SelectionChanged(_ssp);
 
