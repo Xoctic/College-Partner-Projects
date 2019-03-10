@@ -46,6 +46,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadsheetPanel", "Spreads
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShreadsheetGUI", "ShreadsheetGUI\ShreadsheetGUI.csproj", "{44469A8F-96D8-4C3E-8925-4853ED69AD0D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PS-7", "PS-7\PS-7.csproj", "{ACCD15F4-818F-478D-9812-0070D2104850}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -191,6 +193,14 @@ Global
 		{44469A8F-96D8-4C3E-8925-4853ED69AD0D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{44469A8F-96D8-4C3E-8925-4853ED69AD0D}.Release|x86.ActiveCfg = Release|Any CPU
 		{44469A8F-96D8-4C3E-8925-4853ED69AD0D}.Release|x86.Build.0 = Release|Any CPU
+		{ACCD15F4-818F-478D-9812-0070D2104850}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACCD15F4-818F-478D-9812-0070D2104850}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACCD15F4-818F-478D-9812-0070D2104850}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ACCD15F4-818F-478D-9812-0070D2104850}.Debug|x86.Build.0 = Debug|Any CPU
+		{ACCD15F4-818F-478D-9812-0070D2104850}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACCD15F4-818F-478D-9812-0070D2104850}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACCD15F4-818F-478D-9812-0070D2104850}.Release|x86.ActiveCfg = Release|Any CPU
+		{ACCD15F4-818F-478D-9812-0070D2104850}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
