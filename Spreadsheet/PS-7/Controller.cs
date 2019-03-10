@@ -17,17 +17,19 @@ namespace PS_7
             this.model = new Spreadsheet();
             window.CloseWindowEvent += HandleClose;
             window.HelpButtonEvent += HandleHelp;
-            window.NewCellSelectedEvent += HandleCellSelected;
+            window.NewCellSelectedEvent += HandleUpdateCell;
             window.OpenFileEvent += HandleOpenFile;
             window.SaveFileEvent += HandleSave;
             window.UpdateCellEvent += HandleUpdateCell;
             window.OpenNewEvent += OpenNewWindow;
         }
 
-        private void HandleUpdateCell(string _cellName, string _cellContents)
+        private void HandleUpdateCell(string _cellName)
         {
-            
-           
+            string contents = model.GetCellContents(_cellName).ToString();
+
+            window.updateCell(contents);
+
         }
 
         private void HandleSave(string obj)
@@ -49,7 +51,7 @@ namespace PS_7
         {
             string contents = model.GetCellContents(_cellName).ToString();
 
-            window.updateCell(_cellName, contents);
+            window.updateCell(contents);
 
             
         }

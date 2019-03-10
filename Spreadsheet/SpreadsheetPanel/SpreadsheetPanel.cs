@@ -456,30 +456,7 @@ namespace SSGui
             }
 
 
-            protected override void OnKeyDown(KeyEventArgs e)
-            {
-                base.OnKeyDown(e); 
-                _selectedRow--;
-                _ssp.SelectionChanged(_ssp);
-
-                //if(e.KeyData == Keys.Down)
-                //{
-                //    int newRow = _selectedRow - 1;
-
-                //    if (InvalidAddress(_selectedCol, newRow))
-                //    {
-                //        _selectedRow--;
-
-                      
-                //            _ssp.SelectionChanged(_ssp);
-                            
-
-                        
-                //    }
-                //}
-                Invalidate();
-                
-            }
+            
 
 
 

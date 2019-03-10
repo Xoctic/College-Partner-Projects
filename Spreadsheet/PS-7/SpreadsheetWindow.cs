@@ -60,7 +60,7 @@ namespace PS_7
         /// <summary>
         /// Fired when the contents of the cellContentsTextBox is changed
         /// </summary>
-        public event Action<string, string> UpdateCellEvent;
+        public event Action<string> UpdateCellEvent;
 
         /// <summary>
         /// Fired when a new cell is selected
@@ -72,19 +72,15 @@ namespace PS_7
         /// <summary>
         /// 
         /// </summary>
-        public void ChangeValueOfCell(string _cellName, string _cellContents)
+        public void ChangeValueOfCell(string _cellName, string _cellValue)
         {
-
-
-
-
-            throw new NotImplementedException();
+            spreadsheetPanel1.SetValue(getCol(_cellName), getRow(_cellName), _cellValue);
         }
 
-        public void updateCell(string _cellName, string _cellContents)
+        public void updateCell(string _cellContents)
         {
-
-            //spreadsheetPanel1.SetValue(); 
+            cellContentTextBox.Text = _cellContents;
+            
         }
 
         
@@ -189,7 +185,9 @@ namespace PS_7
             return result-1;
         }
 
+        private void OpenClicked(object sender, EventArgs e)
+        {
 
-
+        }
     }
 }

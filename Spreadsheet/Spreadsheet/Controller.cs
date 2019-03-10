@@ -14,7 +14,7 @@ namespace SS
 
         public Controller(Interface _window)
         {
-            this.window = window;
+            this.window = _window;
             this.model = new Spreadsheet();
             window.CloseWindowEvent += HandleClose;
             window.HelpButtonEvent += HandleHelp;

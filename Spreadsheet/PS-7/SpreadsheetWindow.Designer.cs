@@ -73,6 +73,7 @@
             this.openMenuItem.Name = "openMenuItem";
             this.openMenuItem.Size = new System.Drawing.Size(252, 30);
             this.openMenuItem.Text = "Open";
+            this.openMenuItem.Click += new System.EventHandler(this.OpenClicked);
             // 
             // newMenuItem
             // 

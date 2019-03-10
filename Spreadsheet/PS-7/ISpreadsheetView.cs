@@ -18,7 +18,7 @@ namespace PS_7
 
         event Action CloseWindowEvent;
 
-        event Action<string, string> UpdateCellEvent;
+        event Action<string> UpdateCellEvent;
 
         event Action<string> NewCellSelectedEvent;
 
@@ -30,7 +30,7 @@ namespace PS_7
 
         void OpenNew();
 
-        void updateCell(string cellName, string cellContents);
+        void updateCell(string cellContents);
        
     }
 }
