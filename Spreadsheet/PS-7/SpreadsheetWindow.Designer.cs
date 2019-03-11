@@ -35,7 +35,7 @@
             this.newMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cellContentTextBox = new System.Windows.Forms.TextBox();
+            this.cellContentText = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -71,20 +71,20 @@
             // openMenuItem
             // 
             this.openMenuItem.Name = "openMenuItem";
-            this.openMenuItem.Size = new System.Drawing.Size(252, 30);
+            this.openMenuItem.Size = new System.Drawing.Size(140, 30);
             this.openMenuItem.Text = "Open";
             this.openMenuItem.Click += new System.EventHandler(this.OpenClicked);
             // 
             // newMenuItem
             // 
             this.newMenuItem.Name = "newMenuItem";
-            this.newMenuItem.Size = new System.Drawing.Size(252, 30);
+            this.newMenuItem.Size = new System.Drawing.Size(140, 30);
             this.newMenuItem.Text = "New";
             // 
             // saveMenuItem
             // 
             this.saveMenuItem.Name = "saveMenuItem";
-            this.saveMenuItem.Size = new System.Drawing.Size(252, 30);
+            this.saveMenuItem.Size = new System.Drawing.Size(140, 30);
             this.saveMenuItem.Text = "Save";
             // 
             // helpMenuItem
@@ -93,19 +93,20 @@
             this.helpMenuItem.Size = new System.Drawing.Size(61, 29);
             this.helpMenuItem.Text = "Help";
             // 
-            // cellContentTextBox
+            // cellContentText
             // 
-            this.cellContentTextBox.Location = new System.Drawing.Point(404, 64);
-            this.cellContentTextBox.Name = "cellContentTextBox";
-            this.cellContentTextBox.Size = new System.Drawing.Size(247, 26);
-            this.cellContentTextBox.TabIndex = 2;
+            this.cellContentText.Location = new System.Drawing.Point(404, 64);
+            this.cellContentText.Name = "cellContentText";
+            this.cellContentText.Size = new System.Drawing.Size(247, 26);
+            this.cellContentText.TabIndex = 2;
+            this.cellContentText.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.cellContentTextBox_KeyPress);
             // 
             // SpreadsheetWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1687, 1299);
-            this.Controls.Add(this.cellContentTextBox);
+            this.Controls.Add(this.cellContentText);
             this.Controls.Add(this.spreadsheetPanel1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
@@ -127,6 +128,6 @@
         private System.Windows.Forms.ToolStripMenuItem newMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpMenuItem;
-        private System.Windows.Forms.TextBox cellContentTextBox;
+        private System.Windows.Forms.TextBox cellContentText;
     }
 }
