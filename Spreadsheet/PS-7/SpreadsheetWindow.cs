@@ -7,21 +7,37 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SSGui;
 
 namespace PS_7
 {
     public partial class SpreadsheetWindow : Form, ISpreadsheetView
     {
+       
         public SpreadsheetWindow()
         {
             InitializeComponent();
+            spreadsheetPanel1.SelectionChanged += getCellInfo;
+     
+            //updateCell += displayContentsOfCell;
         }
+
+        private void getCellInfo(SpreadsheetPanel sender)
+        {
+            spreadsheetPanel1.GetSelection(out int col, out int row);
+            char letter = (char)('A' + col);
+            row++;
+            string cellName = letter.ToString() + row;
+            NewCellSelectedEvent(cellName);
+        }
+
+      
 
         public string ContentsOfCell
         {
             set
             {
-                cellContentTextBox.Text = value;
+                cellContentText.Text = value;
             }
         }
 
@@ -68,7 +84,7 @@ namespace PS_7
         /// <summary>
         /// Fired when the contents of the cellContentsTextBox is changed
         /// </summary>
-        public event Action<string> UpdateCellEvent;
+        public event Action<string,string> UpdateCellEvent;
 
         /// <summary>
         /// Fired when a new cell is selected
@@ -82,16 +98,33 @@ namespace PS_7
         /// </summary>
         public void ChangeValueOfCell(string _cellName, string _cellContents)
         {
-            //Not implemented
-
+            spreadsheetPanel1.SetValue(getCol(_cellName), getRow(_cellName), _cellValue);
+            
         }
 
         public void updateCell(string _cellName, string _cellContents)
         {
-            //Not implemented
-            //spreadsheetPanel1.SetValue(); 
+            cellContentText.Text = _cellContents;
         }
 
+
+        private void cellContentTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if(e.KeyChar == (char)Keys.Return)
+            {
+
+                string _text = cellContentText.Text;
+                spreadsheetPanel1.GetSelection(out int col, out int row);
+
+                char letter = (char)('A' + col);
+                row++;
+                string cellName = letter.ToString() + row.ToString();
+                UpdateCellEvent(cellName, _text);
+                getCellInfo(spreadsheetPanel1);
+
+                spreadsheetPanel1.SetValue(col, row-1, _text);
+
+            }
         /// <summary>
         /// Closes the current window
         /// </summary>
@@ -111,7 +144,7 @@ namespace PS_7
 
         public int getCol(string _cellName)
         {
-            string letter = _cellName.Substring(0, 1);
+            string letter = _cellName.Substring(0, 0);
 
             switch (letter.ToUpper())
             {
@@ -177,19 +210,19 @@ namespace PS_7
         public int getRow(string _cellName)
         {
             string numString;
-            if(_cellName.Length == 2)
+            if (_cellName.Length == 2)
             {
-                numString = _cellName.Substring(1, 2);
+                numString = _cellName.Substring(1, 1);
             }
             else
             {
-                numString = _cellName.Substring(1, 3);
+                numString = _cellName.Substring(1, 2);
             }
             int result;
 
             int.TryParse(numString, out result);
 
-            return result-1;
+            return result - 1;
         }
 
         public void updateCell(string cellContents)
@@ -234,6 +267,12 @@ namespace PS_7
             //Not implemented
         }
 
+        /// <summary>
+        /// Opens a new window
+        /// </summary>
+        public void OpenNew()
+        {
+            SpreadsheetApplicationContext.GetContext().RunNew();
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (CloseWindowEvent != null)
@@ -241,5 +280,6 @@ namespace PS_7
                 CloseWindowEvent();
             }
         }
+
     }
 }

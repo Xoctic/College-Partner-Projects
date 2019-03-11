@@ -17,21 +17,33 @@ namespace PS_7
         {
             this.window = _window;
             this.model = new Spreadsheet();
+
             window.CloseWindowEvent += HandleClose;
             window.HelpButtonEvent += HandleHelp;
-            window.NewCellSelectedEvent += HandleUpdateCell;
-            window.OpenFileEvent += HandleFileChosen;
+            window.NewCellSelectedEvent += HandleCellSelected;
+            window.OpenFileEvent += HandleOpenFile;
             window.SaveFileEvent += HandleSave;
             window.UpdateCellEvent += HandleUpdateCell;
             window.OpenNewEvent += OpenNewWindow;
         }
 
-        private void HandleUpdateCell(string _cellName)
+        private void HandleUpdateCell(string _cellName, string _contents)
         {
-            string contents = model.GetCellContents(_cellName).ToString();
+            model.SetContentsOfCell(_cellName, _contents);
+            ReturnCellContents(_cellName);
+            ReturnCellValue(_cellName);
+        }
 
-            window.updateCell(contents);
+        private void ReturnCellContents(string _cellName)
+        {
+            string cellContents = model.GetCellContents(_cellName).ToString();
+            window.updateCell(cellContents);
+        }
 
+        private void ReturnCellValue(string _cellName)
+        {
+            string cellValue = model.GetCellValue(_cellName).ToString();
+            window.ChangeValueOfCell(_cellName, cellValue);
         }
 
         private void HandleSave(string filename)
@@ -75,11 +87,8 @@ namespace PS_7
 
         private void HandleCellSelected(string _cellName)
         {
-            string contents = model.GetCellContents(_cellName).ToString();
-
-            window.updateCell(contents);
-
-            
+            ReturnCellContents(_cellName);
+            ReturnCellValue(_cellName);
         }
 
         private void HandleHelp()
