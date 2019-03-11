@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PS_7
 {
-    interface ISpreadsheetView
+    public interface ISpreadsheetView
     {
         event Action<string> SaveFileEvent;
 
@@ -23,6 +23,10 @@ namespace PS_7
         event Action<string> NewCellSelectedEvent;
 
         string ContentsOfCell { set; }
+
+        string Title { set; }
+
+        string Message { set; }
 
         void ChangeValueOfCell(string cellName, string cellContents);
 

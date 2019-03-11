@@ -25,6 +25,14 @@ namespace PS_7
             }
         }
 
+        public string Title {
+            set { Text = value; }
+        }
+
+        public string Message
+        {
+            set { MessageBox.Show(value); }
+        }
 
         /// <summary>
         /// Fired when the save button is clicked
@@ -72,18 +80,17 @@ namespace PS_7
         /// <summary>
         /// 
         /// </summary>
-        public void ChangeValueOfCell(string _cellName, string _cellValue)
+        public void ChangeValueOfCell(string _cellName, string _cellContents)
         {
-            spreadsheetPanel1.SetValue(getCol(_cellName), getRow(_cellName), _cellValue);
+            //Not implemented
+
         }
 
-        public void updateCell(string _cellContents)
+        public void updateCell(string _cellName, string _cellContents)
         {
-            cellContentTextBox.Text = _cellContents;
-            
+            //Not implemented
+            //spreadsheetPanel1.SetValue(); 
         }
-
-        
 
         /// <summary>
         /// Closes the current window
@@ -185,9 +192,54 @@ namespace PS_7
             return result-1;
         }
 
-        private void OpenClicked(object sender, EventArgs e)
+        public void updateCell(string cellContents)
         {
+            //Not implemented
+        }
 
+        private void fileMenuOpen_Click(object sender, EventArgs e)
+        {
+            DialogResult result = fileDialog.ShowDialog();
+            if (result == DialogResult.Yes || result == DialogResult.OK)
+            {
+                if (OpenFileEvent != null)
+                {
+                    OpenFileEvent(fileDialog.FileName);
+                }
+            }
+        }
+
+        private void newMenuItem_Click(object sender, EventArgs e)
+        {
+            if (OpenNewEvent != null)
+            {
+                OpenNewEvent();
+            }
+        }
+
+        private void saveMenuItem_Click(object sender, EventArgs e)
+        {
+            DialogResult result = saveFileDialog.ShowDialog();
+            if (result == DialogResult.Yes || result == DialogResult.OK)
+            {
+                if (SaveFileEvent != null)
+                {
+                    SaveFileEvent(saveFileDialog.FileName);
+                }
+            }
+        }
+
+        private void helpMenuItem_Click(object sender, EventArgs e)
+        {
+            //Not implemented
+        }
+
+        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (CloseWindowEvent != null)
+            {
+                CloseWindowEvent();
+            }
         }
     }
 }

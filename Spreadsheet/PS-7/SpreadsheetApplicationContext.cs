@@ -54,6 +54,21 @@ namespace PS_7
             window.Show();
         }
 
+        public void RunNew(ISpreadsheetView _window)
+        {
+            // Create the window and the controller
+            SpreadsheetWindow window = (SpreadsheetWindow)_window;
+            new Controller(window);
+
+            // One more form is running
+            windowCount++;
+
+            // When this form closes, we want to find out
+            window.FormClosed += (o, e) => { if (--windowCount <= 0) ExitThread(); };
+
+            // Run the form
+            window.Show();
+        }
 
     }
 }

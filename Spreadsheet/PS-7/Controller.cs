@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace PS_7
@@ -18,7 +20,7 @@ namespace PS_7
             window.CloseWindowEvent += HandleClose;
             window.HelpButtonEvent += HandleHelp;
             window.NewCellSelectedEvent += HandleUpdateCell;
-            window.OpenFileEvent += HandleOpenFile;
+            window.OpenFileEvent += HandleFileChosen;
             window.SaveFileEvent += HandleSave;
             window.UpdateCellEvent += HandleUpdateCell;
             window.OpenNewEvent += OpenNewWindow;
@@ -32,14 +34,38 @@ namespace PS_7
 
         }
 
-        private void HandleSave(string obj)
+        private void HandleSave(string filename)
         {
-            throw new NotImplementedException();
+            //try
+            //{
+            //    string contents = File.ReadAllText(filename);
+            //    StringWriter toBeSaved;
+            //    File.WriteAllText(to)
+            //    model.Save();
+            //    window.SubstringCount = 0;
+            //    window.SearchString = "";
+            //    window.Title = filename;
+            //}
+            //catch (Exception ex)
+            //{
+            //    window.Message = "Unable to open file\n" + ex.Message;
+            //}
         }
 
-        private void HandleOpenFile(string obj)
+        private void HandleFileChosen(string filename)
         {
-            
+            try
+            {
+                string contents = File.ReadAllText(filename);
+                StringReader reader = new StringReader(contents);
+                model = new Spreadsheet(reader, new Regex("[a-zA-Z][1-9][0-9]"));
+                window.Title = filename;
+                SpreadsheetApplicationContext.GetContext().RunNew(window);
+            }
+            catch (Exception ex)
+            {
+                window.Message = "Unable to open file\n" + ex.Message;
+            }
         }
 
         private void OpenNewWindow()
