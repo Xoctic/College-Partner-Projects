@@ -104,6 +104,7 @@ namespace PS_7
         {
             if(e.KeyChar == (char)Keys.Return)
             {
+
                 string _text = cellContentText.Text;
                 spreadsheetPanel1.GetSelection(out int col, out int row);
 
@@ -111,7 +112,7 @@ namespace PS_7
                 row++;
                 string cellName = letter.ToString() + row.ToString();
                 UpdateCellEvent(cellName, _text);
-
+                getCellInfo(spreadsheetPanel1);
 
                 spreadsheetPanel1.SetValue(col, row-1, _text);
 
