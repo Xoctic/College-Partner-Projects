@@ -33,11 +33,6 @@ namespace PS_7
 
       
 
-        public void displayContentsOfCell()
-        {
-
-        }
-
         public string ContentsOfCell
         {
             set
@@ -102,25 +97,25 @@ namespace PS_7
         public void updateCell(string _cellContents)
         {
             cellContentText.Text = _cellContents;
-            
         }
 
-        
 
-        /// <summary>
-        /// Closes the current window
-        /// </summary>
-        public void DoClose()
+        private void cellContentTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
-            Close();
-        }
+            if(e.KeyChar == (char)Keys.Return)
+            {
+                string _text = cellContentText.Text;
+                spreadsheetPanel1.GetSelection(out int col, out int row);
 
-        /// <summary>
-        /// Opens a new window
-        /// </summary>
-        public void OpenNew()
-        {
-            SpreadsheetApplicationContext.GetContext().RunNew();
+                char letter = (char)('A' + col);
+                row++;
+                string cellName = letter.ToString() + row.ToString();
+                UpdateCellEvent(cellName, _text);
+
+
+                spreadsheetPanel1.SetValue(col, row-1, _text);
+
+            }
         }
 
 
@@ -192,7 +187,7 @@ namespace PS_7
         public int getRow(string _cellName)
         {
             string numString;
-            if(_cellName.Length == 2)
+            if (_cellName.Length == 2)
             {
                 numString = _cellName.Substring(1, 1);
             }
@@ -204,30 +199,27 @@ namespace PS_7
 
             int.TryParse(numString, out result);
 
-            return result-1;
+            return result - 1;
         }
 
-        private void OpenClicked(object sender, EventArgs e)
+
+
+        /// <summary>
+        /// Closes the current window
+        /// </summary>
+        public void DoClose()
         {
-
+            Close();
         }
 
-        private void cellContentTextBox_KeyPress(object sender, KeyPressEventArgs e)
+
+        /// <summary>
+        /// Opens a new window
+        /// </summary>
+        public void OpenNew()
         {
-            if(e.KeyChar == (char)Keys.Return)
-            {
-                string _text = cellContentText.Text;
-                spreadsheetPanel1.GetSelection(out int col, out int row);
-
-                char letter = (char)('A' + col);
-                row++;
-                string cellName = letter.ToString() + row;
-                UpdateCellEvent(cellName, _text);
-
-
-                spreadsheetPanel1.SetValue(col, row-1, _text);
-
-            }
+            SpreadsheetApplicationContext.GetContext().RunNew();
         }
+
     }
 }

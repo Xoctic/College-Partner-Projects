@@ -48,6 +48,8 @@
     <Compile Include="AbstractSpreadsheet.cs" />
     <Compile Include="Cell.cs" />
     <Compile Include="Controller.cs" />
+    <Compile Include="DependencyGraph.cs" />
+    <Compile Include="Formula.cs" />
     <Compile Include="ISpreadsheetView.cs" />
     <Compile Include="Launch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
