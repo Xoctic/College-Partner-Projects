@@ -311,12 +311,7 @@ namespace PS_7
         /// </summary>
         protected override IEnumerable<string> GetDirectDependents(string name)
         {
-            //ensures name is not null or invalid
-
             //if the dictionary does not contain the named cell, return an empty hashSet
-
-            //if the named cells content is the name of the cell, throw a circularException
-
 
             return dependencyGraph.GetDependees(name);
         }
@@ -366,7 +361,6 @@ namespace PS_7
         /// </summary>
         public override void Save(TextWriter dest)
         {
-            //Console.Write(dest.ToString());
             try
             {
                 using (XmlWriter writer = XmlWriter.Create(dest))

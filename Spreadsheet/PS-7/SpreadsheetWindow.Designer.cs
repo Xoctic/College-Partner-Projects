@@ -66,8 +66,8 @@
             // fileMenuItem
             // 
             this.fileMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.openMenuItem,
             this.newMenuItem,
+            this.openMenuItem,
             this.saveMenuItem,
             this.closeToolStripMenuItem});
             this.fileMenuItem.Name = "fileMenuItem";
@@ -91,8 +91,8 @@
             // saveMenuItem
             // 
             this.saveMenuItem.Name = "saveMenuItem";
-            this.saveMenuItem.Size = new System.Drawing.Size(115, 22);
-            this.saveMenuItem.Text = "Save";
+            this.saveMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveMenuItem.Text = "Save ...";
             this.saveMenuItem.Click += new System.EventHandler(this.saveMenuItem_Click);
             // 
             // closeToolStripMenuItem

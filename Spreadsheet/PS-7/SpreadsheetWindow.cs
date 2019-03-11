@@ -213,6 +213,8 @@ namespace PS_7
 
         private void fileMenuOpen_Click(object sender, EventArgs e)
         {
+            fileDialog.Filter = ".ss SpreadSheet File|*.ss|All files|*.*";
+            fileDialog.FilterIndex = 1;
             DialogResult result = fileDialog.ShowDialog();
             if (result == DialogResult.Yes || result == DialogResult.OK)
             {
@@ -233,7 +235,8 @@ namespace PS_7
 
         private void saveMenuItem_Click(object sender, EventArgs e)
         {
-            saveFileDialog.Filter = ".ss File|*.ss";
+            saveFileDialog.Filter = ".ss SpreadSheet File|*.ss|All files|*.*";
+            saveFileDialog.FilterIndex = 1;
             DialogResult result = saveFileDialog.ShowDialog();
             if (result == DialogResult.Yes || result == DialogResult.OK)
             {

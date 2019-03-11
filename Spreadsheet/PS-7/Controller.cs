@@ -52,6 +52,7 @@ namespace PS_7
             {
                 StringWriter stringWriter = new StringWriter();
                 model.Save(stringWriter);
+                File.WriteAllText(filename, stringWriter.ToString());
             }
             catch (Exception ex)
             {
@@ -65,7 +66,7 @@ namespace PS_7
             {
                 string contents = File.ReadAllText(filename);
                 StringReader reader = new StringReader(contents);
-                model = new Spreadsheet(reader, new Regex("[a-zA-Z][1-9][0-9]"));
+                model = new Spreadsheet(reader, new Regex(""));
                 window.Title = filename;
                 SpreadsheetApplicationContext.GetContext().RunNew(window);
             }
