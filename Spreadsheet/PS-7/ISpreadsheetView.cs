@@ -18,9 +18,11 @@ namespace PS_7
 
         event Action CloseWindowEvent;
 
-        event Action<string> UpdateCellEvent;
+        event Action<string, string> UpdateCellEvent;
 
         event Action<string> NewCellSelectedEvent;
+
+        //event Action<string> updateCell;
 
         string ContentsOfCell { set; }
 

@@ -102,7 +102,7 @@
             this.helpMenuItem.Text = "Help";
             this.helpMenuItem.Click += new System.EventHandler(this.helpMenuItem_Click);
             // 
-            // cellContentTextBox
+            // cellContentText
             // 
             this.cellContentTextBox.Location = new System.Drawing.Point(269, 42);
             this.cellContentTextBox.Margin = new System.Windows.Forms.Padding(2);
