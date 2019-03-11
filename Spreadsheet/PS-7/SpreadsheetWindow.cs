@@ -96,17 +96,11 @@ namespace PS_7
         /// <summary>
         /// 
         /// </summary>
-        public void ChangeValueOfCell(string _cellName, string _cellContents)
+        public void ChangeValueOfCell(string _cellName, string _cellValue)
         {
             spreadsheetPanel1.SetValue(getCol(_cellName), getRow(_cellName), _cellValue);
             
         }
-
-        public void updateCell(string _cellContents)
-        {
-            cellContentText.Text = _cellContents;
-        }
-
 
         private void cellContentTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -123,7 +117,8 @@ namespace PS_7
                 getCellInfo(spreadsheetPanel1);
 
                 spreadsheetPanel1.SetValue(col, row-1, _text);
-
+                //ALL YOU NEEDED WAS THIS LINE TO FIX THE ANNOYING NOISE WHEN ENTER IS PRESSED LMAO
+                e.Handled = true; 
             }
         }
 
@@ -211,9 +206,9 @@ namespace PS_7
             return result - 1;
         }
 
-        public void updateCell(string cellContents)
+        public void updateCell(string _cellContents)
         {
-            //Not implemented
+            cellContentText.Text = _cellContents;
         }
 
         private void fileMenuOpen_Click(object sender, EventArgs e)
@@ -238,6 +233,7 @@ namespace PS_7
 
         private void saveMenuItem_Click(object sender, EventArgs e)
         {
+            saveFileDialog.Filter = ".ss File|*.ss";
             DialogResult result = saveFileDialog.ShowDialog();
             if (result == DialogResult.Yes || result == DialogResult.OK)
             {
@@ -261,5 +257,14 @@ namespace PS_7
             }
         }
 
+        public void DoClose()
+        {
+            Close();
+        }
+
+        public void OpenNew()
+        {
+            SpreadsheetApplicationContext.GetContext().RunNew();
+        }
     }
 }

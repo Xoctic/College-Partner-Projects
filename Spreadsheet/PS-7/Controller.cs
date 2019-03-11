@@ -20,7 +20,7 @@ namespace PS_7
 
             window.CloseWindowEvent += HandleClose;
             window.HelpButtonEvent += HandleHelp;
-            window.NewCellSelectedEvent += HandleUpdateCell;
+            window.NewCellSelectedEvent += HandleCellSelected;
             window.OpenFileEvent += HandleFileChosen;
             window.SaveFileEvent += HandleSave;
             window.UpdateCellEvent += HandleUpdateCell;
@@ -48,20 +48,15 @@ namespace PS_7
 
         private void HandleSave(string filename)
         {
-            //try
-            //{
-            //    string contents = File.ReadAllText(filename);
-            //    StringWriter toBeSaved;
-            //    File.WriteAllText(to)
-            //    model.Save();
-            //    window.SubstringCount = 0;
-            //    window.SearchString = "";
-            //    window.Title = filename;
-            //}
-            //catch (Exception ex)
-            //{
-            //    window.Message = "Unable to open file\n" + ex.Message;
-            //}
+            try
+            {
+                StringWriter stringWriter = new StringWriter();
+                model.Save(stringWriter);
+            }
+            catch (Exception ex)
+            {
+                window.Message = "Unable to open file\n" + ex.Message;
+            }
         }
 
         private void HandleFileChosen(string filename)
