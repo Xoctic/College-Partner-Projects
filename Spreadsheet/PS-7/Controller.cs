@@ -79,6 +79,11 @@ namespace PS_7
                 model = new Spreadsheet(reader, new Regex(""));
                 window.Title = filename;
                 SpreadsheetApplicationContext.GetContext().RunNew(window);
+                foreach (string cell in model.GetNamesOfAllNonemptyCells())
+                {
+                    ReturnCellContents(cell);
+                    ReturnCellValue(cell);
+                }
             }
             catch (Exception ex)
             {
