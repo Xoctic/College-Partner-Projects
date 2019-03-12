@@ -269,5 +269,31 @@ namespace PS_7
         {
             SpreadsheetApplicationContext.GetContext().RunNew();
         }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            spreadsheetPanel1.GetSelection(out int x, out int y);
+            if(keyData == Keys.Up)
+            {
+                spreadsheetPanel1.SetSelection(x, y - 1);
+                return true;
+            }
+            else if(keyData == Keys.Down)
+            {
+                spreadsheetPanel1.SetSelection(x, y + 1);
+                return true;
+            }
+            else if (keyData == Keys.Right)
+            {
+                spreadsheetPanel1.SetSelection(x + 1, y);
+                return true;
+            }
+            else if (keyData == Keys.Left)
+            {
+                spreadsheetPanel1.SetSelection(x - 1, y);
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
     }
 }

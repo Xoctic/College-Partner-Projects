@@ -50,6 +50,12 @@
     <Compile Include="Controller.cs" />
     <Compile Include="DependencyGraph.cs" />
     <Compile Include="Formula.cs" />
+    <Compile Include="HelpMenu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HelpMenu.Designer.cs">
+      <DependentUpon>HelpMenu.cs</DependentUpon>
+    </Compile>
     <Compile Include="ISpreadsheetView.cs" />
     <Compile Include="Launch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -84,6 +90,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="HelpMenu.resx">
+      <DependentUpon>HelpMenu.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SpreadsheetWindow.resx">
       <DependentUpon>SpreadsheetWindow.cs</DependentUpon>
     </EmbeddedResource>
