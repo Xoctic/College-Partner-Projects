@@ -14,7 +14,7 @@ namespace PS_7
     {
         public HelpMenu()
         {
-            InitializeComponent();
+            InitializeComponent();           
         }
     }
 }

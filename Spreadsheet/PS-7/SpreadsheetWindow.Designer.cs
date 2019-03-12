@@ -31,8 +31,8 @@
             this.spreadsheetPanel1 = new SSGui.SpreadsheetPanel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -74,13 +74,6 @@
             this.fileMenuItem.Size = new System.Drawing.Size(37, 22);
             this.fileMenuItem.Text = "File";
             // 
-            // openMenuItem
-            // 
-            this.openMenuItem.Name = "openMenuItem";
-            this.openMenuItem.Size = new System.Drawing.Size(115, 22);
-            this.openMenuItem.Text = "Open ...";
-            this.openMenuItem.Click += new System.EventHandler(this.fileMenuOpen_Click);
-            // 
             // newMenuItem
             // 
             this.newMenuItem.Name = "newMenuItem";
@@ -88,10 +81,17 @@
             this.newMenuItem.Text = "New";
             this.newMenuItem.Click += new System.EventHandler(this.newMenuItem_Click);
             // 
+            // openMenuItem
+            // 
+            this.openMenuItem.Name = "openMenuItem";
+            this.openMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.openMenuItem.Text = "Open ...";
+            this.openMenuItem.Click += new System.EventHandler(this.fileMenuOpen_Click);
+            // 
             // saveMenuItem
             // 
             this.saveMenuItem.Name = "saveMenuItem";
-            this.saveMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveMenuItem.Size = new System.Drawing.Size(115, 22);
             this.saveMenuItem.Text = "Save ...";
             this.saveMenuItem.Click += new System.EventHandler(this.saveMenuItem_Click);
             // 
@@ -133,6 +133,7 @@
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "SpreadsheetWindow";
             this.Text = "SpreadsheetWindow";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SpreadsheetWindow_FormClosing);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
