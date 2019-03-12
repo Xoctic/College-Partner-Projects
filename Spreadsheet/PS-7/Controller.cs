@@ -27,7 +27,10 @@ namespace PS_7
             window.SaveFileEvent += HandleSave;
             window.UpdateCellEvent += HandleUpdateCell;
             window.OpenNewEvent += OpenNewWindow;
+            
         }
+
+        
 
         private void HandleUpdateCell(string _cellName, string _contents)
         {

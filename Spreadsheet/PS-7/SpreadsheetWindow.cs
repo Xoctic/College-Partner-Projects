@@ -135,6 +135,8 @@ namespace PS_7
         /// </summary>
         public event Action<string> NewCellSelectedEvent;
 
+      
+
         /// <summary>
         /// 
         /// </summary>
@@ -146,21 +148,37 @@ namespace PS_7
 
         private void cellContentTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if(e.KeyChar == (char)Keys.Return)
+            try
             {
+                try
+                {
+                    if (e.KeyChar == (char)Keys.Return)
+                    {
 
-                string _text = cellContentText.Text;
-                spreadsheetPanel1.GetSelection(out int col, out int row);
+                        string _text = cellContentText.Text;
+                        spreadsheetPanel1.GetSelection(out int col, out int row);
 
-                char letter = (char)('A' + col);
-                row++;
-                string cellName = letter.ToString() + row.ToString();
-                UpdateCellEvent(cellName, _text);
-                getCellInfo(spreadsheetPanel1);
-                //FIXED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Was passing in _text instead of currentValue
-                spreadsheetPanel1.SetValue(col, row-1, currentValue);
-                //ALL YOU NEEDED WAS THIS LINE TO FIX THE ANNOYING NOISE WHEN ENTER IS PRESSED LMAO
-                e.Handled = true; 
+                        char letter = (char)('A' + col);
+                        row++;
+                        string cellName = letter.ToString() + row.ToString();
+                        UpdateCellEvent(cellName, _text);
+                        getCellInfo(spreadsheetPanel1);
+                        //FIXED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Was passing in _text instead of currentValue
+                        spreadsheetPanel1.SetValue(col, row - 1, currentValue);
+                        //ALL YOU NEEDED WAS THIS LINE TO FIX THE ANNOYING NOISE WHEN ENTER IS PRESSED LMAO
+                        e.Handled = true;
+                    }
+                }
+                catch (CircularException eX)
+                {
+                    //create a new form
+                    MessageBox.Show("Can't perform operation because it will result in a circular dependency", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                }
+            }
+            catch (InvalidNameException ep)
+            {
+                MessageBox.Show("Cell Name Entered is Invalid", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
