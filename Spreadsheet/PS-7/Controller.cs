@@ -30,20 +30,30 @@ namespace PS_7
         private void HandleUpdateCell(string _cellName, string _contents)
         {
             model.SetContentsOfCell(_cellName, _contents);
+
             ReturnCellContents(_cellName);
             ReturnCellValue(_cellName);
+            //updates all cells in the spreadsheet after a cell value is changed
+            foreach(string cell in model.GetNamesOfAllNonemptyCells())
+            {
+                ReturnCellContents(cell);
+                ReturnCellValue(cell);
+            }
         }
 
         private void ReturnCellContents(string _cellName)
         {
             string cellContents = model.GetCellContents(_cellName).ToString();
+            window.ContentsOfCurrentCell = cellContents;
+
             window.updateCell(cellContents);
         }
 
         private void ReturnCellValue(string _cellName)
         {
             string cellValue = model.GetCellValue(_cellName).ToString();
-            window.ChangeValueOfCell(_cellName, cellValue);
+            window.ValueOfCurrentCell = cellValue;
+            window.ChangeValueOfCell(_cellName, window.ValueOfCurrentCell);
         }
 
         private void HandleSave(string filename)

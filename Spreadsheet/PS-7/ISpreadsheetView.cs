@@ -24,7 +24,11 @@ namespace PS_7
 
         //event Action<string> updateCell;
 
-        string ContentsOfCell { set; }
+        string ContentsOfCurrentCell { get; set; }
+
+        string ValueOfCurrentCell { get; set; }
+
+        string currentCellName { set; }
 
         string Title { set; }
 

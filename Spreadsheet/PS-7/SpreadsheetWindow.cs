@@ -13,11 +13,15 @@ namespace PS_7
 {
     public partial class SpreadsheetWindow : Form, ISpreadsheetView
     {
+        private string currentContents = "";
+        private string currentValue = "";
+        private string currentName = "";
        
         public SpreadsheetWindow()
         {
             InitializeComponent();
             spreadsheetPanel1.SelectionChanged += getCellInfo;
+            
      
             //updateCell += displayContentsOfCell;
         }
@@ -33,11 +37,44 @@ namespace PS_7
 
       
 
-        public string ContentsOfCell
+        public string ContentsOfCurrentCell
         {
             set
             {
-                cellContentText.Text = value;
+                currentContents = value.ToString();
+                //cellContentText.Text = value;
+            }
+
+            get
+            {
+                return currentContents;
+            }
+
+        }
+
+        public string ValueOfCurrentCell
+        {
+            set
+            {
+                currentValue = value.ToString();
+                //spreadsheetPanel1.SetValue(col, row - 1, _text);
+            }
+            get
+            {
+                return currentValue;
+            }
+
+        }
+
+        public string currentCellName
+        {
+            set
+            {
+                currentName = value;
+            }
+            get
+            {
+                return currentName;
             }
         }
 
@@ -98,7 +135,7 @@ namespace PS_7
         /// </summary>
         public void ChangeValueOfCell(string _cellName, string _cellValue)
         {
-            spreadsheetPanel1.SetValue(getCol(_cellName), getRow(_cellName), _cellValue);
+            spreadsheetPanel1.SetValue(getCol(_cellName), getRow(_cellName), currentValue);
             
         }
 
@@ -115,8 +152,8 @@ namespace PS_7
                 string cellName = letter.ToString() + row.ToString();
                 UpdateCellEvent(cellName, _text);
                 getCellInfo(spreadsheetPanel1);
-
-                spreadsheetPanel1.SetValue(col, row-1, _text);
+                //FIXED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Was passing in _text instead of currentValue
+                spreadsheetPanel1.SetValue(col, row-1, currentValue);
                 //ALL YOU NEEDED WAS THIS LINE TO FIX THE ANNOYING NOISE WHEN ENTER IS PRESSED LMAO
                 e.Handled = true; 
             }
@@ -125,7 +162,7 @@ namespace PS_7
 
         public int getCol(string _cellName)
         {
-            string letter = _cellName.Substring(0, 0);
+            string letter = _cellName.Substring(0, 1);
 
             switch (letter.ToUpper())
             {
@@ -182,9 +219,10 @@ namespace PS_7
                 case "Z":
                     return 25;
                 default:
-                    break;
+                    return -1;
+                    //break;
             }
-            return -1;
+            //return -1;
         }
 
 
