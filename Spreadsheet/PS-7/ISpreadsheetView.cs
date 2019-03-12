@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace PS_7
 {
@@ -16,7 +17,9 @@ namespace PS_7
 
         event Action HelpButtonEvent;
 
-        event Action CloseWindowEvent;
+        event Action CloseButtonClickedEvent;
+
+        event Action<FormClosingEventArgs> CloseWindowEvent;
 
         event Action<string, string> UpdateCellEvent;
 

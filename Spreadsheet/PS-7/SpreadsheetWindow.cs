@@ -116,7 +116,12 @@ namespace PS_7
         /// <summary>
         /// Fired when a close action is requested.
         /// </summary>
-        public event Action CloseWindowEvent;
+        public event Action<FormClosingEventArgs> CloseWindowEvent;
+
+        /// <summary>
+        /// Fired when the close button is clocked.
+        /// </summary>
+        public event Action CloseButtonClickedEvent;
 
         /// <summary>
         /// Fired when the contents of the cellContentsTextBox is changed
@@ -287,14 +292,17 @@ namespace PS_7
 
         private void helpMenuItem_Click(object sender, EventArgs e)
         {
-            //Not implemented
+            if (HelpButtonEvent != null)
+            {
+                HelpButtonEvent();
+            }
         }
 
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CloseWindowEvent != null)
+            if (CloseButtonClickedEvent != null)
             {
-                CloseWindowEvent();
+                CloseButtonClickedEvent();
             }
         }
 
@@ -306,6 +314,37 @@ namespace PS_7
         public void OpenNew()
         {
             SpreadsheetApplicationContext.GetContext().RunNew();
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            spreadsheetPanel1.GetSelection(out int x, out int y);
+            if(keyData == Keys.Up)
+            {
+                spreadsheetPanel1.SetSelection(x, y - 1);
+                return true;
+            }
+            else if(keyData == Keys.Down)
+            {
+                spreadsheetPanel1.SetSelection(x, y + 1);
+                return true;
+            }
+            else if (keyData == Keys.Right)
+            {
+                spreadsheetPanel1.SetSelection(x + 1, y);
+                return true;
+            }
+            else if (keyData == Keys.Left)
+            {
+                spreadsheetPanel1.SetSelection(x - 1, y);
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void SpreadsheetWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            CloseWindowEvent(e);
         }
     }
 }

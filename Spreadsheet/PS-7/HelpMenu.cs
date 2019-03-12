@@ -14,12 +14,7 @@ namespace PS_7
     {
         public HelpMenu()
         {
-            InitializeComponent();
-        }
-
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-
+            InitializeComponent();           
         }
     }
 }

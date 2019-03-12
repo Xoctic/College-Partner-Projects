@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace PS_7
 {
@@ -17,8 +18,9 @@ namespace PS_7
         {
             this.window = _window;
             this.model = new Spreadsheet();
-
-            window.CloseWindowEvent += HandleClose;
+ 
+            window.CloseWindowEvent += HandleExitWindow;
+            window.CloseButtonClickedEvent += HandleCloseButtonClick;
             window.HelpButtonEvent += HandleHelp;
             window.NewCellSelectedEvent += HandleCellSelected;
             window.OpenFileEvent += HandleFileChosen;
@@ -104,14 +106,25 @@ namespace PS_7
 
         private void HandleHelp()
         {
-            throw new NotImplementedException();
+            HelpMenu helpMenu = new HelpMenu();
+            helpMenu.Show();
         }
 
-        private void HandleClose()
+        private void HandleExitWindow(FormClosingEventArgs e)
+        {
+            if(model.Changed == true)
+            {
+                DialogResult dialog = MessageBox.Show("Do you really want to close the Spread Sheet without saving?", "Exit", MessageBoxButtons.YesNo);
+                if (dialog == DialogResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
+        private void HandleCloseButtonClick()
         {
             window.DoClose();
         }
-
 
     }
 }
