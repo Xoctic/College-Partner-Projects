@@ -47,7 +47,7 @@
             this.spreadsheetPanel1.Location = new System.Drawing.Point(28, 77);
             this.spreadsheetPanel1.Margin = new System.Windows.Forms.Padding(1);
             this.spreadsheetPanel1.Name = "spreadsheetPanel1";
-            this.spreadsheetPanel1.Size = new System.Drawing.Size(1063, 747);
+            this.spreadsheetPanel1.Size = new System.Drawing.Size(1761, 881);
             this.spreadsheetPanel1.TabIndex = 0;
             // 
             // menuStrip1
@@ -59,7 +59,7 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(4, 1, 0, 1);
-            this.menuStrip1.Size = new System.Drawing.Size(1125, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1799, 24);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -111,7 +111,7 @@
             // 
             // cellContentText
             // 
-            this.cellContentText.Location = new System.Drawing.Point(430, 41);
+            this.cellContentText.Location = new System.Drawing.Point(775, 38);
             this.cellContentText.Name = "cellContentText";
             this.cellContentText.Size = new System.Drawing.Size(247, 20);
             this.cellContentText.TabIndex = 2;
@@ -125,7 +125,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1125, 690);
+            this.ClientSize = new System.Drawing.Size(1799, 811);
             this.Controls.Add(this.cellContentText);
             this.Controls.Add(this.spreadsheetPanel1);
             this.Controls.Add(this.menuStrip1);
