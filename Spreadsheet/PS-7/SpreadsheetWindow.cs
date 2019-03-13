@@ -13,19 +13,28 @@ namespace PS_7
 {
     public partial class SpreadsheetWindow : Form, ISpreadsheetView
     {
+        /// <summary>
+        /// Private instance variables to hold the conents, and value of the current cell selected in spreadsheetPanel1
+        /// </summary>
         private string currentContents = "";
         private string currentValue = "";
         private string currentName = "";
        
+        /// <summary>
+        /// Constructor which initializes a spreadSheet GUI
+        /// Hooks a selectionChanged event that occurs inside spreadsheetPanel1 to a method getCellInfo
+        /// </summary>
         public SpreadsheetWindow()
         {
             InitializeComponent();
             spreadsheetPanel1.SelectionChanged += getCellInfo;
-            
-     
-            //updateCell += displayContentsOfCell;
         }
 
+        /// <summary>
+        /// Retrieves the row and column number of the current selected cell
+        /// Converts the row and column number into a cellName which is passed into a newCellSectedEvent where it will be used by the spreadsheet model
+        /// </summary>
+        /// <param name="sender"></param>
         private void getCellInfo(SpreadsheetPanel sender)
         {
             spreadsheetPanel1.GetSelection(out int col, out int row);
@@ -36,7 +45,9 @@ namespace PS_7
         }
 
       
-
+        /// <summary>
+        /// setter and getter for the contents of the current selected cell in spreadsheetPanel1
+        /// </summary>
         public string ContentsOfCurrentCell
         {
             set
@@ -52,6 +63,9 @@ namespace PS_7
 
         }
 
+        /// <summary>
+        /// setter and getter for the value of the current selected cell in spreadSheetPanel1
+        /// </summary>
         public string ValueOfCurrentCell
         {
             set
@@ -66,6 +80,9 @@ namespace PS_7
 
         }
 
+        /// <summary>
+        /// setter and getter for the name of the current selected cell in spreadsheetPanel1
+        /// </summary>
         public string currentCellName
         {
             set
@@ -78,10 +95,16 @@ namespace PS_7
             }
         }
 
+        /// <summary>
+        /// Sets the title of the spreadSheetWindow
+        /// </summary>
         public string Title {
             set { Text = value; }
         }
 
+        /// <summary>
+        /// ???
+        /// </summary>
         public string Message
         {
             set { MessageBox.Show(value); }
@@ -138,7 +161,8 @@ namespace PS_7
       
 
         /// <summary>
-        /// 
+        /// sets the new value of the cell in spreadsheetPanel1 that corresponds with the cellName passed in
+        /// Converts a cell name into corresponding row and column numbers in spreadSheetPanel1
         /// </summary>
         public void ChangeValueOfCell(string _cellName, string _cellValue)
         {
@@ -146,6 +170,12 @@ namespace PS_7
             
         }
 
+        /// <summary>
+        /// Handles the event when the enter key is pressed within the cellContentsTextBox
+        /// Catches any circularException or invalidNameException using a try/catch and an error winodw without modifying the spreadSheet
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cellContentTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             try
@@ -154,16 +184,22 @@ namespace PS_7
                 {
                     if (e.KeyChar == (char)Keys.Return)
                     {
-
+                        //appends current string in cellContentsTextBox
+                        //retrieves the row and column number of the current selected cell in spreadSheetPanel1
                         string _text = cellContentText.Text;
                         spreadsheetPanel1.GetSelection(out int col, out int row);
 
+                        //converts the row and column number into a readable cell name for the model
                         char letter = (char)('A' + col);
                         row++;
                         string cellName = letter.ToString() + row.ToString();
+
+                        //calls an updateCellEvent using the newly created cellName and the text that was appended in the cellContentsTextBox
                         UpdateCellEvent(cellName, _text);
                         getCellInfo(spreadsheetPanel1);
-                        //FIXED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Was passing in _text instead of currentValue
+
+                        //Sets new value of the cell after being calculated by the model as well as ensuring theevent is handled
+                        //FIXED! Was passing in _text instead of currentValue
                         spreadsheetPanel1.SetValue(col, row - 1, currentValue);
                         //ALL YOU NEEDED WAS THIS LINE TO FIX THE ANNOYING NOISE WHEN ENTER IS PRESSED LMAO
                         e.Handled = true;
@@ -182,7 +218,11 @@ namespace PS_7
             }
         }
 
-
+        /// <summary>
+        /// Retrieves the column number for spreadsheetPanel1 that is associated with the cellName passed in
+        /// </summary>
+        /// <param name="_cellName"></param>
+        /// <returns></returns>
         public int getCol(string _cellName)
         {
             string letter = _cellName.Substring(0, 1);
@@ -243,12 +283,16 @@ namespace PS_7
                     return 25;
                 default:
                     return -1;
-                    //break;
+                   
             }
-            //return -1;
+           
         }
 
-
+        /// <summary>
+        /// Retrieves the row number for spreadsheetPanel1 that is associated with the cellName passed in
+        /// </summary>
+        /// <param name="_cellName"></param>
+        /// <returns></returns>
         public int getRow(string _cellName)
         {
             string numString;
@@ -267,11 +311,21 @@ namespace PS_7
             return result - 1;
         }
 
+        /// <summary>
+        /// assigns the contents of cellContentTextBox to whatever string is passed in
+        /// </summary>
+        /// <param name="_cellContents"></param>
         public void updateCell(string _cellContents)
         {
             cellContentText.Text = _cellContents;
         }
 
+        /// <summary>
+        /// Handles when the open fileMenuItem is clicked
+        /// ???
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void fileMenuOpen_Click(object sender, EventArgs e)
         {
             fileDialog.Filter = ".ss SpreadSheet File|*.ss|All files|*.*";
@@ -286,6 +340,11 @@ namespace PS_7
             }
         }
 
+        /// <summary>
+        /// Handles when the new fileMenuItem is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void newMenuItem_Click(object sender, EventArgs e)
         {
             if (OpenNewEvent != null)
@@ -294,6 +353,12 @@ namespace PS_7
             }
         }
 
+        /// <summary>
+        /// Handles when the save fileMenuItem is clicked
+        /// ???
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void saveMenuItem_Click(object sender, EventArgs e)
         {
             saveFileDialog.Filter = ".ss SpreadSheet File|*.ss|All files|*.*";
@@ -307,7 +372,13 @@ namespace PS_7
                 }
             }
         }
-
+        
+        /// <summary>
+        /// Handles when the help fileMenuItem is clicked
+        /// ???
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void helpMenuItem_Click(object sender, EventArgs e)
         {
             if (HelpButtonEvent != null)
@@ -316,6 +387,12 @@ namespace PS_7
             }
         }
 
+        /// <summary>
+        /// Handles when the close menuItem is clicked
+        /// ???
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (CloseButtonClickedEvent != null)
@@ -324,16 +401,28 @@ namespace PS_7
             }
         }
 
+        /// <summary>
+        ///  Closes the current window
+        /// </summary>
         public void DoClose()
         {
             Close();
         }
 
+        /// <summary>
+        /// Runs a new spreadSheetWindow
+        /// </summary>
         public void OpenNew()
         {
             SpreadsheetApplicationContext.GetContext().RunNew();
         }
 
+        /// <summary>
+        /// Handles the event of when arrow keys are pressed to navigate in the spreadsheet
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="keyData"></param>
+        /// <returns></returns>
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             spreadsheetPanel1.GetSelection(out int x, out int y);
@@ -360,6 +449,11 @@ namespace PS_7
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
+        /// <summary>
+        /// ???
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SpreadsheetWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             CloseWindowEvent(e);
