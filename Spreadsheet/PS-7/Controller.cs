@@ -11,13 +11,21 @@ namespace PS_7
 {
     class Controller
     {
+        //only two instance variable used for the controller
+        //one is the window which is an interface
+        //other is the model which is a spreadsheet object
         private ISpreadsheetView window;
         private AbstractSpreadsheet model;
 
+        /// <summary>
+        /// constuctor for the controller takes in an interface, and initializes the winodw and model
+        /// also hooks all the events in the window and handles them in the various methods below
+        /// </summary>
+        /// <param name="_window"></param>
         public Controller(ISpreadsheetView _window)
         {
             this.window = _window;
-            this.model = new Spreadsheet();
+            this.model = new Spreadsheet(new Regex("^([a-zA-Z][1-9]([0-9]?))$"));
  
             window.CloseWindowEvent += HandleExitWindow;
             window.CloseButtonClickedEvent += HandleCloseButtonClick;
@@ -31,7 +39,12 @@ namespace PS_7
         }
 
         
-
+        /// <summary>
+        /// uses the model to set the contents of the cell
+        /// uses the methods returnCellContents
+        /// </summary>
+        /// <param name="_cellName"></param>
+        /// <param name="_contents"></param>
         private void HandleUpdateCell(string _cellName, string _contents)
         {
             model.SetContentsOfCell(_cellName, _contents);
@@ -81,7 +94,7 @@ namespace PS_7
             {
                 string contents = File.ReadAllText(filename);
                 StringReader reader = new StringReader(contents);
-                model = new Spreadsheet(reader, new Regex(""));
+                model = new Spreadsheet(reader, new Regex("^([a-zA-Z][1-9]([0-9]?))$"));
                 window.Title = filename;
                 SpreadsheetApplicationContext.GetContext().RunNew(window);
                 foreach (string cell in model.GetNamesOfAllNonemptyCells())

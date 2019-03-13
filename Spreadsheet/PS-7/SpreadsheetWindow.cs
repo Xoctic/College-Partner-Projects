@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using SSGui;
+using Formulas;
 
 namespace PS_7
 {
@@ -178,8 +179,7 @@ namespace PS_7
         /// <param name="e"></param>
         private void cellContentTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
-            try
-            {
+           
                 try
                 {
                     if (e.KeyChar == (char)Keys.Return)
@@ -205,17 +205,26 @@ namespace PS_7
                         e.Handled = true;
                     }
                 }
-                catch (CircularException eX)
+                catch (Exception eX)
                 {
-                    //create a new form
-                    MessageBox.Show("Can't perform operation because it will result in a circular dependency", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    if(eX.GetType() == typeof(CircularException))
+                    {
+                        //create a new form
+                        MessageBox.Show("Can't perform operation because it will result in a circular dependency", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    }
+                    if(eX.GetType() == typeof(InvalidNameException) || eX.GetType() == typeof(FormulaFormatException))
+                    {
+                        MessageBox.Show("Cell Name Entered is Invalid", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        throw eX;
+                    }
+
 
                 }
-            }
-            catch (InvalidNameException ep)
-            {
-                MessageBox.Show("Cell Name Entered is Invalid", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+           
         }
 
         /// <summary>
@@ -429,6 +438,7 @@ namespace PS_7
             if(keyData == Keys.Up)
             {
                 spreadsheetPanel1.SetSelection(x, y - 1);
+
                 return true;
             }
             else if(keyData == Keys.Down)
