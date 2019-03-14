@@ -2,11 +2,10 @@
 using System.Windows.Forms;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PS_7;
-using SSGui;
 
 namespace PS_7UnitTestss
 {
-    class Stub : Form, ISpreadsheetView
+    class SpreadsheetwindowStub : ISpreadsheetView
     {
         // These four properties record whether a method has been called
         public bool CalledDoClose

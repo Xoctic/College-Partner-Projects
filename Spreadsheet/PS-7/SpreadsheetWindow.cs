@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using SSGui;
 using Formulas;
+//Authors:  Andrew Hare(u1033940), Aric Campbell(u1188031)
 
 namespace PS_7
 {

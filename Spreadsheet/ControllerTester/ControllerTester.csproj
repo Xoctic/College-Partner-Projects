@@ -5,11 +5,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A25F504C-202D-4541-A315-66D96E2D1623}</ProjectGuid>
+    <ProjectGuid>{7AB1CBC5-4365-4EF6-95E0-38B32F4DD1BD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PS_7UnitTestss</RootNamespace>
-    <AssemblyName>PS-7UnitTestss</AssemblyName>
+    <RootNamespace>ControllerTester</RootNamespace>
+    <AssemblyName>ControllerTester</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -50,32 +50,20 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
-    <Compile Include="Stub.cs" />
+    <Compile Include="SpreadsheetWindowStub.cs" />
+    <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DependencyGraph\DependencyGraph.csproj">
-      <Project>{862ead85-346f-4d2b-a53c-98074ff813ba}</Project>
-      <Name>DependencyGraph</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Formula\Formula.csproj">
-      <Project>{d43d998c-9797-4cf4-9bb0-6de22753849a}</Project>
-      <Name>Formula</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PS-7\PS-7.csproj">
-      <Project>{accd15f4-818f-478d-9812-0070d2104850}</Project>
+      <Project>{ACCD15F4-818F-478D-9812-0070D2104850}</Project>
       <Name>PS-7</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SpreadsheetPanel\SpreadsheetPanel.csproj">
-      <Project>{f31299dc-288f-4e46-a3af-6bf461b21c79}</Project>
-      <Name>SpreadsheetPanel</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Spreadsheet\Spreadsheet.csproj">
-      <Project>{9025a594-df2a-4e6a-b8c2-f087ecc3e203}</Project>
+      <Project>{9025A594-DF2A-4E6A-B8C2-F087ECC3E203}</Project>
       <Name>Spreadsheet</Name>
     </ProjectReference>
   </ItemGroup>

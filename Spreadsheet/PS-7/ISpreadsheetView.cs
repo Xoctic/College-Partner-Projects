@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+//Authors:  Andrew Hare(u1033940), Aric Campbell(u1188031)
 
 namespace PS_7
 {
