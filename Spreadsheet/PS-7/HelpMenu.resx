@@ -117,4 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="label1.Text" xml:space="preserve">
+    <value>-To select a cell, click the cell with the mouse cursor or use the arrow keys.                                                          -The cell that is currently selected will have a thicker border.                                                                                       -To edit a cells contents, click the text box near the top of the SpreadSheet, type in the desired value and then press enter.                                                                                                                                                                 -This will set the selected cells contents and set cell values as necessary.                                                                  -Cell values are what is displayed inside of the cell.  Cell contents are displayed in the text box for the current selected cell.                                                                                                                                                                  -Once the text box has been selected with the mouse cursor, navigating and editing cells is much easier by using the arrow keys.  The cursor will remain in the text box if arrow keys are used. </value>
+  </data>
 </root>

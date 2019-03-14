@@ -16,6 +16,7 @@ namespace PS_7
         //other is the model which is a spreadsheet object
         private ISpreadsheetView window;
         private AbstractSpreadsheet model;
+        private Controller controller;
 
         /// <summary>
         /// constuctor for the controller takes in an interface, and initializes the winodw and model
@@ -38,7 +39,7 @@ namespace PS_7
             
         }
 
-        
+
         /// <summary>
         /// uses the model to set the contents of the cell
         /// uses the methods returnCellContents
@@ -84,7 +85,7 @@ namespace PS_7
             }
             catch (Exception ex)
             {
-                window.Message = "Unable to open file\n" + ex.Message;
+                window.Message = "Unable to save file\n" + ex.Message;
             }
         }
 
@@ -92,15 +93,42 @@ namespace PS_7
         {
             try
             {
-                string contents = File.ReadAllText(filename);
-                StringReader reader = new StringReader(contents);
-                model = new Spreadsheet(reader, new Regex("^([a-zA-Z][1-9]([0-9]?))$"));
-                window.Title = filename;
-                SpreadsheetApplicationContext.GetContext().RunNew(window);
-                foreach (string cell in model.GetNamesOfAllNonemptyCells())
+                if (model.Changed == true)
                 {
-                    ReturnCellContents(cell);
-                    ReturnCellValue(cell);
+                    DialogResult dialog = MessageBox.Show("Do you really want to open a Spread Sheet without saving?", "Exit", MessageBoxButtons.YesNo);
+                    if (dialog == DialogResult.No)
+                    {
+                        return;
+                    }
+                    else if(dialog == DialogResult.Yes)
+                    {
+                        string contents = File.ReadAllText(filename);
+                        StringReader reader = new StringReader(contents);
+                        AbstractSpreadsheet modelToOpen = new Spreadsheet(reader, new Regex("^([a-zA-Z][1-9]([0-9]?))$"));
+                        window.Title = filename;
+                        window.OpenNew();
+                        model = modelToOpen;
+
+                        //SpreadsheetApplicationContext.GetContext().RunNew(window);
+                        foreach (string cell in model.GetNamesOfAllNonemptyCells())
+                        {
+                            ReturnCellContents(cell);
+                            ReturnCellValue(cell);
+                        }
+                    }
+                }
+                else
+                {
+                    string contents = File.ReadAllText(filename);
+                    StringReader reader = new StringReader(contents);
+                    model = new Spreadsheet(reader, new Regex("^([a-zA-Z][1-9]([0-9]?))$"));
+                    window.Title = filename;
+                    SpreadsheetApplicationContext.GetContext().RunNew(window);
+                    foreach (string cell in model.GetNamesOfAllNonemptyCells())
+                    {
+                        ReturnCellContents(cell);
+                        ReturnCellValue(cell);
+                    }
                 }
             }
             catch (Exception ex)
@@ -109,6 +137,10 @@ namespace PS_7
             }
         }
 
+        private void OpenNewWindowSelectedFile()
+        {
+
+        }
         private void OpenNewWindow()
         {
             window.OpenNew();

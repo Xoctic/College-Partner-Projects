@@ -54,14 +54,11 @@ namespace PS_7
             set
             {
                 currentContents = value.ToString();
-                //cellContentText.Text = value;
             }
-
             get
             {
                 return currentContents;
             }
-
         }
 
         /// <summary>
@@ -72,13 +69,11 @@ namespace PS_7
             set
             {
                 currentValue = value.ToString();
-                //spreadsheetPanel1.SetValue(col, row - 1, _text);
             }
             get
             {
                 return currentValue;
             }
-
         }
 
         /// <summary>
@@ -222,7 +217,7 @@ namespace PS_7
                         throw eX;
                     }
 
-
+                e.Handled = true;
                 }
            
         }
@@ -235,65 +230,67 @@ namespace PS_7
         public int getCol(string _cellName)
         {
             string letter = _cellName.Substring(0, 1);
-
-            switch (letter.ToUpper())
-            {
-                case "A":
-                    return 0;
-                case "B":
-                    return 1;
-                case "C":
-                    return 2;
-                case "D":
-                    return 3;
-                case "E":
-                    return 4;
-                case "F":
-                    return 5;
-                case "G":
-                    return 6;
-                case "H":
-                    return 7;
-                case "I":
-                    return 8;
-                case "J":
-                    return 9;
-                case "K":
-                    return 10;
-                case "L":
-                    return 11;
-                case "M":
-                    return 12;
-                case "N":
-                    return 13;
-                case "O":
-                    return 14;
-                case "P":
-                    return 15;
-                case "Q":
-                    return 16;
-                case "R":
-                    return 17;
-                case "S":
-                    return 18;
-                case "T":
-                    return 19;
-                case "U":
-                    return 20;
-                case "V":
-                    return 21;
-                case "W":
-                    return 22;
-                case "X":
-                    return 23;
-                case "Y":
-                    return 24;
-                case "Z":
-                    return 25;
-                default:
-                    return -1;
+            byte[] bytes = Encoding.ASCII.GetBytes(letter.ToUpper());
+            int result = Convert.ToInt32(bytes[0]);
+            return result - 65;
+            //switch (letter.ToUpper())
+            //{
+            //    case "A":
+            //        return 0;
+            //    case "B":
+            //        return 1;
+            //    case "C":
+            //        return 2;
+            //    case "D":
+            //        return 3;
+            //    case "E":
+            //        return 4;
+            //    case "F":
+            //        return 5;
+            //    case "G":
+            //        return 6;
+            //    case "H":
+            //        return 7;
+            //    case "I":
+            //        return 8;
+            //    case "J":
+            //        return 9;
+            //    case "K":
+            //        return 10;
+            //    case "L":
+            //        return 11;
+            //    case "M":
+            //        return 12;
+            //    case "N":
+            //        return 13;
+            //    case "O":
+            //        return 14;
+            //    case "P":
+            //        return 15;
+            //    case "Q":
+            //        return 16;
+            //    case "R":
+            //        return 17;
+            //    case "S":
+            //        return 18;
+            //    case "T":
+            //        return 19;
+            //    case "U":
+            //        return 20;
+            //    case "V":
+            //        return 21;
+            //    case "W":
+            //        return 22;
+            //    case "X":
+            //        return 23;
+            //    case "Y":
+            //        return 24;
+            //    case "Z":
+            //        return 25;
+            //    default:
+            //        return -1;
                    
-            }
+            //}
            
         }
 
@@ -345,6 +342,7 @@ namespace PS_7
                 if (OpenFileEvent != null)
                 {
                     OpenFileEvent(fileDialog.FileName);
+                    
                 }
             }
         }
@@ -370,6 +368,7 @@ namespace PS_7
         /// <param name="e"></param>
         private void saveMenuItem_Click(object sender, EventArgs e)
         {
+            saveFileDialog.OverwritePrompt = true;
             saveFileDialog.Filter = ".ss SpreadSheet File|*.ss|All files|*.*";
             saveFileDialog.FilterIndex = 1;
             DialogResult result = saveFileDialog.ShowDialog();
@@ -435,28 +434,35 @@ namespace PS_7
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             spreadsheetPanel1.GetSelection(out int x, out int y);
-            if(keyData == Keys.Up)
+            switch(keyData)
             {
-                spreadsheetPanel1.SetSelection(x, y - 1);
+                case Keys.Up:
+                    spreadsheetPanel1.SetSelection(x, y - 1);
+                    getCellInfo(spreadsheetPanel1);
+                    return true;
 
-                return true;
+                case Keys.Down:
+                    spreadsheetPanel1.SetSelection(x, y + 1);
+                    getCellInfo(spreadsheetPanel1);
+                    return true;
+
+                case Keys.Right:
+                    spreadsheetPanel1.SetSelection(x + 1, y);
+                    getCellInfo(spreadsheetPanel1);
+                    return true;
+
+                case Keys.Left:
+                    spreadsheetPanel1.SetSelection(x - 1, y);
+                    getCellInfo(spreadsheetPanel1);
+                    return true;
+
+                case Keys.X:
+                    CloseButtonClickedEvent();
+                    return true;
+
+                default:
+                    return base.ProcessCmdKey(ref msg, keyData);
             }
-            else if(keyData == Keys.Down)
-            {
-                spreadsheetPanel1.SetSelection(x, y + 1);
-                return true;
-            }
-            else if (keyData == Keys.Right)
-            {
-                spreadsheetPanel1.SetSelection(x + 1, y);
-                return true;
-            }
-            else if (keyData == Keys.Left)
-            {
-                spreadsheetPanel1.SetSelection(x - 1, y);
-                return true;
-            }
-            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         /// <summary>
