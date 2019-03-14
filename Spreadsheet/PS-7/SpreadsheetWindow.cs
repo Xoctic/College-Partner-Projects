@@ -425,6 +425,11 @@ namespace PS_7
             SpreadsheetApplicationContext.GetContext().RunNew();
         }
 
+        public void OpenNewOpenedFile(AbstractSpreadsheet model)
+        {
+            SpreadsheetApplicationContext.GetContext().RunNew(model);
+        }
+
         /// <summary>
         /// Handles the event of when arrow keys are pressed to navigate in the spreadsheet
         /// </summary>

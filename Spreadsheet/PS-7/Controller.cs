@@ -16,7 +16,6 @@ namespace PS_7
         //other is the model which is a spreadsheet object
         private ISpreadsheetView window;
         private AbstractSpreadsheet model;
-        private Controller controller;
 
         /// <summary>
         /// constuctor for the controller takes in an interface, and initializes the winodw and model
@@ -37,6 +36,21 @@ namespace PS_7
             window.UpdateCellEvent += HandleUpdateCell;
             window.OpenNewEvent += OpenNewWindow;
             
+        }
+
+        public Controller(ISpreadsheetView _window, AbstractSpreadsheet _model)
+        {
+            this.window = _window;
+            this.model = _model;
+
+            window.CloseWindowEvent += HandleExitWindow;
+            window.CloseButtonClickedEvent += HandleCloseButtonClick;
+            window.HelpButtonEvent += HandleHelp;
+            window.NewCellSelectedEvent += HandleCellSelected;
+            window.OpenFileEvent += HandleFileChosen;
+            window.SaveFileEvent += HandleSave;
+            window.UpdateCellEvent += HandleUpdateCell;
+            window.OpenNewEvent += OpenNewWindow;
         }
 
 
@@ -93,42 +107,15 @@ namespace PS_7
         {
             try
             {
-                if (model.Changed == true)
+                string contents = File.ReadAllText(filename);
+                StringReader reader = new StringReader(contents);
+                AbstractSpreadsheet modelToOpen = new Spreadsheet(reader, new Regex("^([a-zA-Z][1-9]([0-9]?))$"));
+                window.OpenNewOpenedFile(modelToOpen);
+                //window.Title = filename;
+                foreach (string cell in modelToOpen.GetNamesOfAllNonemptyCells())
                 {
-                    DialogResult dialog = MessageBox.Show("Do you really want to open a Spread Sheet without saving?", "Exit", MessageBoxButtons.YesNo);
-                    if (dialog == DialogResult.No)
-                    {
-                        return;
-                    }
-                    else if(dialog == DialogResult.Yes)
-                    {
-                        string contents = File.ReadAllText(filename);
-                        StringReader reader = new StringReader(contents);
-                        AbstractSpreadsheet modelToOpen = new Spreadsheet(reader, new Regex("^([a-zA-Z][1-9]([0-9]?))$"));
-                        window.Title = filename;
-                        window.OpenNew();
-                        model = modelToOpen;
-
-                        //SpreadsheetApplicationContext.GetContext().RunNew(window);
-                        foreach (string cell in model.GetNamesOfAllNonemptyCells())
-                        {
-                            ReturnCellContents(cell);
-                            ReturnCellValue(cell);
-                        }
-                    }
-                }
-                else
-                {
-                    string contents = File.ReadAllText(filename);
-                    StringReader reader = new StringReader(contents);
-                    model = new Spreadsheet(reader, new Regex("^([a-zA-Z][1-9]([0-9]?))$"));
-                    window.Title = filename;
-                    SpreadsheetApplicationContext.GetContext().RunNew(window);
-                    foreach (string cell in model.GetNamesOfAllNonemptyCells())
-                    {
-                        ReturnCellContents(cell);
-                        ReturnCellValue(cell);
-                    }
+                    ReturnCellContents(cell);
+                    ReturnCellValue(cell);
                 }
             }
             catch (Exception ex)

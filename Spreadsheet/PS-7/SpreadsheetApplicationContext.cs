@@ -54,11 +54,11 @@ namespace PS_7
             window.Show();
         }
 
-        public void RunNew(ISpreadsheetView _window)
+        public void RunNew(AbstractSpreadsheet model)
         {
             // Create the window and the controller
-            SpreadsheetWindow window = (SpreadsheetWindow)_window;
-            new Controller(window);
+            SpreadsheetWindow window = new SpreadsheetWindow();
+            new Controller(window, model);
 
             // One more form is running
             windowCount++;

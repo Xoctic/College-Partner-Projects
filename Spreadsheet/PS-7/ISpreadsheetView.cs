@@ -45,6 +45,8 @@ namespace PS_7
 
         void OpenNew();
 
+        void OpenNewOpenedFile(AbstractSpreadsheet model);
+
         void updateCell(string cellContents);
        
     }
