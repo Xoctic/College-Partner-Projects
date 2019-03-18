@@ -26,69 +26,71 @@ namespace ReaderWriterLockClasses
     public abstract class RWLock : IDisposable
     {
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Initializes a new instance of the ReaderWriterLockSlim class with default property values.
         /// </summary>
         public RWLock ()
         {
         }
 
-        /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// <summary>	
+        /// Gets the total number of unique threads that have entered the lock in read mode.
         /// </summary>
         public abstract int CurrentReadCount { get; }
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Gets a value that indicates whether the current thread has entered the lock in read mode.
         /// </summary>
         public abstract bool IsReadLockHeld { get; }
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Gets the total number of threads that are waiting to enter the lock in read mode.
         /// </summary>
         public abstract int WaitingReadCount { get; }
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Gets a value that indicates whether the current thread has entered the lock in write mode.
         /// </summary>
         public abstract bool IsWriteLockHeld { get; }
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Gets the total number of threads that are waiting to enter the lock in write mode.
         /// </summary>
         public abstract int WaitingWriteCount { get; }
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Tries to enter the lock in read mode.
         /// </summary>
         public abstract void EnterReadLock();
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Tries to enter the lock in write mode.
+        /// 1 test currently
         /// </summary>
         public abstract void EnterWriteLock();
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Reduces the recursion count for read mode, and exits read mode if the resulting count is 0 (zero)
         /// </summary>
         public abstract void ExitReadLock();
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Reduces the recursion count for write mode, and exits write mode if the resulting count is 0 (zero).
+        /// 1 test currently
         /// </summary>
         public abstract void ExitWriteLock();
 
-        /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// <summary>	
+        /// Tries to enter the lock in read mode, with an optional integer time-out.
         /// </summary>
         public abstract bool TryEnterReadLock(int millisecondsTimeout);
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Tries to enter the lock in write mode, with an optional time-out.
         /// </summary>
         public abstract bool TryEnterWriteLock(int millisecondsTimeout);
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Releases all resources used by the current instance of the ReaderWriterLockSlim class.
         /// </summary>
         public abstract void Dispose();
     }

@@ -14,13 +14,16 @@ namespace ReaderWriterLockClasses
     {
         ReaderWriterLockSlim rwLock;
 
+        /// <summary>
+        /// Initializes a new instance of the ReaderWriterLockSlim class with default property values.
+        /// </summary>
         public ReaderWriterLockSlimWrapper ()
         {
             rwLock = new ReaderWriterLockSlim();
         }
 
-        /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// <summary>	
+        /// Gets the total number of unique threads that have entered the lock in read mode.
         /// </summary>
         public override int CurrentReadCount
         {
@@ -31,7 +34,7 @@ namespace ReaderWriterLockClasses
         }
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Gets a value that indicates whether the current thread has entered the lock in read mode.
         /// </summary>
         public override bool IsReadLockHeld
         {
@@ -42,7 +45,7 @@ namespace ReaderWriterLockClasses
         }
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Gets the total number of threads that are waiting to enter the lock in read mode.
         /// </summary>
         public override int WaitingReadCount
         {
@@ -53,7 +56,7 @@ namespace ReaderWriterLockClasses
         }
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Gets a value that indicates whether the current thread has entered the lock in write mode.
         /// </summary>
         public override bool IsWriteLockHeld
         {
@@ -64,7 +67,7 @@ namespace ReaderWriterLockClasses
         }
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Gets the total number of threads that are waiting to enter the lock in write mode.
         /// </summary>
         public override int WaitingWriteCount
         {
@@ -75,7 +78,7 @@ namespace ReaderWriterLockClasses
         }
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Tries to enter the lock in read mode.
         /// </summary>
         public override void EnterReadLock()
         {
@@ -83,7 +86,7 @@ namespace ReaderWriterLockClasses
         }
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Tries to enter the lock in write mode.
         /// </summary>
         public override void EnterWriteLock()
         {
@@ -91,7 +94,7 @@ namespace ReaderWriterLockClasses
         }
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Reduces the recursion count for read mode, and exits read mode if the resulting count is 0 (zero)
         /// </summary>
         public override void ExitReadLock()
         {
@@ -99,15 +102,15 @@ namespace ReaderWriterLockClasses
         }
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Reduces the recursion count for write mode, and exits write mode if the resulting count is 0 (zero).
         /// </summary>
         public override void ExitWriteLock()
         {
             rwLock.ExitWriteLock();
         }
 
-        /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// <summary>	
+        /// Tries to enter the lock in read mode, with an optional integer time-out.
         /// </summary>
         public override bool TryEnterReadLock(int millisecondsTimeout)
         {
@@ -115,7 +118,7 @@ namespace ReaderWriterLockClasses
         }
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Tries to enter the lock in write mode, with an optional time-out.
         /// </summary>
         public override bool TryEnterWriteLock(int millisecondsTimeout)
         {
@@ -123,7 +126,7 @@ namespace ReaderWriterLockClasses
         }
 
         /// <summary>
-        /// See ReaderWriterLockSlim for specification.
+        /// Releases all resources used by the current instance of the ReaderWriterLockSlim class.
         /// </summary>
         public override void Dispose()
         {

@@ -64,5 +64,38 @@ namespace ReaderWriterUnitTests
                 rwLock.ExitReadLock();
             }
         }
+
+        //Tests to ensure that two writers can not enter the lock at the same time
+        [TestMethod]
+        public void TestMethod3()
+        {
+            int count = 2;
+            ManualResetEvent mre = new ManualResetEvent(false);
+            RWLock rwLock = RWLockBuilder.NewLock();
+
+            Task t1 = Task.Run(() => GetWriteLock());
+            Task t2 = Task.Run(() => GetWriteLock());
+
+            Assert.IsFalse(SpinWait.SpinUntil(() => count == 0, 1000), "Unable to have two simultaneous writers");
+
+            mre.Set();
+
+            // This method is run simultaneously in two tasks
+            void GetWriteLock()
+            {
+                // Acquire a read lock
+                rwLock.EnterWriteLock();
+
+                // Atomically decrement the shared count variable.  Note that merely doing count-- won't always work.
+                Interlocked.Decrement(ref count);
+
+                // Block until the main task sets the mre to true.
+                mre.WaitOne();
+
+                // Exit the read lock
+                rwLock.ExitWriteLock();
+            }
+
+        }
     }
 }
