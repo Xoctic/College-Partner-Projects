@@ -12,6 +12,39 @@ namespace ReaderWriterUnitTests
     [TestClass]
     public class RWLockTests
     {
+        //This method runs a read lock
+        public void GetReadLock(RWLock _rwLock, int _count, ManualResetEvent _mre)
+        {
+            // Acquire a read lock
+            _rwLock.EnterReadLock();
+
+            // Atomically decrement the shared count variable.  Note that merely doing count-- won't always work.
+            Interlocked.Decrement(ref _count);
+
+            // Block until the main task sets the mre to true.
+            _mre.WaitOne();
+
+            // Exit the read lock
+            _rwLock.ExitReadLock();
+        }
+
+        // This method is runs a write lock
+        private void GetWriteLock(RWLock _rwLock, int _count, ManualResetEvent _mre)
+        {
+            // Acquire a read lock
+            _rwLock.EnterWriteLock();
+
+            // Atomically decrement the shared count variable.  Note that merely doing count-- won't always work.
+            Interlocked.Decrement(ref _count);
+
+            // Block until the main task sets the mre to true.
+            _mre.WaitOne();
+
+            // Exit the read lock
+            _rwLock.ExitWriteLock();
+        }
+
+
         /// <summary>
         /// Verifies that an attempt to exit a write lock without having previously acquired a write
         /// lock results in a SynchronizationLockException.
@@ -77,7 +110,7 @@ namespace ReaderWriterUnitTests
             Task t2 = Task.Run(() => GetWriteLock());
 
             Assert.IsFalse(SpinWait.SpinUntil(() => count == 0, 1000), "Unable to have two simultaneous writers");
-
+            Console.WriteLine("bitch");
             mre.Set();
 
             // This method is run simultaneously in two tasks
@@ -96,6 +129,43 @@ namespace ReaderWriterUnitTests
                 rwLock.ExitWriteLock();
             }
 
+        }
+
+
+        [TestMethod]
+        public void TestMethod4()
+        {
+            int count = 2;
+            ManualResetEvent mre = new ManualResetEvent(false);
+            RWLock rWLock = RWLockBuilder.NewLock();
+
+            Task t1 = Task.Run(() => GetReadLock());
+            Task t2 = Task.Run(() => GetReadLock());
+
+            Assert.IsTrue(rWLock.CurrentReadCount == 2);
+
+
+            // This method is run simultaneously in two tasks
+            void GetReadLock()
+            {
+                // Acquire a read lock
+                rWLock.EnterReadLock();
+
+                // Atomically decrement the shared count variable.  Note that merely doing count-- won't always work.
+                Interlocked.Decrement(ref count);
+
+                // Block until the main task sets the mre to true.
+                mre.WaitOne();
+
+                // Exit the read lock
+                rWLock.ExitReadLock();
+            }
+        }
+
+        [TestMethod]
+        public void TestMethod5()
+        {
+            System.Diagnostics.Debug.WriteLine("hi");
         }
     }
 }
