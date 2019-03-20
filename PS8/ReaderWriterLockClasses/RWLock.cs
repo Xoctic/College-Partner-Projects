@@ -34,11 +34,13 @@ namespace ReaderWriterLockClasses
 
         /// <summary>	
         /// Gets the total number of unique threads that have entered the lock in read mode.
+        /// 1 test currently test4
         /// </summary>
         public abstract int CurrentReadCount { get; }
 
         /// <summary>
         /// Gets a value that indicates whether the current thread has entered the lock in read mode.
+        /// 1 test currently test4
         /// </summary>
         public abstract bool IsReadLockHeld { get; }
 
@@ -49,6 +51,7 @@ namespace ReaderWriterLockClasses
 
         /// <summary>
         /// Gets a value that indicates whether the current thread has entered the lock in write mode.
+        /// 1 test currently test3
         /// </summary>
         public abstract bool IsWriteLockHeld { get; }
 
