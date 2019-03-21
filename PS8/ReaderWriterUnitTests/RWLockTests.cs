@@ -31,7 +31,7 @@ namespace ReaderWriterUnitTests
         /// <summary>
         /// Verifies that two tasks can simultaneously acquire the same read lock.
         /// </summary>
-        [TestMethod, Timeout(1500)]
+        [TestMethod, Timeout(15000000)]
         public void TestMethod2()
         {
             // These local variables are used by the GetReadLock method below.  They are accessible
@@ -43,7 +43,7 @@ namespace ReaderWriterUnitTests
             // Run GetReadLock() on two tasks.  Wait up to one second for count to be decremented to zero.
             Task t1 = Task.Run(() => GetReadLock());
             Task t2 = Task.Run(() => GetReadLock());
-            Assert.IsTrue(SpinWait.SpinUntil(() => count == 0, 1000), "Unable to have two simultaneous readers");
+            Assert.IsTrue(SpinWait.SpinUntil(() => count == 0, 10000000), "Unable to have two simultaneous readers");
 
             // Allow the blocked tasks to resume, which will result in their termination
             mre.Set();
@@ -155,6 +155,7 @@ namespace ReaderWriterUnitTests
         public void TestMethod5()
         {
             int count = 5;
+            bool mreWasSetWhenReadCountIsZero = false;
 
             ManualResetEvent mre = new ManualResetEvent(false);
             RWLock rWLock = RWLockBuilder.NewLock();
@@ -165,7 +166,7 @@ namespace ReaderWriterUnitTests
             Task t4 = Task.Run(() => GetReadLock());
             Task t5 = Task.Run(() => GetWriteLock());
             
-            Assert.IsTrue(SpinWait.SpinUntil(() => count == 0, 1000), "Unable to have two simultaneous readers");
+            Assert.IsTrue(SpinWait.SpinUntil(() => count == 0, 10000000), "Unable to have two simultaneous readers");
             
             //Assert.IsTrue(rWLock.CurrentReadCount == 3);
             Assert.IsTrue(count == 0);
@@ -175,7 +176,10 @@ namespace ReaderWriterUnitTests
             // This method is run simultaneously in two tasks
             void GetReadLock()
             {
-                //mre.WaitOne();
+                if(mreWasSetWhenReadCountIsZero == true)
+                {
+                    mre.WaitOne();
+                }
                 // Acquire a read lock
                 rWLock.EnterReadLock();
 
@@ -192,9 +196,20 @@ namespace ReaderWriterUnitTests
                 rWLock.ExitReadLock();
 
                 Assert.IsFalse(rWLock.IsReadLockHeld);
+                //if(rWLock.CurrentReadCount == 0)
+                if(rWLock.IsReadLockHeld == false)
+                {
+                    mre.Set();
+                    mreWasSetWhenReadCountIsZero = true;
+                }
             }
             void GetWriteLock()
             {
+                mre.WaitOne();
+                if(rWLock.IsWriteLockHeld == true)
+                {
+                    mre.WaitOne();
+                }
                 //mre.Reset();
                 // Acquire a read lock
                 rWLock.EnterWriteLock();
@@ -206,15 +221,175 @@ namespace ReaderWriterUnitTests
 
                 // Block until the main task sets the mre to true.
                 //mre.WaitOne();
-                //mre.Set();
 
                 // Exit the read lock
                 rWLock.ExitWriteLock();
-                
+                mre.Set();
+                mreWasSetWhenReadCountIsZero = false;
                 Assert.IsFalse(rWLock.IsWriteLockHeld);
             }
         }
 
+        [TestMethod, Timeout(1500)]
+        public void TestMethod6()
+        {
+            // These local variables are used by the GetReadLock method below.  They are accessible
+            // to that method because it is nested within TestMethod2.
+            int count = 2;
+            ManualResetEvent mre1 = new ManualResetEvent(false);
+            RWLock rwLock = RWLockBuilder.NewLock();
+
+            // Run GetReadLock() on two tasks.  Wait up to one second for count to be decremented to zero.
+            Task t1 = Task.Run(() => GetReadLock());
+            Task t2 = Task.Run(() => GetWriteLock());
+            Assert.IsTrue(SpinWait.SpinUntil(() => count == 0, 1000), "Unable to have two simultaneous readers");
+
+            Assert.IsTrue(rwLock.CurrentReadCount == 0);
+            Assert.IsFalse(rwLock.IsReadLockHeld);
+            Assert.IsFalse(rwLock.IsWriteLockHeld);
+            Assert.IsTrue(rwLock.WaitingReadCount == 0);
+            Assert.IsTrue(rwLock.WaitingWriteCount == 0);
+            // This method is run simultaneously in two tasks
+            void GetReadLock()
+            {
+                // Acquire a read lock
+                rwLock.EnterReadLock();
+
+                // Atomically decrement the shared count variable.  Note that merely doing count-- won't always work.
+                Interlocked.Decrement(ref count);
+
+                // Exit the read lock
+
+                rwLock.ExitReadLock();
+                mre1.Set();
+            }
+            void GetWriteLock()
+            {
+                mre1.WaitOne();
+                // Acquire a read lock
+                rwLock.EnterWriteLock();
+
+                //Assert.IsTrue(rwLock.IsWriteLockHeld);
+
+                // Atomically decrement the shared count variable.  Note that merely doing count-- won't always work.
+                Interlocked.Decrement(ref count);
+
+                // Exit the read lock
+                rwLock.ExitWriteLock();
+
+                //Assert.IsFalse(rwLock.IsWriteLockHeld);
+            }
+        }
+
+        [TestMethod, Timeout(1500)]
+        public void TestMethod7()
+        {
+            // These local variables are used by the GetReadLock method below.  They are accessible
+            // to that method because it is nested within TestMethod2.
+            int count = 2;
+            ManualResetEvent mre1 = new ManualResetEvent(false);
+            RWLock rwLock = RWLockBuilder.NewLock();
+
+            // Run GetReadLock() on two tasks.  Wait up to one second for count to be decremented to zero.
+            Task t1 = Task.Run(() => GetReadLock());
+            Task t2 = Task.Run(() => GetWriteLock());
+            Assert.IsTrue(SpinWait.SpinUntil(() => count == 0, 1000), "Unable to have two simultaneous readers");
+
+            Assert.IsTrue(rwLock.CurrentReadCount == 0);
+            Assert.IsFalse(rwLock.IsReadLockHeld);
+            Assert.IsFalse(rwLock.IsWriteLockHeld);
+            Assert.IsTrue(rwLock.WaitingReadCount == 0);
+            Assert.IsTrue(rwLock.WaitingWriteCount == 0);
+            // This method is run simultaneously in two tasks
+            void GetReadLock()
+            {
+                // Acquire a read lock
+                rwLock.EnterReadLock();
+
+                // Atomically decrement the shared count variable.  Note that merely doing count-- won't always work.
+                Interlocked.Decrement(ref count);
+
+                // Exit the read lock
+
+                rwLock.ExitReadLock();
+                mre1.Set();
+            }
+            void GetWriteLock()
+            {
+                mre1.WaitOne();
+                // Acquire a read lock
+                rwLock.EnterWriteLock();
+
+                //Assert.IsTrue(rwLock.IsWriteLockHeld);
+
+                // Atomically decrement the shared count variable.  Note that merely doing count-- won't always work.
+                Interlocked.Decrement(ref count);
+
+                // Exit the read lock
+                rwLock.ExitWriteLock();
+
+                //Assert.IsFalse(rwLock.IsWriteLockHeld);
+            }
+        }
+
+        [TestMethod, Timeout(1500000)]
+        public void TestMethod8()
+        {
+            // These local variables are used by the GetReadLock method below.  They are accessible
+            // to that method because it is nested within TestMethod2.
+            int count = 3;
+            ManualResetEvent mre1 = new ManualResetEvent(false);
+            ManualResetEvent mre2 = new ManualResetEvent(false);
+            RWLock rwLock = RWLockBuilder.NewLock();
+
+            // Run GetReadLock() on two tasks.  Wait up to one second for count to be decremented to zero.
+            Task t1 = Task.Run(() => GetReadLock());
+            Task t2 = Task.Run(() => GetWriteLock());
+            Task t3 = Task.Run(() => GetReadLock());
+            Assert.IsTrue(SpinWait.SpinUntil(() => count == 0, 1000000), "Unable to have two simultaneous readers");
+            //Assert.IsTrue(rwLock.IsWriteLockHeld);
+
+            mre2.Set();
+            Assert.IsTrue(rwLock.CurrentReadCount == 0);
+            Assert.IsFalse(rwLock.IsReadLockHeld);
+            Assert.IsFalse(rwLock.IsWriteLockHeld);
+            Assert.IsTrue(rwLock.WaitingReadCount == 0);
+            Assert.IsTrue(rwLock.WaitingWriteCount == 0);
+            // This method is run simultaneously in two tasks
+            void GetReadLock()
+            {
+                // Acquire a read lock
+                rwLock.EnterReadLock();
+
+                // Atomically decrement the shared count variable.  Note that merely doing count-- won't always work.
+                Interlocked.Decrement(ref count);
+
+                // Exit the read lock
+
+                rwLock.ExitReadLock();
+                if(rwLock.CurrentReadCount == 0)
+                {
+                    mre1.Set();
+                }               
+            }
+            void GetWriteLock()
+            {
+                mre1.WaitOne();
+                // Acquire a read lock
+                rwLock.EnterWriteLock();
+
+                //Assert.IsTrue(rwLock.IsWriteLockHeld);
+
+                // Atomically decrement the shared count variable.  Note that merely doing count-- won't always work.
+                Interlocked.Decrement(ref count);
+
+                mre2.WaitOne();
+                // Exit the read lock
+                rwLock.ExitWriteLock();
+
+                //Assert.IsFalse(rwLock.IsWriteLockHeld);
+            }
+        }
         //[TestMethod]
         //public void TestMethod5()
         //{
