@@ -585,17 +585,17 @@ namespace ReaderWriterUnitTests
             {
 
                 mre1.WaitOne();
+
                 // Acquire a read lock
                 lock1.EnterWriteLock();
 
-
                 enteredWriteLock = lock1.IsWriteLockHeld;
-
                 
                 mre2.WaitOne();
 
                 // Exit the read lock
                 lock1.ExitWriteLock();
+
             }
 
         }
@@ -604,6 +604,7 @@ namespace ReaderWriterUnitTests
         [TestMethod]
         public void TestMethodE()
         {
+
             ManualResetEvent mre1 = new ManualResetEvent(false);
             RWLock locker = RWLockBuilder.NewLock();
             bool enteredReadLock = false;
@@ -621,7 +622,9 @@ namespace ReaderWriterUnitTests
 
             void GetReadLock()
             {
+
                 mre1.WaitOne();
+
                 // Acquire a read lock
                 locker.EnterReadLock();
 
@@ -642,6 +645,7 @@ namespace ReaderWriterUnitTests
         [TestMethod]
         public void TestMethodF()
         {
+
             ManualResetEvent mre1 = new ManualResetEvent(false);
             ManualResetEvent mre2 = new ManualResetEvent(false);
             ManualResetEvent mre3 = new ManualResetEvent(false);
@@ -680,11 +684,10 @@ namespace ReaderWriterUnitTests
 
                 mre1.WaitOne();
                 // Acquire a read lock
+
                 lock1.EnterWriteLock();
 
-
                 enteredWriteLock = lock1.IsWriteLockHeld;
-
 
                 mre2.WaitOne();
 
@@ -696,7 +699,9 @@ namespace ReaderWriterUnitTests
             void GetReadLock()
             {
                 mre3.WaitOne();
+
                 enteredGetReadLock = true;
+
                 // Acquire a read lock
                 lock1.EnterReadLock();
 
@@ -713,6 +718,7 @@ namespace ReaderWriterUnitTests
         [TestMethod]
         public void TestMethodG()
         {
+
             ManualResetEvent mre1 = new ManualResetEvent(false);
             ManualResetEvent mre2 = new ManualResetEvent(false);
             ManualResetEvent mre3 = new ManualResetEvent(false);
@@ -729,10 +735,10 @@ namespace ReaderWriterUnitTests
             mre1.Set();
 
             Assert.IsTrue(SpinWait.SpinUntil(() => enteredReadLock == true, 1000));
-            Assert.IsTrue(lock1.TryEnterReadLock(50));
+            Assert.IsTrue(lock1.TryEnterReadLock(50));    
 
             mre3.Set();
-
+                
             Assert.IsTrue(SpinWait.SpinUntil(() => enteredGetWriteLock == true, 1000));
             Assert.IsFalse(SpinWait.SpinUntil(() => enteredWriteLock == true, 1000));
 
@@ -743,7 +749,7 @@ namespace ReaderWriterUnitTests
 
             void GetReadLock()
             {
-
+                
                 mre1.WaitOne();
                 // Acquire a read lock
                 lock1.EnterReadLock();
@@ -751,6 +757,7 @@ namespace ReaderWriterUnitTests
                 enteredReadLock = lock1.IsReadLockHeld;
 
                 mre2.WaitOne();
+
                 // Exit the read lock
                 lock1.ExitReadLock();
 
@@ -759,8 +766,11 @@ namespace ReaderWriterUnitTests
 
             void GetWriteLock()
             {
+
                 mre3.WaitOne();
+
                 enteredGetWriteLock = true;
+
                 // Acquire a read lock
                 lock1.EnterWriteLock();
 
@@ -768,6 +778,7 @@ namespace ReaderWriterUnitTests
 
                 // Exit the read lock
                 lock1.ExitWriteLock();
+
             }
 
 
