@@ -519,12 +519,12 @@ namespace ReaderWriterUnitTests
             mre1.Set();
 
 
-            SpinWait.SpinUntil(() => enteredWriteLock == true, 1000);
+            Assert.IsTrue(SpinWait.SpinUntil(() => enteredWriteLock == true, 1000));
 
             Assert.IsFalse(lock1.TryEnterWriteLock(100));
 
-            mre1.Set();
-
+            //mre1.Set();
+         
             
 
             void GetWriteLock()
@@ -540,28 +540,9 @@ namespace ReaderWriterUnitTests
                 mre1 = new ManualResetEvent(false);
                 mre1.WaitOne();
 
-             
-
                 // Exit the read lock
                 lock1.ExitWriteLock();
-
-               
-
             }
-
-            void GetReadLock(ManualResetEvent _mre)
-            {
-                // Acquire a read lock
-                lock1.EnterReadLock();
-
-             
-
-                // Exit the read lock
-                lock1.ExitReadLock();
-
-            }
-
-
 
         }
 
@@ -569,7 +550,36 @@ namespace ReaderWriterUnitTests
         public void TestMethodE()
         {
             ManualResetEvent mre1 = new ManualResetEvent(false);
-            RWLock lock1 = RWLockBuilder.NewLock();
+            RWLock locker = RWLockBuilder.NewLock();
+            bool enteredReadLock = false;
+
+            Task t1 = Task.Run(() => GetReadLock());
+
+            mre1.Set();
+
+            Assert.IsTrue(SpinWait.SpinUntil(() => enteredReadLock == true, 10000000));
+
+            Assert.IsFalse(locker.TryEnterReadLock(100));
+
+            //mre1.Set();
+            
+
+            void GetReadLock()
+            {
+                mre1.WaitOne();
+                // Acquire a read lock
+                locker.EnterReadLock();
+
+                enteredReadLock = locker.IsReadLockHeld;
+
+                mre1 = new ManualResetEvent(false);
+                mre1.WaitOne();
+
+                // Exit the read lock
+                locker.ExitReadLock();
+
+            }
+
 
         }
 
