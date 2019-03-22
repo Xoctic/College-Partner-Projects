@@ -600,7 +600,7 @@ namespace ReaderWriterUnitTests
 
         }
 
-
+        //Tests to see if more than one task can access a readLock at the same time
         [TestMethod]
         public void TestMethodE()
         {
@@ -635,6 +635,143 @@ namespace ReaderWriterUnitTests
 
             }
 
+
+        } 
+
+        //Tests if waitingReadCount == 1 after 1 reader tries to enter the lock when the writer is still in the lock
+        [TestMethod]
+        public void TestMethodF()
+        {
+            ManualResetEvent mre1 = new ManualResetEvent(false);
+            ManualResetEvent mre2 = new ManualResetEvent(false);
+            ManualResetEvent mre3 = new ManualResetEvent(false);
+
+            RWLock lock1 = RWLockBuilder.NewLock();
+            bool enteredWriteLock = false;
+            bool enteredGetReadLock = false;
+            bool enteredReadLock = false;
+
+
+            Task t1 = Task.Run(() => GetWriteLock());
+            Task t2 = Task.Run(() => GetReadLock());
+
+
+            mre1.Set();
+
+
+            Assert.IsTrue(SpinWait.SpinUntil(() => enteredWriteLock == true, 1000));
+
+            Assert.IsFalse(lock1.TryEnterWriteLock(100));
+
+            mre3.Set();
+
+            Assert.IsTrue(SpinWait.SpinUntil(() => enteredGetReadLock == true, 1000));
+
+            Assert.IsFalse(SpinWait.SpinUntil(() => enteredReadLock == true, 1000));
+
+            Assert.IsTrue(lock1.WaitingReadCount == 1);
+
+            mre2.Set();
+
+
+
+            void GetWriteLock()
+            {
+
+                mre1.WaitOne();
+                // Acquire a read lock
+                lock1.EnterWriteLock();
+
+
+                enteredWriteLock = lock1.IsWriteLockHeld;
+
+
+                mre2.WaitOne();
+
+                // Exit the read lock
+                lock1.ExitWriteLock();
+            }
+
+
+            void GetReadLock()
+            {
+                mre3.WaitOne();
+                enteredGetReadLock = true;
+                // Acquire a read lock
+                lock1.EnterReadLock();
+
+                enteredReadLock = lock1.IsReadLockHeld;
+
+                // Exit the read lock
+                lock1.ExitReadLock();
+
+            }
+
+        }
+
+        //Tests if waitingWriteCount == 1 after 1 writer tries to enter the lock when a reader is still in the lock
+        [TestMethod]
+        public void TestMethodG()
+        {
+            ManualResetEvent mre1 = new ManualResetEvent(false);
+            ManualResetEvent mre2 = new ManualResetEvent(false);
+            ManualResetEvent mre3 = new ManualResetEvent(false);
+
+            RWLock lock1 = RWLockBuilder.NewLock();
+            bool enteredGetWriteLock = false;
+            bool enteredWriteLock = false;
+            bool enteredReadLock = false;
+
+
+            Task t1 = Task.Run(() => GetReadLock());
+            Task t2 = Task.Run(() => GetWriteLock());
+
+            mre1.Set();
+
+            Assert.IsTrue(SpinWait.SpinUntil(() => enteredReadLock == true, 1000));
+            Assert.IsTrue(lock1.TryEnterReadLock(50));
+
+            mre3.Set();
+
+            Assert.IsTrue(SpinWait.SpinUntil(() => enteredGetWriteLock == true, 1000));
+            Assert.IsFalse(SpinWait.SpinUntil(() => enteredWriteLock == true, 1000));
+
+            Assert.IsTrue(lock1.WaitingWriteCount == 1);
+
+            mre2.Set();
+
+
+            void GetReadLock()
+            {
+
+                mre1.WaitOne();
+                // Acquire a read lock
+                lock1.EnterReadLock();
+
+                enteredReadLock = lock1.IsReadLockHeld;
+
+                mre2.WaitOne();
+                // Exit the read lock
+                lock1.ExitReadLock();
+
+            }
+
+
+            void GetWriteLock()
+            {
+                mre3.WaitOne();
+                enteredGetWriteLock = true;
+                // Acquire a read lock
+                lock1.EnterWriteLock();
+
+                enteredWriteLock = lock1.IsWriteLockHeld;
+
+                // Exit the read lock
+                lock1.ExitWriteLock();
+            }
+
+
+            
 
         }
 
