@@ -281,59 +281,9 @@ namespace ReaderWriterUnitTests
             }
         }
 
-        [TestMethod, Timeout(1500)]
-        public void TestMethod7()
-        {
-            // These local variables are used by the GetReadLock method below.  They are accessible
-            // to that method because it is nested within TestMethod2.
-            int count = 2;
-            ManualResetEvent mre1 = new ManualResetEvent(false);
-            RWLock rwLock = RWLockBuilder.NewLock();
-
-            // Run GetReadLock() on two tasks.  Wait up to one second for count to be decremented to zero.
-            Task t1 = Task.Run(() => GetReadLock());
-            Task t2 = Task.Run(() => GetWriteLock());
-            Assert.IsTrue(SpinWait.SpinUntil(() => count == 0, 1000), "Unable to have two simultaneous readers");
-
-            Assert.IsTrue(rwLock.CurrentReadCount == 0);
-            Assert.IsFalse(rwLock.IsReadLockHeld);
-            Assert.IsFalse(rwLock.IsWriteLockHeld);
-            Assert.IsTrue(rwLock.WaitingReadCount == 0);
-            Assert.IsTrue(rwLock.WaitingWriteCount == 0);
-            // This method is run simultaneously in two tasks
-            void GetReadLock()
-            {
-                // Acquire a read lock
-                rwLock.EnterReadLock();
-
-                // Atomically decrement the shared count variable.  Note that merely doing count-- won't always work.
-                Interlocked.Decrement(ref count);
-
-                // Exit the read lock
-
-                rwLock.ExitReadLock();
-                mre1.Set();
-            }
-            void GetWriteLock()
-            {
-                mre1.WaitOne();
-                // Acquire a read lock
-                rwLock.EnterWriteLock();
-
-                //Assert.IsTrue(rwLock.IsWriteLockHeld);
-
-                // Atomically decrement the shared count variable.  Note that merely doing count-- won't always work.
-                Interlocked.Decrement(ref count);
-
-                // Exit the read lock
-                rwLock.ExitWriteLock();
-
-                //Assert.IsFalse(rwLock.IsWriteLockHeld);
-            }
-        }
 
         [TestMethod, Timeout(1500000)]
-        public void TestMethod8()
+        public void TestMethod7()
         {
             // These local variables are used by the GetReadLock method below.  They are accessible
             // to that method because it is nested within TestMethod2.
@@ -390,10 +340,257 @@ namespace ReaderWriterUnitTests
                 //Assert.IsFalse(rwLock.IsWriteLockHeld);
             }
         }
-        //[TestMethod]
-        //public void TestMethod5()
-        //{
-        //    System.Diagnostics.Debug.WriteLine("hi");
-        //}
+
+
+        //Simple writer test
+        [TestMethod]
+        public void TestMethodA()
+        {
+            int count = 2;
+            ManualResetEvent mre1 = new ManualResetEvent(false);
+            ManualResetEvent mre2 = new ManualResetEvent(false);
+            RWLock lock1 = RWLockBuilder.NewLock();
+
+            Task t1 = Task.Run(() => GetWriteLock(mre1));
+            Task t2 = Task.Run(() => GetWriteLock(mre2));
+
+            mre1.Set();
+
+            t1.Wait();
+
+            mre2.Set();
+
+            t2.Wait();
+
+
+            Assert.IsTrue(count == 0);
+
+
+            void GetWriteLock(ManualResetEvent _mre)
+            {
+                _mre.WaitOne();
+                // Acquire a read lock
+                lock1.EnterWriteLock();
+
+                //Assert.IsTrue(rwLock.IsWriteLockHeld);
+
+                // Atomically decrement the shared count variable.  Note that merely doing count-- won't always work.
+                Interlocked.Decrement(ref count);
+
+               
+                // Exit the read lock
+                lock1.ExitWriteLock();
+
+                //mre.Reset();
+
+                //Assert.IsFalse(rwLock.IsWriteLockHeld);
+            }
+
+        }
+
+
+        //Tests if the write lock is held in the lock
+        //Tests if the read lock is held in the lock
+        [TestMethod]
+        public void TestMethodB()
+        {
+
+            ManualResetEvent mre = new ManualResetEvent(false);
+            
+            
+            RWLock lock1 = RWLockBuilder.NewLock();
+            bool writeLockHeld = false;
+            bool readLockHeld = false;
+            Task t1 = Task.Run(() => GetWriteLock(mre));
+            
+            mre.Set();
+            t1.Wait();
+            Assert.IsTrue(writeLockHeld);
+
+
+
+           
+            mre = new ManualResetEvent(false);
+            t1 = Task.Run(() => GetReadLock(mre));
+
+            mre.Set();
+            t1.Wait();
+            Assert.IsTrue(readLockHeld);
+
+
+            void GetWriteLock(ManualResetEvent _mre)
+            {
+
+                _mre.WaitOne();
+                // Acquire a read lock
+                lock1.EnterWriteLock();
+
+                writeLockHeld = lock1.IsWriteLockHeld;
+
+                // Exit the read lock
+                lock1.ExitWriteLock();
+
+            }
+
+
+            void GetReadLock(ManualResetEvent _mre)
+            {
+                // Acquire a read lock
+                lock1.EnterReadLock();
+
+                readLockHeld = lock1.IsReadLockHeld;
+
+                // Exit the read lock
+                lock1.ExitReadLock();
+
+                mre.Set();
+            }
+
+        }
+
+        //Tests if the write lock is not held outside of the lock
+        //Tests if the read lock is not held outside of the lock
+        [TestMethod]
+        public void TestMethodC()
+        {
+            ManualResetEvent mre = new ManualResetEvent(false);
+            RWLock lock1 = RWLockBuilder.NewLock();
+            bool writeLockHeld = false;
+            bool readLockHeld = false;
+
+
+            Task t1 = Task.Run(() => GetWriteLock(mre));
+
+            mre.Set();
+            t1.Wait();
+            Assert.IsFalse(writeLockHeld);
+
+            mre = new ManualResetEvent(false);
+            t1 = Task.Run(() => GetReadLock(mre));
+
+            mre.Set();
+            t1.Wait();
+            Assert.IsFalse(readLockHeld);
+
+            void GetWriteLock(ManualResetEvent _mre)
+            {
+
+                _mre.WaitOne();
+                // Acquire a read lock
+                lock1.EnterWriteLock();
+
+                writeLockHeld = lock1.IsWriteLockHeld;
+
+                // Exit the read lock
+                lock1.ExitWriteLock();
+
+                writeLockHeld = lock1.IsWriteLockHeld;
+
+            }
+
+
+            void GetReadLock(ManualResetEvent _mre)
+            {
+                // Acquire a read lock
+                lock1.EnterReadLock();
+
+                readLockHeld = lock1.IsReadLockHeld;
+
+                // Exit the read lock
+                lock1.ExitReadLock();
+
+                readLockHeld = lock1.IsReadLockHeld;
+            }
+
+        }
+
+        //tries to enter a write lock when the write lock is already held
+        [TestMethod]
+        public void TestMethodD()
+        {
+            ManualResetEvent mre1 = new ManualResetEvent(false);
+            RWLock lock1 = RWLockBuilder.NewLock();
+            bool enteredWriteLock = false;
+           
+
+            Task t1 = Task.Run(() => GetWriteLock());
+
+
+            mre1.Set();
+
+
+            SpinWait.SpinUntil(() => enteredWriteLock == true, 1000);
+
+            Assert.IsFalse(lock1.TryEnterWriteLock(100));
+
+            mre1.Set();
+
+            
+
+            void GetWriteLock()
+            {
+
+                mre1.WaitOne();
+                // Acquire a read lock
+                lock1.EnterWriteLock();
+
+
+                enteredWriteLock = lock1.IsWriteLockHeld;
+
+                mre1 = new ManualResetEvent(false);
+                mre1.WaitOne();
+
+             
+
+                // Exit the read lock
+                lock1.ExitWriteLock();
+
+               
+
+            }
+
+            void GetReadLock(ManualResetEvent _mre)
+            {
+                // Acquire a read lock
+                lock1.EnterReadLock();
+
+             
+
+                // Exit the read lock
+                lock1.ExitReadLock();
+
+            }
+
+
+
+        }
+
+        [TestMethod]
+        public void TestMethodE()
+        {
+            ManualResetEvent mre1 = new ManualResetEvent(false);
+            RWLock lock1 = RWLockBuilder.NewLock();
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+       
     }
 }
