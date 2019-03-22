@@ -282,7 +282,7 @@ namespace ReaderWriterUnitTests
         }
 
 
-        [TestMethod, Timeout(1500000)]
+        [TestMethod, Timeout(1500000000)]
         public void TestMethod7()
         {
             // These local variables are used by the GetReadLock method below.  They are accessible
@@ -291,15 +291,18 @@ namespace ReaderWriterUnitTests
             ManualResetEvent mre1 = new ManualResetEvent(false);
             ManualResetEvent mre2 = new ManualResetEvent(false);
             RWLock rwLock = RWLockBuilder.NewLock();
-
             // Run GetReadLock() on two tasks.  Wait up to one second for count to be decremented to zero.
             Task t1 = Task.Run(() => GetReadLock());
             Task t2 = Task.Run(() => GetWriteLock());
             Task t3 = Task.Run(() => GetReadLock());
-            Assert.IsTrue(SpinWait.SpinUntil(() => count == 0, 1000000), "Unable to have two simultaneous readers");
+            Assert.IsTrue(SpinWait.SpinUntil(() => count == 1, 1000), "Unable to have two simultaneous readers");
+            Assert.IsFalse(rwLock.TryEnterWriteLock(1));
+            Assert.IsTrue(rwLock.CurrentReadCount == 2);
             //Assert.IsTrue(rwLock.IsWriteLockHeld);
-
             mre2.Set();
+            t1.Wait();
+            t3.Wait();
+            t2.Wait();
             Assert.IsTrue(rwLock.CurrentReadCount == 0);
             Assert.IsFalse(rwLock.IsReadLockHeld);
             Assert.IsFalse(rwLock.IsWriteLockHeld);
@@ -310,36 +313,86 @@ namespace ReaderWriterUnitTests
             {
                 // Acquire a read lock
                 rwLock.EnterReadLock();
-
                 // Atomically decrement the shared count variable.  Note that merely doing count-- won't always work.
                 Interlocked.Decrement(ref count);
-
+                mre2.WaitOne();
                 // Exit the read lock
-
                 rwLock.ExitReadLock();
-                if(rwLock.CurrentReadCount == 0)
+                if (rwLock.CurrentReadCount == 0)
                 {
                     mre1.Set();
-                }               
+                }
             }
             void GetWriteLock()
             {
                 mre1.WaitOne();
                 // Acquire a read lock
                 rwLock.EnterWriteLock();
-
                 //Assert.IsTrue(rwLock.IsWriteLockHeld);
-
                 // Atomically decrement the shared count variable.  Note that merely doing count-- won't always work.
                 Interlocked.Decrement(ref count);
-
-                mre2.WaitOne();
+                //mre2.WaitOne();
                 // Exit the read lock
                 rwLock.ExitWriteLock();
-
                 //Assert.IsFalse(rwLock.IsWriteLockHeld);
             }
         }
+
+
+        [TestMethod, Timeout(1500)]
+        //[TestMethod]
+        public void TestMethod8()
+        {
+            int count = 6;
+            bool currentlyNoActiveReaders = false;
+            //for write locks
+            ManualResetEvent mre1 = new ManualResetEvent(false);
+            //for read locks
+            ManualResetEvent mre2 = new ManualResetEvent(false);
+            RWLock rwLock = RWLockBuilder.NewLock();
+
+            Task t1 = Task.Run(() => GetReadLock());
+            Task t2 = Task.Run(() => GetReadLock());
+            Task t3 = Task.Run(() => GetWriteLock());
+            Task t4 = Task.Run(() => GetReadLock());
+            Task t5 = Task.Run(() => GetReadLock());
+            Task t6 = Task.Run(() => GetReadLock());
+
+            Assert.IsTrue(SpinWait.SpinUntil(() => count == 0, 1000), "Unable to have two simultaneous readers");
+            Assert.IsTrue(count == 0);
+            //mre2.Set();
+            // This method is run simultaneously in two tasks
+            void GetReadLock()
+            {
+                if (currentlyNoActiveReaders == true)
+                {
+                    mre2.WaitOne();
+                }
+                rwLock.EnterReadLock();
+                // Atomically decrement the shared count variable.  Note that merely doing count-- won't always work.
+                Interlocked.Decrement(ref count);
+                // Exit the read lock
+                rwLock.ExitReadLock();
+                if (rwLock.CurrentReadCount == 0)
+                {
+                    currentlyNoActiveReaders = true;
+                    mre1.Set();
+                }
+            }
+            void GetWriteLock()
+            {
+                mre1.WaitOne();
+                // Acquire a read lock
+                rwLock.EnterWriteLock();
+                // Atomically decrement the shared count variable.  Note that merely doing count-- won't always work.
+                Interlocked.Decrement(ref count);
+                // Exit the read lock
+                rwLock.ExitWriteLock();
+                mre2.Set();
+            }
+        }
+
+
 
 
         //Simple writer test
@@ -509,6 +562,7 @@ namespace ReaderWriterUnitTests
         public void TestMethodD()
         {
             ManualResetEvent mre1 = new ManualResetEvent(false);
+            ManualResetEvent mre2 = new ManualResetEvent(false);
             RWLock lock1 = RWLockBuilder.NewLock();
             bool enteredWriteLock = false;
            
@@ -523,7 +577,7 @@ namespace ReaderWriterUnitTests
 
             Assert.IsFalse(lock1.TryEnterWriteLock(100));
 
-            //mre1.Set();
+            mre2.Set();
          
             
 
@@ -537,14 +591,15 @@ namespace ReaderWriterUnitTests
 
                 enteredWriteLock = lock1.IsWriteLockHeld;
 
-                mre1 = new ManualResetEvent(false);
-                mre1.WaitOne();
+                
+                mre2.WaitOne();
 
                 // Exit the read lock
                 lock1.ExitWriteLock();
             }
 
         }
+
 
         [TestMethod]
         public void TestMethodE()
@@ -559,7 +614,7 @@ namespace ReaderWriterUnitTests
 
             Assert.IsTrue(SpinWait.SpinUntil(() => enteredReadLock == true, 10000000));
 
-            Assert.IsFalse(locker.TryEnterReadLock(100));
+            Assert.IsTrue(locker.TryEnterReadLock(100));
 
             //mre1.Set();
             
