@@ -1,4 +1,4 @@
-﻿// Written by Joseph Zachary for CS 3500
+﻿ // Written by Joseph Zachary for CS 3500
 // Copyright Joseph Zachary, March 2019
 
 using System;
