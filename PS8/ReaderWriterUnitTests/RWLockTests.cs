@@ -43,7 +43,7 @@ namespace ReaderWriterUnitTests
             // Run GetReadLock() on two tasks.  Wait up to one second for count to be decremented to zero.
             Task t1 = Task.Run(() => GetReadLock());
             Task t2 = Task.Run(() => GetReadLock());
-            Assert.IsTrue(SpinWait.SpinUntil(() => count == 0, 10000000), "Unable to have two simultaneous readers");
+            Assert.IsTrue(SpinWait.SpinUntil(() => count == 0, 1000), "Unable to have two simultaneous readers");
 
             // Allow the blocked tasks to resume, which will result in their termination
             mre.Set();
