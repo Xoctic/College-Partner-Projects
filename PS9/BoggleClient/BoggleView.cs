@@ -10,11 +10,11 @@ using System.Windows.Forms;
 
 namespace BoggleClient
 {
-    public partial class Boggle : Form, IBogleView
+    public partial class BoggleView : Form, IBogleView
     {
         public bool IsUserRegistered { get; set;  }
 
-        public Boggle()
+        public BoggleView()
         {
             InitializeComponent();
         }
