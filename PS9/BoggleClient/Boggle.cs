@@ -38,13 +38,12 @@ namespace BoggleClient
                     control.Enabled = state && IsUserRegistered;
                 }
             }
-            //Commented out code from Professors Example, possibly needed.
-            //cancelButton.Enabled = !state;
+            CancelButton.Enabled = !state;
         }
 
         public event Action<string, string> RegisterPressed;
 
-        public event Action<string, string> JoinGamePressed;
+        public event Action<int> JoinGamePressed;
 
         public event Action<string, string> QuitGamePressed;
 
@@ -52,12 +51,13 @@ namespace BoggleClient
 
         private void RegisterUserButton_Click(object sender, EventArgs e)
         {
-
+            RegisterPressed?.Invoke(NameTextBox.Text.Trim(), ServerTextBox.Text.Trim());
         }
 
         private void JoinGameButton_Click(object sender, EventArgs e)
         {
-
+            //Incomplete method
+            CancelButton.Visible = true;
         }
 
         private void QuitGameButton_Click(object sender, EventArgs e)
@@ -67,12 +67,30 @@ namespace BoggleClient
 
         private void CancelButton_Click(object sender, EventArgs e)
         {
-
+            CancelPressed?.Invoke();
+            CancelButton.Visible = false;
         }
 
+        private void WordTextBox_EnterPressed(object sender, KeyPressEventArgs e)
+        {
+            if(e.KeyChar == (char)Keys.Return)
+            {
+                //Incomplete method
+            }
+        }
+
+        private void Registration_TextChanged(object sender, EventArgs e)
+        {
+            EnableControls(true);
+        }
+
+        private void TimeLimit_TextChanged(object sender, EventArgs e)
+        {
+            EnableControls(true);
+        }
         public void Clear()
         {
-            throw new NotImplementedException();
+            
         }
     }
 }

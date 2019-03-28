@@ -51,6 +51,7 @@
             this.NameTextBox.Name = "NameTextBox";
             this.NameTextBox.Size = new System.Drawing.Size(313, 26);
             this.NameTextBox.TabIndex = 0;
+            this.NameTextBox.TextChanged += new System.EventHandler(this.Registration_TextChanged);
             // 
             // label1
             // 
@@ -70,6 +71,7 @@
             this.ServerTextBox.Name = "ServerTextBox";
             this.ServerTextBox.Size = new System.Drawing.Size(313, 26);
             this.ServerTextBox.TabIndex = 2;
+            this.ServerTextBox.TextChanged += new System.EventHandler(this.Registration_TextChanged);
             // 
             // label2
             // 
@@ -82,6 +84,7 @@
             // 
             // RegisterUserButton
             // 
+            this.RegisterUserButton.Enabled = false;
             this.RegisterUserButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.RegisterUserButton.Location = new System.Drawing.Point(241, 115);
             this.RegisterUserButton.Name = "RegisterUserButton";
@@ -99,6 +102,7 @@
             this.TimeTextBox.Name = "TimeTextBox";
             this.TimeTextBox.Size = new System.Drawing.Size(313, 26);
             this.TimeTextBox.TabIndex = 5;
+            this.TimeTextBox.TextChanged += new System.EventHandler(this.TimeLimit_TextChanged);
             // 
             // label3
             // 
@@ -112,6 +116,7 @@
             // 
             // JoinGameButton
             // 
+            this.JoinGameButton.Enabled = false;
             this.JoinGameButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.JoinGameButton.Location = new System.Drawing.Point(241, 199);
             this.JoinGameButton.Name = "JoinGameButton";
@@ -123,6 +128,7 @@
             // 
             // BogleGrid
             // 
+            this.BogleGrid.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
             this.BogleGrid.ColumnCount = 4;
             this.BogleGrid.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.BogleGrid.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -140,6 +146,7 @@
             // 
             // QuitGameButton
             // 
+            this.QuitGameButton.Enabled = false;
             this.QuitGameButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.QuitGameButton.Location = new System.Drawing.Point(241, 642);
             this.QuitGameButton.Name = "QuitGameButton";
@@ -157,6 +164,7 @@
             this.WordTextBox.Name = "WordTextBox";
             this.WordTextBox.Size = new System.Drawing.Size(313, 26);
             this.WordTextBox.TabIndex = 10;
+            this.WordTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.WordTextBox_EnterPressed);
             // 
             // label4
             // 
