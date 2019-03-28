@@ -38,7 +38,7 @@ namespace BoggleClient
         /// <summary>
         /// Fired when user selects join game button. Initiates search for a second player.
         /// </summary>
-        event Action<string, string> JoinGamePressed;
+        event Action<int> JoinGamePressed;
 
         /// <summary>
         /// Fired when a user selects the quit game button.  Clears the game board and resets the timer.
