@@ -50,7 +50,6 @@
             this.NameTextBox.Name = "NameTextBox";
             this.NameTextBox.Size = new System.Drawing.Size(313, 26);
             this.NameTextBox.TabIndex = 0;
-            this.NameTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.NameTextBox_EnterPressed);
             // 
             // label1
             // 
@@ -70,7 +69,6 @@
             this.ServerTextBox.Name = "ServerTextBox";
             this.ServerTextBox.Size = new System.Drawing.Size(313, 26);
             this.ServerTextBox.TabIndex = 2;
-            this.ServerTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ServerTextBox_EnterPressed);
             // 
             // label2
             // 
@@ -100,7 +98,6 @@
             this.TimeTextBox.Name = "TimeTextBox";
             this.TimeTextBox.Size = new System.Drawing.Size(313, 26);
             this.TimeTextBox.TabIndex = 5;
-            this.TimeTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TimeLimitTextBox_EnterPressed);
             // 
             // label3
             // 
@@ -159,7 +156,6 @@
             this.WordTextBox.Name = "WordTextBox";
             this.WordTextBox.Size = new System.Drawing.Size(313, 26);
             this.WordTextBox.TabIndex = 10;
-            this.WordTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.WordTextBox_EnterPressed);
             // 
             // label4
             // 

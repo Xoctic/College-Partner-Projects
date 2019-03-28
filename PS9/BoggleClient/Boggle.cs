@@ -31,25 +31,5 @@ namespace BoggleClient
         {
 
         }
-
-        private void NameTextBox_EnterPressed(object sender, KeyPressEventArgs e)
-        {
-
-        }
-
-        private void ServerTextBox_EnterPressed(object sender, KeyPressEventArgs e)
-        {
-
-        }
-
-        private void TimeLimitTextBox_EnterPressed(object sender, KeyPressEventArgs e)
-        {
-
-        }
-
-        private void WordTextBox_EnterPressed(object sender, KeyPressEventArgs e)
-        {
-
-        }
     }
 }
