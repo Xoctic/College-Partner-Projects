@@ -57,7 +57,7 @@
     </Compile>
     <Compile Include="Controller.cs" />
     <Compile Include="IBogleView.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Launch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="BoggleView.resx">
       <DependentUpon>BoggleView.cs</DependentUpon>

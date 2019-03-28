@@ -14,6 +14,14 @@ namespace BoggleClient
     {
         public bool IsUserRegistered { get; set;  }
 
+        public event Action<string, string> RegisterPressed;
+
+        public event Action<int> JoinGamePressed;
+
+        public event Action<string, string> QuitGamePressed;
+
+        public event Action CancelPressed;
+
         public BoggleView()
         {
             InitializeComponent();
@@ -41,16 +49,11 @@ namespace BoggleClient
             CancelButton.Enabled = !state;
         }
 
-        public event Action<string, string> RegisterPressed;
-
-        public event Action<int> JoinGamePressed;
-
-        public event Action<string, string> QuitGamePressed;
-
-        public event Action CancelPressed;
+       
 
         private void RegisterUserButton_Click(object sender, EventArgs e)
         {
+            //RegisterPressed(NameTextBox.Text.Trim(), ServerTextBox.Text.Trim());
             RegisterPressed?.Invoke(NameTextBox.Text.Trim(), ServerTextBox.Text.Trim());
         }
 

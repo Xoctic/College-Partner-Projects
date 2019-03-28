@@ -48,7 +48,7 @@ namespace BoggleClient
             throw new NotImplementedException();
         }
 
-        private void JoinGame(string arg1, string arg2)
+        private void JoinGame(int time)
         {
             throw new NotImplementedException();
         }
@@ -69,11 +69,11 @@ namespace BoggleClient
                     // add more stuffs
                     dynamic user = new ExpandoObject();
                     user.Name = name;
-                    user.Server = server;
+                    //user.Server = server;
 
                     //Compose & Send Request
                     tokenSource = new CancellationTokenSource();
-                    StringContent content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
+                    StringContent content = new StringContent(JsonConvert.SerializeObject(user.Name), Encoding.UTF8, "application/json");
                     HttpResponseMessage response = await client.PostAsync("RegisterUser", content, tokenSource.Token);
 
                     //Deal With Response
@@ -82,6 +82,7 @@ namespace BoggleClient
                         String result = await response.Content.ReadAsStringAsync();
                         userToken = (string)JsonConvert.DeserializeObject(result);
                         view.IsUserRegistered = true;
+                        MessageBox.Show("success!: " + view.IsUserRegistered);
                     }
                     else
                     {

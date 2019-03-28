@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace BoggleClient
 {
-    interface IBogleView
+    public interface IBogleView
     {
         /// <summary>
         /// If state == true, enables all controls that are normally enabled; disables Cancel.
