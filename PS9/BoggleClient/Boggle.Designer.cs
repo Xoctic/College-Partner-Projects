@@ -28,28 +28,29 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.NameTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.ServerTextBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.RegisterUserButton = new System.Windows.Forms.Button();
+            this.TimeTextBox = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.button3 = new System.Windows.Forms.Button();
-            this.textBox4 = new System.Windows.Forms.TextBox();
+            this.JoinGameButton = new System.Windows.Forms.Button();
+            this.BogleGrid = new System.Windows.Forms.TableLayoutPanel();
+            this.QuitGameButton = new System.Windows.Forms.Button();
+            this.WordTextBox = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // textBox1
+            // NameTextBox
             // 
-            this.textBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.Location = new System.Drawing.Point(304, 51);
-            this.textBox1.MaxLength = 100;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(313, 26);
-            this.textBox1.TabIndex = 0;
+            this.NameTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.NameTextBox.Location = new System.Drawing.Point(304, 51);
+            this.NameTextBox.MaxLength = 100;
+            this.NameTextBox.Name = "NameTextBox";
+            this.NameTextBox.Size = new System.Drawing.Size(313, 26);
+            this.NameTextBox.TabIndex = 0;
+            this.NameTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.NameTextBox_EnterPressed);
             // 
             // label1
             // 
@@ -61,14 +62,15 @@
             this.label1.Text = "Name";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // textBox2
+            // ServerTextBox
             // 
-            this.textBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox2.Location = new System.Drawing.Point(304, 83);
-            this.textBox2.MaxLength = 100;
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(313, 26);
-            this.textBox2.TabIndex = 2;
+            this.ServerTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ServerTextBox.Location = new System.Drawing.Point(304, 83);
+            this.ServerTextBox.MaxLength = 100;
+            this.ServerTextBox.Name = "ServerTextBox";
+            this.ServerTextBox.Size = new System.Drawing.Size(313, 26);
+            this.ServerTextBox.TabIndex = 2;
+            this.ServerTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ServerTextBox_EnterPressed);
             // 
             // label2
             // 
@@ -79,24 +81,26 @@
             this.label2.TabIndex = 3;
             this.label2.Text = "Server";
             // 
-            // button1
+            // RegisterUserButton
             // 
-            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.Location = new System.Drawing.Point(241, 115);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(376, 28);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "Register User";
-            this.button1.UseVisualStyleBackColor = true;
+            this.RegisterUserButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.RegisterUserButton.Location = new System.Drawing.Point(241, 115);
+            this.RegisterUserButton.Name = "RegisterUserButton";
+            this.RegisterUserButton.Size = new System.Drawing.Size(376, 28);
+            this.RegisterUserButton.TabIndex = 4;
+            this.RegisterUserButton.Text = "Register User";
+            this.RegisterUserButton.UseVisualStyleBackColor = true;
+            this.RegisterUserButton.Click += new System.EventHandler(this.RegisterUserButton_Click);
             // 
-            // textBox3
+            // TimeTextBox
             // 
-            this.textBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox3.Location = new System.Drawing.Point(304, 158);
-            this.textBox3.MaxLength = 100;
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(313, 26);
-            this.textBox3.TabIndex = 5;
+            this.TimeTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TimeTextBox.Location = new System.Drawing.Point(304, 158);
+            this.TimeTextBox.MaxLength = 100;
+            this.TimeTextBox.Name = "TimeTextBox";
+            this.TimeTextBox.Size = new System.Drawing.Size(313, 26);
+            this.TimeTextBox.TabIndex = 5;
+            this.TimeTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TimeLimitTextBox_EnterPressed);
             // 
             // label3
             // 
@@ -108,47 +112,54 @@
             this.label3.Text = "Time Limit";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // button2
+            // JoinGameButton
             // 
-            this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button2.Location = new System.Drawing.Point(241, 199);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(376, 28);
-            this.button2.TabIndex = 7;
-            this.button2.Text = "Join Game";
-            this.button2.UseVisualStyleBackColor = true;
+            this.JoinGameButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.JoinGameButton.Location = new System.Drawing.Point(241, 199);
+            this.JoinGameButton.Name = "JoinGameButton";
+            this.JoinGameButton.Size = new System.Drawing.Size(376, 28);
+            this.JoinGameButton.TabIndex = 7;
+            this.JoinGameButton.Text = "Join Game";
+            this.JoinGameButton.UseVisualStyleBackColor = true;
+            this.JoinGameButton.Click += new System.EventHandler(this.JoinGameButton_Click);
             // 
-            // tableLayoutPanel1
+            // BogleGrid
             // 
-            this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(241, 242);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(376, 384);
-            this.tableLayoutPanel1.TabIndex = 8;
+            this.BogleGrid.ColumnCount = 4;
+            this.BogleGrid.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.BogleGrid.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.BogleGrid.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 93F));
+            this.BogleGrid.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 95F));
+            this.BogleGrid.Location = new System.Drawing.Point(241, 242);
+            this.BogleGrid.Name = "BogleGrid";
+            this.BogleGrid.RowCount = 4;
+            this.BogleGrid.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.BogleGrid.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.BogleGrid.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 94F));
+            this.BogleGrid.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 97F));
+            this.BogleGrid.Size = new System.Drawing.Size(376, 384);
+            this.BogleGrid.TabIndex = 8;
             // 
-            // button3
+            // QuitGameButton
             // 
-            this.button3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button3.Location = new System.Drawing.Point(241, 642);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(376, 28);
-            this.button3.TabIndex = 9;
-            this.button3.Text = "Quit Game";
-            this.button3.UseVisualStyleBackColor = true;
+            this.QuitGameButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.QuitGameButton.Location = new System.Drawing.Point(241, 642);
+            this.QuitGameButton.Name = "QuitGameButton";
+            this.QuitGameButton.Size = new System.Drawing.Size(376, 28);
+            this.QuitGameButton.TabIndex = 9;
+            this.QuitGameButton.Text = "Quit Game";
+            this.QuitGameButton.UseVisualStyleBackColor = true;
+            this.QuitGameButton.Click += new System.EventHandler(this.QuitGameButton_Click);
             // 
-            // textBox4
+            // WordTextBox
             // 
-            this.textBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox4.Location = new System.Drawing.Point(304, 689);
-            this.textBox4.MaxLength = 100;
-            this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(313, 26);
-            this.textBox4.TabIndex = 10;
+            this.WordTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.WordTextBox.Location = new System.Drawing.Point(304, 689);
+            this.WordTextBox.MaxLength = 100;
+            this.WordTextBox.Name = "WordTextBox";
+            this.WordTextBox.Size = new System.Drawing.Size(313, 26);
+            this.WordTextBox.TabIndex = 10;
+            this.WordTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.WordTextBox_EnterPressed);
             // 
             // label4
             // 
@@ -166,17 +177,17 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(867, 752);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.textBox4);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.tableLayoutPanel1);
-            this.Controls.Add(this.button2);
+            this.Controls.Add(this.WordTextBox);
+            this.Controls.Add(this.QuitGameButton);
+            this.Controls.Add(this.BogleGrid);
+            this.Controls.Add(this.JoinGameButton);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.textBox3);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.TimeTextBox);
+            this.Controls.Add(this.RegisterUserButton);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.textBox2);
+            this.Controls.Add(this.ServerTextBox);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.NameTextBox);
             this.Name = "Boggle";
             this.Text = "Form1";
             this.ResumeLayout(false);
@@ -186,17 +197,17 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox NameTextBox;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox ServerTextBox;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.Button RegisterUserButton;
+        private System.Windows.Forms.TextBox TimeTextBox;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.TextBox textBox4;
+        private System.Windows.Forms.Button JoinGameButton;
+        private System.Windows.Forms.TableLayoutPanel BogleGrid;
+        private System.Windows.Forms.Button QuitGameButton;
+        private System.Windows.Forms.TextBox WordTextBox;
         private System.Windows.Forms.Label label4;
     }
 }
