@@ -40,6 +40,7 @@
             this.QuitGameButton = new System.Windows.Forms.Button();
             this.WordTextBox = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
+            this.CancelButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // NameTextBox
@@ -167,11 +168,24 @@
             this.label4.Text = "Word";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // CancelButton
+            // 
+            this.CancelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CancelButton.Location = new System.Drawing.Point(632, 158);
+            this.CancelButton.Name = "CancelButton";
+            this.CancelButton.Size = new System.Drawing.Size(88, 69);
+            this.CancelButton.TabIndex = 12;
+            this.CancelButton.Text = "Cancel Join Game";
+            this.CancelButton.UseVisualStyleBackColor = true;
+            this.CancelButton.Visible = false;
+            this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
+            // 
             // Boggle
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(867, 752);
+            this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.WordTextBox);
             this.Controls.Add(this.QuitGameButton);
@@ -205,6 +219,7 @@
         private System.Windows.Forms.Button QuitGameButton;
         private System.Windows.Forms.TextBox WordTextBox;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button CancelButton;
     }
 }
 
