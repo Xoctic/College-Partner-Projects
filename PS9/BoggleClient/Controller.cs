@@ -34,7 +34,7 @@ namespace BoggleClient
         public Controller(BoggleView view)
         {
             this.view = view;
-            userToken = "0";
+            userToken = Guid.NewGuid().ToString();
 
             view.RegisterPressed += Register;
             view.JoinGamePressed += JoinGame;
@@ -73,8 +73,8 @@ namespace BoggleClient
 
                     //Compose & Send Request
                     tokenSource = new CancellationTokenSource();
-                    StringContent content = new StringContent(JsonConvert.SerializeObject(user.Name), Encoding.UTF8, "application/json");
-                    HttpResponseMessage response = await client.PostAsync("RegisterUser", content, tokenSource.Token);
+                    StringContent content = new StringContent(JsonConvert.SerializeObject(name), Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PostAsync("BoggleService/users", content, tokenSource.Token);
 
                     //Deal With Response
                     if(response.IsSuccessStatusCode)
@@ -82,7 +82,7 @@ namespace BoggleClient
                         String result = await response.Content.ReadAsStringAsync();
                         userToken = (string)JsonConvert.DeserializeObject(result);
                         view.IsUserRegistered = true;
-                        MessageBox.Show("success!: " + view.IsUserRegistered);
+                        
                     }
                     else
                     {
