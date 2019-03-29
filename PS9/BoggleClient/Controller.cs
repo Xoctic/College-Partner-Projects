@@ -44,6 +44,11 @@ namespace BoggleClient
         /// </summary>
         private CancellationTokenSource tokenSource;
 
+        /// <summary>
+        /// Contains all the information of the current game
+        /// </summary>
+        private dynamic gameInfo = new ExpandoObject();
+
 
 
         public Controller(BoggleView view)
@@ -55,7 +60,7 @@ namespace BoggleClient
             view.JoinGamePressed += JoinGame;
             view.QuitGamePressed += QuitGame;
             view.CancelPressed += CancelJoinGame;
-
+            gameInfo.GameState = "";
 
         }
 
@@ -66,12 +71,29 @@ namespace BoggleClient
             {
                 tokenSource = new CancellationTokenSource();
                 StringContent content = new StringContent(gameID, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "true"); 
+                HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "false"); 
 
                 if(response.IsSuccessStatusCode)
                 {
                     
                     String result = await response.Content.ReadAsStringAsync();
+                  
+                    dynamic items = JsonConvert.DeserializeObject(result);
+                  
+                    int counter = 0;
+                    string temp;
+                    foreach(dynamic item in items)
+                    {
+                        temp = item.ToString();
+                        //temp = temp.Substring(14, temp.Length - 15);
+
+                        gameInfo.GameState = temp;
+                        
+
+                        
+
+
+                    }
 
                 }
             }
@@ -179,6 +201,7 @@ namespace BoggleClient
             {
                 view.EnableControls(true);
                 Update();
+                
             }
         }
 
