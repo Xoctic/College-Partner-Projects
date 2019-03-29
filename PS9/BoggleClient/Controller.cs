@@ -72,11 +72,10 @@ namespace BoggleClient
                 {
                     //Create Parameter
                     // add more stuffs
-                    dynamic user = new ExpandoObject();
-                    string gameInfo = "{/n" + "\"UserToken\": " + userToken + ",/n" + "\"TimeLimit\": " + time + "/n" + "}";
-                    //user.UserGameInfo = gameInfo;
+                    dynamic gameInfo = new ExpandoObject();
+                    gameInfo.UserToken = userToken;
+                    gameInfo.TimeLimit = time;
                     
-
                     //Compose & Send Request
                     tokenSource = new CancellationTokenSource();
                     StringContent content = new StringContent(JsonConvert.SerializeObject(gameInfo), Encoding.UTF8, "application/json");
@@ -88,9 +87,22 @@ namespace BoggleClient
                         String result = await response.Content.ReadAsStringAsync();
                         dynamic items = JsonConvert.DeserializeObject(result);
                         //userToken = (string)JsonConvert.DeserializeObject(result);
+                        int counter = 0;
                         foreach(dynamic item in items)
                         {
-                            isPending = false;
+                            //if(counter == 0)
+                            //{
+                            //    gameID = item.ToSting();
+                            //    gameID = gameID.Substring(11, gameID.Length - 12);
+                            //}
+                            //if(counter == 1)
+                            //{
+                            //    string test = item.ToString();
+
+                            //}
+                            string test = item.ToString();
+                            test = test.Substring(11, test.Length - 12);
+                            counter++;
                         }
 
                     }
@@ -122,12 +134,6 @@ namespace BoggleClient
                 view.EnableControls(false);
                 using (HttpClient client = CreateClient(server))
                 {
-                    //Create Parameter
-                    // add more stuffs
-                    dynamic user = new ExpandoObject();
-                    user.Name = name;
-                    //user.Server = server;
-
                     //Compose & Send Request
                     tokenSource = new CancellationTokenSource();
                     StringContent content = new StringContent(JsonConvert.SerializeObject(name), Encoding.UTF8, "application/json");
