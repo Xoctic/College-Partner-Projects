@@ -146,19 +146,11 @@ namespace BoggleClient
 
         private async void Update()
         {
-            //view.EnableControls(false);
             using (HttpClient client = CreateClient(serverURL))
-            {
-                //tokenSource = new CancellationTokenSource();
-                //StringContent content = new StringContent(gameID, Encoding.UTF8, "application/json");
-               
+            {  
                 HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "false");
-                
-               
-
                 if (response.IsSuccessStatusCode)
-                {
-                    
+                {                   
                     string result = await response.Content.ReadAsStringAsync();
 
                     dynamic items = JsonConvert.DeserializeObject(result);
@@ -185,13 +177,8 @@ namespace BoggleClient
 
                             break;
                         default:
-                            break;
-                 
+                            break;                
                     }
-                    
-
-
-
                 }
             }
         }
@@ -213,7 +200,7 @@ namespace BoggleClient
 
         }
 
-        private async void activeUpdate(string _result)
+        private void activeUpdate(string _result)
         {
            // HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "true");
             
@@ -232,10 +219,7 @@ namespace BoggleClient
 
         }
 
-       
-
-
-        private async void CancelJoinGame()
+        private void CancelJoinGame()
         {
             tokenSource.Cancel();
             view.Refresh();
@@ -319,9 +303,6 @@ namespace BoggleClient
                             }
                             counter++;
                         }
-
-                       // MessageBox.Show("isPending: " + isPending);
-
                     }
                     else
                     {

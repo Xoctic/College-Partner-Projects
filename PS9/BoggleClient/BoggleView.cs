@@ -68,11 +68,8 @@ namespace BoggleClient
             }
         }
 
-
-
         private void RegisterUserButton_Click(object sender, EventArgs e)
         {
-            //RegisterPressed(NameTextBox.Text.Trim(), ServerTextBox.Text.Trim());
             RegisterPressed?.Invoke(NameTextBox.Text.Trim(), ServerTextBox.Text.Trim());
         }
 
@@ -99,6 +96,8 @@ namespace BoggleClient
             if (e.KeyChar == (char)Keys.Return)
             {
                 EnterPressedInWordTextBox?.Invoke(WordTextBox.Text.Trim());
+                WordTextBox.Text = "";
+                e.Handled = true;
             }
         }
 
