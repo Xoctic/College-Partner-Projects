@@ -45,6 +45,8 @@ namespace BoggleClient
         /// </summary>
         private CancellationTokenSource tokenSource;
 
+        private bool gameBegun;
+
         /// <summary>
         /// Timer used to check multiple aspects of the game.
         /// </summary>
@@ -61,6 +63,7 @@ namespace BoggleClient
             view.CancelPressed += CancelJoinGame;
             myTimer.Tick += TimerEventProcessor;
             myTimer.Interval = 1000;
+            gameBegun = false;
         }
 
         private void TimerEventProcessor(object sender, EventArgs e)
@@ -76,84 +79,68 @@ namespace BoggleClient
                 tokenSource = new CancellationTokenSource();
                 StringContent content = new StringContent(gameID, Encoding.UTF8, "application/json");
                
-                    HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "false");
+                HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "false");
                 
                
 
                 if (response.IsSuccessStatusCode)
                 {
+                    
                     var result = await response.Content.ReadAsStringAsync();
 
-                    var jo = JObject.Parse(result);
-                    var gameState = jo["GameState"].ToString();
-                    var board = jo["Board"].ToString();
-                    var timeLimit = jo["TimeLimit"].ToString();
-                    var timeLeft = jo["TImeLeft"].ToString();
-           
-                    var player1NickName = jo["Player1"]["Nickname"].ToString();
-                    var player1Score = jo["Score"].ToString();
-
-                    var player2NickName = jo["Player2"]["Nickname"].ToString();
-                    var player2Score = jo["Player2"]["Score"];
-
                     dynamic items = JsonConvert.DeserializeObject(result);
+                    string gameState = (string)items.GameState;
 
-
-
-                    int counter = 0;
-                    string temp;
-                    foreach (dynamic item in items)
+                    switch (gameState)
                     {
-                        temp = item.ToString();
-                        //temp = temp.Substring(14, temp.Length - 15);
+                        case "active":
+                            if(gameBegun == false)
+                            {
+                                gameBegun = true;
+                                startGameUpdate(response);
+                            }
+                            else
+                            {
+                                response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "true");
+                                activeUpdate(response);
+                            }
+                            break;
+                      
+                        case "completed":
+                            completedUpdate(response);
 
-                        switch (counter)
-                        {
-                            //gameState
-                            case 0:
-                                //This is how to set temp to current item.  There are other properties 
-                                //of item that exist that may be needed, such as item.Next.
-                                //The debugger will show you all the properties that exist for item.
-                                temp = item.Last;
-
-                                //temp = temp.Substring(14, temp.Length - 15);
-                                break;
-
-                            case 1:
-                                temp = item.Last;
-                                //temp = temp.Substring(10, temp.Length - 11);
-                                break;
-
-                            case 2:
-                                //temp = temp.Substring(13, temp.Length - 14);
-                                temp = item.Last;
-                                break;
-
-                            case 3:
-                                temp = item.Last;
-                                //temp = temp.Substring(12, temp.Length - 13);
-                                break;
-
-                            case 4:
-                                temp = item.First.First.Last.Value;
-                                break;
-                            case 5:
-
-                                break;
-
-                        }
-
-
-
-
-
-                        counter++;
-
+                            break;
+                        default:
+                            break;
+                 
                     }
+                    
+
+
 
                 }
             }
         }
+
+        private void startGameUpdate(HttpResponseMessage message)
+        {
+
+
+        }
+
+        private void activeUpdate(HttpResponseMessage message)
+        {
+
+
+        }
+
+        private void completedUpdate(HttpResponseMessage message)
+        {
+
+        }
+
+
+
 
         private async void CancelJoinGame()
         {
