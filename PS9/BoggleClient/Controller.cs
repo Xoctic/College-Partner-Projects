@@ -45,11 +45,9 @@ namespace BoggleClient
         private CancellationTokenSource tokenSource;
 
         /// <summary>
-        /// Contains all the information of the current game
+        /// Timer used to check multiple aspects of the game.
         /// </summary>
-        private dynamic gameInfo = new ExpandoObject();
-
-
+        private System.Windows.Forms.Timer myTimer = new System.Windows.Forms.Timer();
 
         public Controller(BoggleView view)
         {
@@ -60,8 +58,13 @@ namespace BoggleClient
             view.JoinGamePressed += JoinGame;
             view.QuitGamePressed += QuitGame;
             view.CancelPressed += CancelJoinGame;
-            gameInfo.GameState = "";
+            myTimer.Tick += TimerEventProcessor;
+            myTimer.Interval = 1000;
+        }
 
+        private void TimerEventProcessor(object sender, EventArgs e)
+        {
+            Update();
         }
 
         private async void Update()
@@ -71,27 +74,60 @@ namespace BoggleClient
             {
                 tokenSource = new CancellationTokenSource();
                 StringContent content = new StringContent(gameID, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "false"); 
+                HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "false");
 
-                if(response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
-                    
+
                     String result = await response.Content.ReadAsStringAsync();
-                  
                     dynamic items = JsonConvert.DeserializeObject(result);
-                  
+
+
+
                     int counter = 0;
                     string temp;
-                    foreach(dynamic item in items)
+                    foreach (dynamic item in items)
                     {
                         temp = item.ToString();
                         //temp = temp.Substring(14, temp.Length - 15);
 
-                        gameInfo.GameState = temp;
-                        
+                        switch (counter)
+                        {
+                            //gameState
+                            case 0:
+                                //This is how to set temp to current item.  There are other properties 
+                                //of item that exist that may be needed, such as item.Next.
+                                //The debugger will show you all the properties that exist for item.
+                                temp = item.Last;
 
-                        
+                                //temp = temp.Substring(14, temp.Length - 15);
+                                break;
 
+                            case 1:
+                                string tester = item.Board;
+                                temp = temp.Substring(10, temp.Length - 11);
+                                break;
+
+                            case 2:
+                                temp = temp.Substring(13, temp.Length - 14);
+                                break;
+
+                            case 3:
+                                temp = temp.Substring(12, temp.Length - 13);
+                                break;
+
+                            case 4:
+                                break;
+                            case 5:
+                                break;
+
+                        }
+
+
+
+
+
+                        counter++;
 
                     }
 
@@ -200,8 +236,7 @@ namespace BoggleClient
             finally
             {
                 view.EnableControls(true);
-                Update();
-                
+                myTimer.Start();
             }
         }
 
