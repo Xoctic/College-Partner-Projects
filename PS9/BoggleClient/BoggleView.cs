@@ -49,6 +49,23 @@ namespace BoggleClient
             CancelButton.Enabled = !state;
         }
 
+        public void SetBoard(string board)
+        {
+            int counter = 0;
+            char[] array = board.ToCharArray();
+
+            foreach(Control control in BogleGrid.Controls)
+            {
+                Label label = control as Label;
+                if(label != null)
+                {
+                    label.Text = array[counter].ToString();
+                }
+
+                counter++;
+            }
+        }
+
        
 
         private void RegisterUserButton_Click(object sender, EventArgs e)

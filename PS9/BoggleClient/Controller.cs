@@ -165,7 +165,16 @@ namespace BoggleClient
 
         private void startGameUpdate(HttpResponseMessage message, dynamic items)
         {
+            gameState = items.GameState;
+            gameBoard = items.Board;
+            timeLimit = items.TimeLimit;
+            timeLeft = items.TimeLeft;
+            player1Nickname = items.Player1.Nickname;
+            player1Score = items.Player1.Score;
+            player2Nickname = items.Player2.Nickname;
+            player2Score = items.Player2.Score;
 
+            view.SetBoard(gameBoard);
 
         }
 
@@ -184,7 +193,7 @@ namespace BoggleClient
 
         }
 
-
+       
 
 
         private async void CancelJoinGame()
