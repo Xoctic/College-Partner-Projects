@@ -101,30 +101,33 @@ namespace BoggleClient
 
         private async void CancelJoinGame()
         {
-            try
-            {
-                view.EnableControls(false);
-                using (HttpClient client = CreateClient(serverURL))
-                {
-                    tokenSource = new CancellationTokenSource();
-                    StringContent content = new StringContent(JsonConvert.SerializeObject(userToken), Encoding.UTF8, "application/json");
-                    HttpResponseMessage response = await client.PutAsync("BoggleService/games", content, tokenSource.Token);
-                    //should check to see if it is a 204
-                    if(!response.IsSuccessStatusCode)
-                    {
-                        MessageBox.Show("Something wrong with cancelling join game");
-                    }
-                }
+            tokenSource.Cancel();
+            view.Refresh();
+            view.EnableControls(true);
+            //try
+            //{
+            //    view.EnableControls(false);
+            //    using (HttpClient client = CreateClient(serverURL))
+            //    {
+            //        tokenSource = new CancellationTokenSource();
+            //        StringContent content = new StringContent(JsonConvert.SerializeObject(userToken), Encoding.UTF8, "application/json");
+            //        HttpResponseMessage response = await client.PutAsync("BoggleService/games", content, tokenSource.Token);
+            //        //should check to see if it is a 204
+            //        if(!response.IsSuccessStatusCode)
+            //        {
+            //            MessageBox.Show("Something wrong with cancelling join game");
+            //        }
+            //    }
 
 
-            }
-            catch(TaskCanceledException)
-            {
-            }
-            finally
-            {
-                view.EnableControls(true);
-            }
+            //}
+            //catch(TaskCanceledException)
+            //{
+            //}
+            //finally
+            //{
+            //    view.EnableControls(true);
+            //}
         }
 
         private void QuitGame(string arg1, string arg2)
@@ -155,7 +158,6 @@ namespace BoggleClient
                     {
                         String result = await response.Content.ReadAsStringAsync();
                         dynamic items = JsonConvert.DeserializeObject(result);
-                        //userToken = (string)JsonConvert.DeserializeObject(result);
                         int counter = 0;
                         foreach(dynamic item in items)
                         {
@@ -179,8 +181,6 @@ namespace BoggleClient
                                 }
 
                             }
-                           // string test = item.ToString();
-                            //test = test.Substring(11, test.Length - 12);
                             counter++;
                         }
 
