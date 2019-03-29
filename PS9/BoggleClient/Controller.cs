@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -79,7 +80,13 @@ namespace BoggleClient
                 if (response.IsSuccessStatusCode)
                 {
 
-                    String result = await response.Content.ReadAsStringAsync();
+                    
+
+                    var result = await response.Content.ReadAsStringAsync();
+
+                    var jo = JObject.Parse(result);
+                    var player1NickName = jo["Player1"]["Nickname"].ToString();
+
                     dynamic items = JsonConvert.DeserializeObject(result);
 
 
@@ -104,21 +111,25 @@ namespace BoggleClient
                                 break;
 
                             case 1:
-                                string tester = item.Board;
-                                temp = temp.Substring(10, temp.Length - 11);
+                                temp = item.Last;
+                                //temp = temp.Substring(10, temp.Length - 11);
                                 break;
 
                             case 2:
-                                temp = temp.Substring(13, temp.Length - 14);
+                                //temp = temp.Substring(13, temp.Length - 14);
+                                temp = item.Last;
                                 break;
 
                             case 3:
-                                temp = temp.Substring(12, temp.Length - 13);
+                                temp = item.Last;
+                                //temp = temp.Substring(12, temp.Length - 13);
                                 break;
 
                             case 4:
+                                temp = item.First.First.Last.Value;
                                 break;
                             case 5:
+
                                 break;
 
                         }
