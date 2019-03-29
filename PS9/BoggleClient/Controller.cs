@@ -186,6 +186,8 @@ namespace BoggleClient
             timeLeft = items.TimeLeft;
             player1Score = items.Player1.Score;
             player2Score = items.Player2.Score;
+
+
         }
 
         private void completedUpdate(HttpResponseMessage message, dynamic items)
