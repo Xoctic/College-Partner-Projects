@@ -115,11 +115,11 @@ namespace BoggleClient
 
         private async void Update()
         {
-            view.EnableControls(false);
+            //view.EnableControls(false);
             using (HttpClient client = CreateClient(serverURL))
             {
-                tokenSource = new CancellationTokenSource();
-                StringContent content = new StringContent(gameID, Encoding.UTF8, "application/json");
+                //tokenSource = new CancellationTokenSource();
+                //StringContent content = new StringContent(gameID, Encoding.UTF8, "application/json");
                
                 HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "false");
                 
@@ -139,17 +139,16 @@ namespace BoggleClient
                             if(gameBegun == false)
                             {
                                 gameBegun = true;
-                                startGameUpdate(response);
+                                startGameUpdate(response, items);
                             }
                             else
                             {
-                                response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "true");
-                                activeUpdate(response);
+                                activeUpdate(client);
                             }
                             break;
                       
                         case "completed":
-                            completedUpdate(response);
+                            completedUpdate(response, items);
 
                             break;
                         default:
@@ -164,19 +163,23 @@ namespace BoggleClient
             }
         }
 
-        private void startGameUpdate(HttpResponseMessage message)
+        private void startGameUpdate(HttpResponseMessage message, dynamic items)
         {
 
 
         }
 
-        private void activeUpdate(HttpResponseMessage message)
+        private async void activeUpdate(HttpClient client)
         {
-
-
+            HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "true");
+            var result = await response.Content.ReadAsStringAsync();
+            dynamic items = JsonConvert.DeserializeObject(result);
+            timeLeft = items.TimeLeft;
+            player1Score = items.Player1.Score;
+            player2Score = items.Player2.Score;
         }
 
-        private void completedUpdate(HttpResponseMessage message)
+        private void completedUpdate(HttpResponseMessage message, dynamic items)
         {
 
         }
