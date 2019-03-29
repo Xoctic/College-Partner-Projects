@@ -9,6 +9,10 @@ namespace BoggleClient
 {
     public interface IBogleView
     {
+
+
+
+
         /// <summary>
         /// If state == true, enables all controls that are normally enabled; disables Cancel.
         /// If state == false, disables all controls; enables Cancel.

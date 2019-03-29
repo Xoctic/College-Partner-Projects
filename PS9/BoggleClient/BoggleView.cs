@@ -12,7 +12,7 @@ namespace BoggleClient
 {
     public partial class BoggleView : Form, IBogleView
     {
-        public bool IsUserRegistered { get; set;  }
+        public bool IsUserRegistered { get; set; }
 
         public event Action<string, string> RegisterPressed;
 
@@ -54,10 +54,10 @@ namespace BoggleClient
             int counter = 0;
             char[] array = board.ToCharArray();
 
-            foreach(Control control in BogleGrid.Controls)
+            foreach (Control control in BogleGrid.Controls)
             {
                 Label label = control as Label;
-                if(label != null)
+                if (label != null)
                 {
                     label.Text = array[counter].ToString();
                 }
@@ -66,7 +66,7 @@ namespace BoggleClient
             }
         }
 
-       
+
 
         private void RegisterUserButton_Click(object sender, EventArgs e)
         {
@@ -94,7 +94,7 @@ namespace BoggleClient
 
         private void WordTextBox_EnterPressed(object sender, KeyPressEventArgs e)
         {
-            if(e.KeyChar == (char)Keys.Return)
+            if (e.KeyChar == (char)Keys.Return)
             {
                 //Incomplete method
             }
@@ -111,7 +111,34 @@ namespace BoggleClient
         }
         public void Clear()
         {
-            
+
         }
+
+        public void SetPlayer1NameLabel(string name)
+        {
+            Player1NameLabel.Text = name;
+        }
+
+        public void SetPlayer2NameLabel(string name)
+        {
+            Player2NameLabel.Text = name;
+        }
+
+        public void SetSecondsLabel(string seconds)
+        {
+            SecondsLabel.Text = seconds;
+        }
+
+        public void SetPlayer1Score(string score)
+        {
+            Player1ScoreLabel.Text = score;
+        }
+
+        public void SetPlayer2Score(string score)
+        {
+            Player2ScoreLabel.Text = score;
+        }
+
+       
     }
 }

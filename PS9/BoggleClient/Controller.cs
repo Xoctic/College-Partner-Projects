@@ -128,7 +128,7 @@ namespace BoggleClient
                 if (response.IsSuccessStatusCode)
                 {
                     
-                    var result = await response.Content.ReadAsStringAsync();
+                    string result = await response.Content.ReadAsStringAsync();
 
                     dynamic items = JsonConvert.DeserializeObject(result);
                     gameState = (string)items.GameState;
@@ -139,11 +139,13 @@ namespace BoggleClient
                             if(gameBegun == false)
                             {
                                 gameBegun = true;
-                                startGameUpdate(response, items);
+                                startGameUpdate(items);
                             }
                             else
                             {
-                                activeUpdate(client);
+                                response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "true");
+                                result = await response.Content.ReadAsStringAsync();
+                                activeUpdate(result);
                             }
                             break;
                       
@@ -163,7 +165,7 @@ namespace BoggleClient
             }
         }
 
-        private void startGameUpdate(HttpResponseMessage message, dynamic items)
+        private void startGameUpdate(dynamic items)
         {
             gameState = items.GameState;
             gameBoard = items.Board;
@@ -175,18 +177,22 @@ namespace BoggleClient
             player2Score = items.Player2.Score;
 
             view.SetBoard(gameBoard);
+            view.SetPlayer1NameLabel(player1Nickname);
+            view.SetPlayer2NameLabel(player2Nickname);
 
         }
 
-        private async void activeUpdate(HttpClient client)
+        private async void activeUpdate(string _result)
         {
-            HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "true");
-            var result = await response.Content.ReadAsStringAsync();
-            dynamic items = JsonConvert.DeserializeObject(result);
+           // HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "true");
+            
+            dynamic items = JsonConvert.DeserializeObject(_result);
             timeLeft = items.TimeLeft;
             player1Score = items.Player1.Score;
             player2Score = items.Player2.Score;
-
+            view.SetSecondsLabel(timeLeft.ToString());
+            view.SetPlayer1Score(player1Score);
+            view.SetPlayer2Score(player2Score);
 
         }
 
