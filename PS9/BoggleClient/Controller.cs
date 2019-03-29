@@ -45,8 +45,50 @@ namespace BoggleClient
         /// </summary>
         private CancellationTokenSource tokenSource;
 
+        /// <summary>
+        /// Keeps track if the game has started or not.
+        /// </summary>
         private bool gameBegun;
 
+        /// <summary>
+        /// State of the current game.
+        /// </summary>
+        private string gameState;
+
+        /// <summary>
+        /// Board of the current game.
+        /// </summary>
+        private string gameBoard;
+
+        /// <summary>
+        /// Average timelimit of the 2 players.
+        /// </summary>
+        private int timeLimit;
+
+        /// <summary>
+        /// Time remaining in the game.
+        /// </summary>
+        private int timeLeft;
+
+        /// <summary>
+        /// Name of player 1
+        /// </summary>
+        private string player1Nickname;
+
+        /// <summary>
+        /// Score for player 1
+        /// </summary>
+        private string player1Score;
+
+        /// <summary>
+        /// Name of player 2
+        /// </summary>
+        private string player2Nickname;
+
+        /// <summary>
+        /// Score for player 2
+        /// </summary>
+        private string player2Score;
         /// <summary>
         /// Timer used to check multiple aspects of the game.
         /// </summary>
@@ -89,7 +131,7 @@ namespace BoggleClient
                     var result = await response.Content.ReadAsStringAsync();
 
                     dynamic items = JsonConvert.DeserializeObject(result);
-                    string gameState = (string)items.GameState;
+                    gameState = (string)items.GameState;
 
                     switch (gameState)
                     {
