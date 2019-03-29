@@ -103,9 +103,40 @@ namespace BoggleClient
             view.JoinGamePressed += JoinGame;
             view.QuitGamePressed += QuitGame;
             view.CancelPressed += CancelJoinGame;
+            view.EnterPressedInWordTextBox += SendWord;
             myTimer.Tick += TimerEventProcessor;
             myTimer.Interval = 1000;
             gameBegun = false;
+        }
+
+        private async void SendWord(string word)
+        {
+
+            using (HttpClient client = CreateClient(serverURL))
+            {
+                //Create Parameter
+                // add more stuffs
+                dynamic wordInfo = new ExpandoObject();
+                wordInfo.UserToken = userToken;
+                wordInfo.Word = word;
+
+                //Compose & Send Request
+                StringContent content = new StringContent(JsonConvert.SerializeObject(wordInfo), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await client.PutAsync("BoggleService/games/" + gameID, content);
+
+                //Deal With Response
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadAsStringAsync();
+                    player1Score += Convert.ToInt32(JsonConvert.DeserializeObject(result));
+
+                }
+                else
+                {
+                    MessageBox.Show("Error sending word: " + response.StatusCode + "\n" + response.ReasonPhrase);
+                }
+
+            }
         }
 
         private void TimerEventProcessor(object sender, EventArgs e)

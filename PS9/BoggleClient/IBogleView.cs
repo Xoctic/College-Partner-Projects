@@ -9,7 +9,10 @@ namespace BoggleClient
 {
     public interface IBogleView
     {
-
+        /// <summary>
+        /// Fires when enter is pressed when inside the WordTextBox.
+        /// </summary>
+        event Action<string> EnterPressedInWordTextBox;
 
 
 

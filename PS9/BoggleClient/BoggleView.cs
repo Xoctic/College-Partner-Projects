@@ -22,6 +22,8 @@ namespace BoggleClient
 
         public event Action CancelPressed;
 
+        public event Action<string> EnterPressedInWordTextBox;
+
         public BoggleView()
         {
             InitializeComponent();
@@ -96,7 +98,7 @@ namespace BoggleClient
         {
             if (e.KeyChar == (char)Keys.Return)
             {
-                //Incomplete method
+                EnterPressedInWordTextBox?.Invoke(WordTextBox.Text.Trim());
             }
         }
 
