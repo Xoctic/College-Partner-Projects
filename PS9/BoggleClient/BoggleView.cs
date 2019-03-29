@@ -59,8 +59,9 @@ namespace BoggleClient
 
         private void JoinGameButton_Click(object sender, EventArgs e)
         {
-            //Incomplete method
             CancelButton.Visible = true;
+            CancelButton.Enabled = true;
+            JoinGamePressed?.Invoke(Convert.ToInt32(TimeTextBox.Text.Trim()));
         }
 
         private void QuitGameButton_Click(object sender, EventArgs e)

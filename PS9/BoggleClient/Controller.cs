@@ -25,6 +25,21 @@ namespace BoggleClient
         private string userToken;
 
         /// <summary>
+        /// The ID of the current game.
+        /// </summary>
+        private string gameID;
+
+        /// <summary>
+        /// Variable to keep track if player is waiting to join game.
+        /// </summary>
+        private bool isPending;
+
+        /// <summary>
+        /// Variable to store the URL of the server.
+        /// </summary>
+        private string serverURL;
+
+        /// <summary>
         /// For cancelling joining a game
         /// </summary>
         private CancellationTokenSource tokenSource;
@@ -48,9 +63,51 @@ namespace BoggleClient
             throw new NotImplementedException();
         }
 
-        private void JoinGame(int time)
+        private async void JoinGame(int time)
         {
-            throw new NotImplementedException();
+            try
+            {
+                view.EnableControls(false);
+                using (HttpClient client = CreateClient(serverURL))
+                {
+                    //Create Parameter
+                    // add more stuffs
+                    dynamic user = new ExpandoObject();
+                    string gameInfo = "{/n" + "\"UserToken\": " + userToken + ",/n" + "\"TimeLimit\": " + time + "/n" + "}";
+                    //user.UserGameInfo = gameInfo;
+                    
+
+                    //Compose & Send Request
+                    tokenSource = new CancellationTokenSource();
+                    StringContent content = new StringContent(JsonConvert.SerializeObject(gameInfo), Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PostAsync("BoggleService/games", content, tokenSource.Token);
+
+                    //Deal With Response
+                    if (response.IsSuccessStatusCode)
+                    {
+                        String result = await response.Content.ReadAsStringAsync();
+                        dynamic items = JsonConvert.DeserializeObject(result);
+                        //userToken = (string)JsonConvert.DeserializeObject(result);
+                        foreach(dynamic item in items)
+                        {
+                            isPending = false;
+                        }
+
+                    }
+                    else
+                    {
+                        MessageBox.Show("Error registering: " + response.StatusCode + "\n" + response.ReasonPhrase);
+                    }
+
+                }
+            }
+            catch (TaskCanceledException)
+            {
+            }
+            finally
+            {
+                view.EnableControls(true);
+            }
         }
 
         /// <summary>
@@ -79,6 +136,7 @@ namespace BoggleClient
                     //Deal With Response
                     if(response.IsSuccessStatusCode)
                     {
+                        serverURL = server;
                         String result = await response.Content.ReadAsStringAsync();
                         userToken = (string)JsonConvert.DeserializeObject(result);
                         view.IsUserRegistered = true;
