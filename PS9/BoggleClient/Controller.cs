@@ -54,8 +54,55 @@ namespace BoggleClient
             view.RegisterPressed += Register;
             view.JoinGamePressed += JoinGame;
             view.QuitGamePressed += QuitGame;
+            view.CancelPressed += CancelJoinGame;
 
 
+        }
+
+        private async void Update()
+        {
+            view.EnableControls(false);
+            using (HttpClient client = CreateClient(serverURL))
+            {
+                tokenSource = new CancellationTokenSource();
+                StringContent content = new StringContent(gameID, Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "true"); 
+
+                if(response.IsSuccessStatusCode)
+                {
+                    
+                    String result = await response.Content.ReadAsStringAsync();
+
+                }
+            }
+        }
+
+        private async void CancelJoinGame()
+        {
+            try
+            {
+                view.EnableControls(false);
+                using (HttpClient client = CreateClient(serverURL))
+                {
+                    tokenSource = new CancellationTokenSource();
+                    StringContent content = new StringContent(JsonConvert.SerializeObject(userToken), Encoding.UTF8, "application/json");
+                    HttpResponseMessage response = await client.PutAsync("BoggleService/games", content, tokenSource.Token);
+                    //should check to see if it is a 204
+                    if(!response.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show("Something wrong with cancelling join game");
+                    }
+                }
+
+
+            }
+            catch(TaskCanceledException)
+            {
+            }
+            finally
+            {
+                view.EnableControls(true);
+            }
         }
 
         private void QuitGame(string arg1, string arg2)
@@ -90,20 +137,32 @@ namespace BoggleClient
                         int counter = 0;
                         foreach(dynamic item in items)
                         {
-                            //if(counter == 0)
-                            //{
-                            //    gameID = item.ToSting();
-                            //    gameID = gameID.Substring(11, gameID.Length - 12);
-                            //}
-                            //if(counter == 1)
-                            //{
-                            //    string test = item.ToString();
+                            if (counter == 0)
+                            {
+                                gameID = item.ToString();
+                                gameID = gameID.Substring(11, gameID.Length - 12);
+                            }
+                            if (counter == 1)
+                            {
+                                string test = item.ToString();
+                                test = test.Substring(12, test.Length - 12);
+                                test = test.Trim();
+                                if(test == "true")
+                                {
+                                    isPending = true;
+                                }
+                                if(test == "false")
+                                {
+                                    isPending = false;
+                                }
 
-                            //}
-                            string test = item.ToString();
-                            test = test.Substring(11, test.Length - 12);
+                            }
+                           // string test = item.ToString();
+                            //test = test.Substring(11, test.Length - 12);
                             counter++;
                         }
+
+                       // MessageBox.Show("isPending: " + isPending);
 
                     }
                     else
@@ -119,6 +178,7 @@ namespace BoggleClient
             finally
             {
                 view.EnableControls(true);
+                Update();
             }
         }
 
