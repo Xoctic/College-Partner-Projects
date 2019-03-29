@@ -75,17 +75,26 @@ namespace BoggleClient
             {
                 tokenSource = new CancellationTokenSource();
                 StringContent content = new StringContent(gameID, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "false");
+               
+                    HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "false");
+                
+               
 
                 if (response.IsSuccessStatusCode)
                 {
-
-                    
-
                     var result = await response.Content.ReadAsStringAsync();
 
                     var jo = JObject.Parse(result);
+                    var gameState = jo["GameState"].ToString();
+                    var board = jo["Board"].ToString();
+                    var timeLimit = jo["TimeLimit"].ToString();
+                    var timeLeft = jo["TImeLeft"].ToString();
+           
                     var player1NickName = jo["Player1"]["Nickname"].ToString();
+                    var player1Score = jo["Score"].ToString();
+
+                    var player2NickName = jo["Player2"]["Nickname"].ToString();
+                    var player2Score = jo["Player2"]["Score"];
 
                     dynamic items = JsonConvert.DeserializeObject(result);
 
