@@ -14,8 +14,6 @@ namespace BoggleClient
         /// </summary>
         event Action<string> EnterPressedInWordTextBox;
 
-
-
         /// <summary>
         /// If state == true, enables all controls that are normally enabled; disables Cancel.
         /// If state == false, disables all controls; enables Cancel.
@@ -54,8 +52,13 @@ namespace BoggleClient
         event Action<string, string> QuitGamePressed;
 
         /// <summary>
-        /// Fires when an ongoing action must be canceled.
+        /// Fires when the cancel join game button is pressed.
         /// </summary>
-        event Action CancelPressed;
+        event Action CancelJoinGamePressed;
+
+        /// <summary>
+        /// Fires when the cancel register button is pressed.
+        /// </summary>
+        event Action CancelRegisterPressed;
     }
 }

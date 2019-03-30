@@ -102,7 +102,7 @@ namespace BoggleClient
             view.RegisterPressed += Register;
             view.JoinGamePressed += JoinGame;
             view.QuitGamePressed += QuitGame;
-            view.CancelPressed += CancelJoinGame;
+            view.CancelJoinGamePressed += CancelJoinGame;
             view.EnterPressedInWordTextBox += SendWord;
             myTimer.Tick += TimerEventProcessor;
             myTimer.Interval = 1000;

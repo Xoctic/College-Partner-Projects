@@ -20,9 +20,11 @@ namespace BoggleClient
 
         public event Action<string, string> QuitGamePressed;
 
-        public event Action CancelPressed;
+        public event Action CancelJoinGamePressed;
 
         public event Action<string> EnterPressedInWordTextBox;
+
+        public event Action CancelRegisterPressed;
 
         public BoggleView()
         {
@@ -48,7 +50,8 @@ namespace BoggleClient
                     control.Enabled = state && IsUserRegistered;
                 }
             }
-            CancelButton.Enabled = !state;
+            CancelJoinGameButton.Enabled = !state;
+            CancelRegisterUser.Enabled = !state;
         }
 
         public void SetBoard(string board)
@@ -61,7 +64,14 @@ namespace BoggleClient
                 Label label = control as Label;
                 if (label != null)
                 {
-                    label.Text = array[counter].ToString();
+                    if(array[counter].ToString() == "Q")
+                    {
+                        label.Text = "QU";
+                    }
+                    else
+                    {
+                        label.Text = array[counter].ToString();
+                    }
                 }
 
                 counter++;
@@ -75,8 +85,8 @@ namespace BoggleClient
 
         private void JoinGameButton_Click(object sender, EventArgs e)
         {
-            CancelButton.Visible = true;
-            CancelButton.Enabled = true;
+            CancelJoinGameButton.Visible = true;
+            CancelJoinGameButton.Enabled = true;
             JoinGamePressed?.Invoke(Convert.ToInt32(TimeTextBox.Text.Trim()));
         }
 
@@ -87,8 +97,8 @@ namespace BoggleClient
 
         private void CancelButton_Click(object sender, EventArgs e)
         {
-            CancelPressed?.Invoke();
-            CancelButton.Visible = false;
+            CancelJoinGamePressed?.Invoke();
+            CancelJoinGameButton.Visible = false;
         }
 
         private void WordTextBox_EnterPressed(object sender, KeyPressEventArgs e)
@@ -140,6 +150,10 @@ namespace BoggleClient
             Player2ScoreLabel.Text = score;
         }
 
-       
+        private void CancelRegisterUser_Click(object sender, EventArgs e)
+        {
+            CancelRegisterPressed?.Invoke();
+            CancelRegisterUser.Visible = false;
+        }
     }
 }
