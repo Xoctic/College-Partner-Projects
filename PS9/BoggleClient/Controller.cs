@@ -31,11 +31,6 @@ namespace BoggleClient
         private string gameID;
 
         /// <summary>
-        /// Variable to keep track if player attempted to join a game.
-        /// </summary>
-        //private bool joinGameAttempted;
-
-        /// <summary>
         /// Variable to store the URL of the server.
         /// </summary>
         private string serverURL;
@@ -130,7 +125,8 @@ namespace BoggleClient
         private void CancelRegister()
         {
             tokenSource.Cancel();
-            view.Refresh();
+            view.RegistrationComplete = false;
+            view.IsUserRegistered = false;
             view.EnableControls(true);
         }
 
@@ -190,8 +186,6 @@ namespace BoggleClient
         {
             if (gameID != null)
             {
-
-
                 using (HttpClient client = CreateClient(serverURL))
                 {
                     HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "false");
@@ -265,16 +259,12 @@ namespace BoggleClient
         /// <param name="items"></param>
         private void activeUpdate(dynamic items)
         {
-           // HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "true");
-            
-            //dynamic items = JsonConvert.DeserializeObject(_result);
             timeLeft = items.TimeLeft;
             player1Score = items.Player1.Score;
             player2Score = items.Player2.Score;
             view.SetSecondsLabel(timeLeft.ToString());
             view.SetPlayer1Score(player1Score);
             view.SetPlayer2Score(player2Score);
-
         }
 
         /// <summary>
@@ -338,7 +328,6 @@ namespace BoggleClient
         private void QuitGame()
         {
             myTimer = new System.Windows.Forms.Timer();
-            //myTimer.Stop();
             gameID = null;
             gameState = "";
             gameBegun = false;
@@ -350,8 +339,6 @@ namespace BoggleClient
             player2Nickname = "";
             player2Score = "";
 
-
-
             view.SetBoard(gameBoard);
             view.SetPlayer1NameLabel(player1Nickname);
             view.SetPlayer2NameLabel(player2Nickname);
@@ -359,11 +346,9 @@ namespace BoggleClient
             view.SetPlayer2Score(player2Score);
             view.SetSecondsLabel("");
             view.SetNameTextBox("");
-
             view.IsUserRegistered = false;
-            
-
-            
+            view.RegistrationComplete = false;
+            view.EnableControls(true);           
         }
 
         /// <summary>
@@ -402,21 +387,6 @@ namespace BoggleClient
                                 gameID = item.ToString();
                                 gameID = gameID.Substring(11, gameID.Length - 12);
                             }
-                            if (counter == 1)
-                            {
-                                //string test = item.ToString();
-                                //test = test.Substring(12, test.Length - 12);
-                                //test = test.Trim();
-                                //if(test == "true")
-                                //{
-                                //    isPending = true;
-                                //}
-                                //if(test == "false")
-                                //{
-                                //    isPending = false;
-                                //}
-
-                            }
                             counter++;
                         }
                     }
@@ -432,7 +402,6 @@ namespace BoggleClient
             }
             finally
             {
-                //view.EnableControls(true);
                 myTimer.Start();
             }
         }
