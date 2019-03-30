@@ -29,11 +29,18 @@ namespace BoggleClient
 
         public event Action HelpMenuPressed;
 
+        /// <summary>
+        /// Creates a new window 
+        /// </summary>
         public BoggleView()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// allows all buttons to be pressed
+        /// </summary>
+        /// <param name="state"></param>
         public void EnableControls(bool state)
         {
             RegisterUserButton.Enabled = state && NameTextBox.Text.Length > 0 && ServerTextBox.Text.Length > 0;
@@ -62,6 +69,10 @@ namespace BoggleClient
             }
         }
 
+        /// <summary>
+        /// restricts the ability to press buttons
+        /// </summary>
+        /// <param name="state"></param>
         public void DisableControls(bool state)
         {
             RegisterUserButton.Enabled = state && NameTextBox.Text.Length > 0 && ServerTextBox.Text.Length > 0;
@@ -79,6 +90,11 @@ namespace BoggleClient
                 }
             }
         }
+
+        /// <summary>
+        /// sets the cells of the boggle board to the letters of the board passed in from the server
+        /// </summary>
+        /// <param name="board"></param>
         public void SetBoard(string board)
         {
             Console.WriteLine(board);
@@ -158,27 +174,13 @@ namespace BoggleClient
                 
             }
 
-
-            //foreach (Control control in BogleGrid.Controls)
-            //{
-            //    Label label = control as Label;
-            //    if (label != null)
-            //    {
-            //        if (array[counter].ToString() == "Q")
-            //        {
-            //            label.Text = "QU";
-            //            label.Font = new Font("Microsoft Sans Serif", 24, FontStyle.Bold);
-            //        }
-            //        else
-            //        {
-            //            label.Text = array[counter].ToString();
-            //        }
-            //    }
-
-            //    counter++;
-            //}
         }
 
+        /// <summary>
+        /// handles when the register button is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void RegisterUserButton_Click(object sender, EventArgs e)
         {
             CancelRegisterUser.Visible = true;
@@ -186,6 +188,11 @@ namespace BoggleClient
             RegisterPressed?.Invoke(NameTextBox.Text.Trim(), ServerTextBox.Text.Trim());
         }
 
+        /// <summary>
+        /// handles when the join game button is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void JoinGameButton_Click(object sender, EventArgs e)
         {
             CancelJoinGameButton.Visible = true;
@@ -193,17 +200,32 @@ namespace BoggleClient
             JoinGamePressed?.Invoke(Convert.ToInt32(TimeTextBox.Text.Trim()));
         }
 
+        /// <summary>
+        /// Handles when the quitGame bUTTONE is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void QuitGameButton_Click(object sender, EventArgs e)
         {
             QuitGamePressed?.Invoke();
         }
 
+        /// <summary>
+        /// Handles when the cancel button is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CancelButton_Click(object sender, EventArgs e)
         {
             CancelJoinGamePressed?.Invoke();
             CancelJoinGameButton.Visible = false;
         }
 
+        /// <summary>
+        /// Handles when the wordTextBox is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void WordTextBox_EnterPressed(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Return)
@@ -214,60 +236,112 @@ namespace BoggleClient
             }
         }
 
+        /// <summary>
+        /// Handles when the registration textBox is changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Registration_TextChanged(object sender, EventArgs e)
         {
             EnableControls(true);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TimeLimit_TextChanged(object sender, EventArgs e)
         {
             EnableControls(true);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public void Clear()
         {
             BogleGrid.Controls.Clear();
         }
 
+        /// <summary>
+        /// sets the name of player1
+        /// </summary>
+        /// <param name="name"></param>
         public void SetPlayer1NameLabel(string name)
         {
             Player1NameLabel.Text = name;
         }
 
+        /// <summary>
+        /// sets the name of player 2
+        /// </summary>
+        /// <param name="name"></param>
         public void SetPlayer2NameLabel(string name)
         {
             Player2NameLabel.Text = name;
         }
 
+        /// <summary>
+        /// displays the remaining seconds
+        /// </summary>
+        /// <param name="seconds"></param>
         public void SetSecondsLabel(string seconds)
         {
             SecondsLabel.Text = seconds;
         }
 
+        /// <summary>
+        /// displays player 1's current score
+        /// </summary>
+        /// <param name="score"></param>
         public void SetPlayer1Score(string score)
         {
             Player1ScoreLabel.Text = score;
         }
 
+        /// <summary>
+        /// displays player 2's current score
+        /// </summary>
+        /// <param name="score"></param>
         public void SetPlayer2Score(string score)
         {
             Player2ScoreLabel.Text = score;
         }
 
+        /// <summary>
+        /// sets the name of the player 
+        /// </summary>
+        /// <param name="name"></param>
         public void SetNameTextBox(string name)
         {
             NameTextBox.Text = name;
         }
 
+        /// <summary>
+        /// sets the name of the server
+        /// </summary>
+        /// <param name="server"></param>
         public void SetServerTextBox(string server)
         {
             ServerTextBox.Text = server;
         }
 
+
+        /// <summary>
+        /// sets the time limit
+        /// </summary>
+        /// <param name="time"></param>
         public void SetTimeTextBox(string time)
         {
             TimeTextBox.Text = time;
         }
 
+        /// <summary>
+        /// displays the words played by both players to the window
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
         public void SetWordsPlayed(List<string> p1, List<string> p2)
         {
             string p1Words = "";
@@ -287,13 +361,22 @@ namespace BoggleClient
             Player2WordsPlayed.Text = p2Words;
         }
     
-
+        /// <summary>
+        /// handles when the cancel register button is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CancelRegisterUser_Click(object sender, EventArgs e)
         {
             CancelRegisterPressed?.Invoke();
             CancelRegisterUser.Visible = false;
         }
 
+        /// <summary>
+        /// handles when the help menu is clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void helpToolStripMenuItem_Click(object sender, EventArgs e)
         {
             HelpMenuPressed?.Invoke();

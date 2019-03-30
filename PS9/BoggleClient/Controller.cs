@@ -94,10 +94,14 @@ namespace BoggleClient
         /// </summary>
         private System.Windows.Forms.Timer myTimer = new System.Windows.Forms.Timer();
 
+        /// <summary>
+        /// Constructor for the controller which deals with all the back end work of the gui
+        /// </summary>
+        /// <param name="view"></param>
         public Controller(BoggleView view)
         {
             this.view = view;
-            //userToken = Guid.NewGuid().ToString();
+            
 
             view.RegisterPressed += Register;
             view.JoinGamePressed += JoinGame;
@@ -111,12 +115,18 @@ namespace BoggleClient
             gameBegun = false;
         }
 
+        /// <summary>
+        /// Displays a help menu to explain how the game works
+        /// </summary>
         private void Helpmenu()
         {
             HelpMenu helpMenu = new HelpMenu();
             helpMenu.Show();
         }
 
+        /// <summary>
+        /// Allows user to cancel in the middle of registering
+        /// </summary>
         private void CancelRegister()
         {
             tokenSource.Cancel();
@@ -124,6 +134,12 @@ namespace BoggleClient
             view.EnableControls(true);
         }
 
+        /// <summary>
+        /// Handles when the user types in a word into the wordTextBox and presses enter
+        /// Sends a Put request to the server with the gameId, userToken, and the word enetered
+        /// Displays an error window box to let the user know if there is a problem 
+        /// </summary>
+        /// <param name="word"></param>
         private async void SendWord(string word)
         {
 
@@ -154,11 +170,22 @@ namespace BoggleClient
             }
         }
 
+        /// <summary>
+        /// Calls update method every second
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TimerEventProcessor(object sender, EventArgs e)
         {
             Update();
         }
 
+        /// <summary>
+        /// Updates information on the board
+        /// If the game state is active but is just starting then the startGameUpdate method is called
+        /// Otherwise activeUpdate method is called
+        /// If the game state is completed then the completedUpdate is called
+        /// </summary>
         private async void Update()
         {
             if (gameID != null)
@@ -178,7 +205,7 @@ namespace BoggleClient
                     switch (gameState)
                     {
                         case "active":
-                            if(gameBegun == false)
+                            if(gameBegun == false || gameBoard == "                ")
                             {
                                 view.EnableControls(true);
                                 view.DisableControls(false);
@@ -209,6 +236,11 @@ namespace BoggleClient
 
         }
 
+        /// <summary>
+        /// Updates the game board for the begining of the game, only should occur once for each game
+        /// requires the gameState, gameBoard, timeLimit, timeLeft, player1NickName, player2NickNAME, both players scores, to be updated in the view
+        /// </summary>
+        /// <param name="items"></param>
         private void startGameUpdate(dynamic items)
         {
             gameState = items.GameState;
@@ -226,6 +258,11 @@ namespace BoggleClient
 
         }
 
+        /// <summary>
+        /// updates the board for an ongoing game, this update usually occurs every second during the game
+        /// requires timeLeft, both players scores to be updated in the view
+        /// </summary>
+        /// <param name="items"></param>
         private void activeUpdate(dynamic items)
         {
            // HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "true");
@@ -240,6 +277,11 @@ namespace BoggleClient
 
         }
 
+        /// <summary>
+        /// updates the board for a completed game, only should occur once for each game
+        /// requires gameState to be updated, player scores, and all words played by each players should be entered into the view
+        /// </summary>
+        /// <param name="items"></param>
         private void completedUpdate(dynamic items)
         {
             gameState = items.GameState;
@@ -261,10 +303,12 @@ namespace BoggleClient
             view.SetWordsPlayed(player1Words, player2Words);
             view.SetSecondsLabel("0");
 
-            
-
         }
 
+        /// <summary>
+        /// cancels an attempt to join a game with a registered user
+        /// stops the timer, and calls a put to the server using the userToken
+        /// </summary>
         private async void CancelJoinGame()
         {
             tokenSource.Cancel();
@@ -287,6 +331,10 @@ namespace BoggleClient
 
         }
 
+        /// <summary>
+        /// sets all the values in the view back to a state that looks as though the program was just opened
+        /// also sets the timer to a new timer and sets the isUserRegistered boolean to false so the controller knows not to keep trying to update an old game
+        /// </summary>
         private void QuitGame()
         {
             myTimer = new System.Windows.Forms.Timer();
@@ -315,14 +363,14 @@ namespace BoggleClient
             view.IsUserRegistered = false;
             
 
-            //this.view = new BoggleView();
-            
-            //view.Clear();
-            //view.Refresh();
-
             
         }
 
+        /// <summary>
+        /// sends a request to the server to join a game with another registered user
+        /// 
+        /// </summary>
+        /// <param name="time"></param>
         private async void JoinGame(int time)
         {
             try
@@ -433,7 +481,12 @@ namespace BoggleClient
                 view.RegistrationComplete = true;
             }
         }
-
+        
+        /// <summary>
+        /// creates a new client to access the server
+        /// </summary>
+        /// <param name="_server"></param>
+        /// <returns></returns>
         private HttpClient CreateClient(string _server)
         {
             // Create a client whose base address is the GitHub server
