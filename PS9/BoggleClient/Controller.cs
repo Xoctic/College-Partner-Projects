@@ -441,7 +441,11 @@ namespace BoggleClient
             }
             catch(Exception f)
             {
-                MessageBox.Show("Error registering");
+                if(f.GetType() != typeof(TaskCanceledException))
+                {
+                    MessageBox.Show("Error registering");
+                }
+               
 
             }
             finally
