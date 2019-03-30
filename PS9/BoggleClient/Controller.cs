@@ -218,7 +218,23 @@ namespace BoggleClient
 
         private void completedUpdate(dynamic items)
         {
+            gameState = items.GameState;
+            player1Score = items.Player1.Score;
+            player2Score = items.Player2.Score;
+            List<string> player1Words = new List<string>();
+            List<string> player2Words = new List<string>();
+            foreach(dynamic item in items.Player1.WordsPlayed)
+            {
+                player1Words.Add(item.Word.ToString());
+                
+            }
 
+            foreach(dynamic item in items.Player2.WordsPlayed)
+            {
+                player2Words.Add(item.Word.ToString());
+            }
+
+            //view.SetWordsPlayed(player1Words, player2Words);
         }
 
         private void CancelJoinGame()

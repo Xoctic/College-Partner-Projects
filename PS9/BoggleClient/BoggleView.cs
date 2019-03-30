@@ -151,6 +151,11 @@ namespace BoggleClient
             Player2ScoreLabel.Text = score;
         }
 
+        public void SetWordsPlayed(List<string> p1, List<string> p2)
+        {
+
+        }
+
         private void CancelRegisterUser_Click(object sender, EventArgs e)
         {
             CancelRegisterPressed?.Invoke();
