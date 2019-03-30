@@ -123,7 +123,7 @@ namespace BoggleClient
         }
         public void Clear()
         {
-
+            BogleGrid.Controls.Clear();
         }
 
         public void SetPlayer1NameLabel(string name)

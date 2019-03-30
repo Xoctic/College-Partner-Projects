@@ -103,10 +103,18 @@ namespace BoggleClient
             view.JoinGamePressed += JoinGame;
             view.QuitGamePressed += QuitGame;
             view.CancelJoinGamePressed += CancelJoinGame;
+            view.CancelRegisterPressed += CancelRegister;
             view.EnterPressedInWordTextBox += SendWord;
             myTimer.Tick += TimerEventProcessor;
             myTimer.Interval = 1000;
             gameBegun = false;
+        }
+
+        private void CancelRegister()
+        {
+            tokenSource.Cancel();
+            view.Refresh();
+            view.EnableControls(true);
         }
 
         private async void SendWord(string word)
@@ -234,7 +242,7 @@ namespace BoggleClient
                 player2Words.Add(item.Word.ToString());
             }
 
-            //view.SetWordsPlayed(player1Words, player2Words);
+            view.SetWordsPlayed(player1Words, player2Words);
         }
 
         private void CancelJoinGame()
@@ -271,6 +279,7 @@ namespace BoggleClient
         private void QuitGame()
         {
             myTimer.Stop();
+            view.Clear();
             view.Refresh();
         }
 
