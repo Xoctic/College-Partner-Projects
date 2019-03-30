@@ -252,9 +252,10 @@ namespace BoggleClient
             //}
         }
 
-        private void QuitGame(string arg1, string arg2)
+        private void QuitGame()
         {
-            throw new NotImplementedException();
+            myTimer.Stop();
+            view.Refresh();
         }
 
         private async void JoinGame(int time)

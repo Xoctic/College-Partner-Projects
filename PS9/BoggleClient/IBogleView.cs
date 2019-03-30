@@ -49,7 +49,7 @@ namespace BoggleClient
         /// <summary>
         /// Fired when a user selects the quit game button.  Clears the game board and resets the timer.
         /// </summary>
-        event Action<string, string> QuitGamePressed;
+        event Action QuitGamePressed;
 
         /// <summary>
         /// Fires when the cancel join game button is pressed.

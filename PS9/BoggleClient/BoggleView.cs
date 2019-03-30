@@ -18,7 +18,7 @@ namespace BoggleClient
 
         public event Action<int> JoinGamePressed;
 
-        public event Action<string, string> QuitGamePressed;
+        public event Action QuitGamePressed;
 
         public event Action CancelJoinGamePressed;
 
@@ -93,7 +93,7 @@ namespace BoggleClient
 
         private void QuitGameButton_Click(object sender, EventArgs e)
         {
-
+            QuitGamePressed?.Invoke();
         }
 
         private void CancelButton_Click(object sender, EventArgs e)
