@@ -67,6 +67,7 @@ namespace BoggleClient
                     if(array[counter].ToString() == "Q")
                     {
                         label.Text = "QU";
+                        label.Font = new Font("Microsoft Sans Serif", 24, FontStyle.Bold);
                     }
                     else
                     {
