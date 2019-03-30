@@ -56,6 +56,7 @@ namespace BoggleClient
 
         public void SetBoard(string board)
         {
+            Console.WriteLine(board);
             //int counter = 0;
             char[] array = board.ToCharArray();
 
@@ -223,6 +224,21 @@ namespace BoggleClient
         public void SetPlayer2Score(string score)
         {
             Player2ScoreLabel.Text = score;
+        }
+
+        public void SetNameTextBox(string name)
+        {
+            NameTextBox.Text = name;
+        }
+
+        public void SetServerTextBox(string server)
+        {
+            ServerTextBox.Text = server;
+        }
+
+        public void SetTimeTextBox(string time)
+        {
+            TimeTextBox.Text = time;
         }
 
         public void SetWordsPlayed(List<string> p1, List<string> p2)

@@ -97,7 +97,7 @@ namespace BoggleClient
         public Controller(BoggleView view)
         {
             this.view = view;
-            userToken = Guid.NewGuid().ToString();
+            //userToken = Guid.NewGuid().ToString();
 
             view.RegisterPressed += Register;
             view.JoinGamePressed += JoinGame;
@@ -154,43 +154,52 @@ namespace BoggleClient
 
         private async void Update()
         {
-            using (HttpClient client = CreateClient(serverURL))
-            {  
-                HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "false");
-                if (response.IsSuccessStatusCode)
-                {                   
-                    string result = await response.Content.ReadAsStringAsync();
+            if (gameID != null)
+            {
 
-                    dynamic items = JsonConvert.DeserializeObject(result);
-                    gameState = (string)items.GameState;
 
-                    switch (gameState)
+                using (HttpClient client = CreateClient(serverURL))
+                {
+                    HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "false");
+                    if (response.IsSuccessStatusCode)
                     {
-                        case "active":
-                            if(gameBegun == false)
-                            {
-                                gameBegun = true;
-                                startGameUpdate(items);
-                            }
-                            else
-                            {
-                                response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "true");
-                                result = await response.Content.ReadAsStringAsync();
-                                items = JsonConvert.DeserializeObject(result);
-                                activeUpdate(items);
-                            }
-                            break;
-                      
-                        case "completed":
+                        string result = await response.Content.ReadAsStringAsync();
 
-                            completedUpdate(items);
+                        dynamic items = JsonConvert.DeserializeObject(result);
+                        gameState = (string)items.GameState;
 
-                            break;
-                        default:
-                            break;                
+                        switch (gameState)
+                        {
+                            case "active":
+                                if (gameBegun == false || gameBoard == "                ")
+                                {
+
+                                    gameBegun = true;
+                                    startGameUpdate(items);
+                                }
+                                else
+                                {
+                                    response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "true");
+                                    result = await response.Content.ReadAsStringAsync();
+                                    items = JsonConvert.DeserializeObject(result);
+                                    activeUpdate(items);
+                                }
+                                
+                                break;
+
+                            case "completed":
+
+                                completedUpdate(items);
+
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
             }
+
+
         }
 
         private void startGameUpdate(dynamic items)
@@ -203,7 +212,7 @@ namespace BoggleClient
             player1Score = items.Player1.Score;
             player2Nickname = items.Player2.Nickname;
             player2Score = items.Player2.Score;
-
+            Console.WriteLine(gameBoard);
             view.SetBoard(gameBoard);
             view.SetPlayer1NameLabel(player1Nickname);
             view.SetPlayer2NameLabel(player2Nickname);
@@ -282,9 +291,38 @@ namespace BoggleClient
 
         private void QuitGame()
         {
-            myTimer.Stop();
-            view.Clear();
-            view.Refresh();
+            myTimer = new System.Windows.Forms.Timer();
+            //myTimer.Stop();
+            gameID = null;
+            gameState = "";
+            gameBegun = false;
+            gameBoard = "                ";
+            timeLimit = 0;
+            timeLeft = 0;
+            player1Nickname = "";
+            player1Score = "";
+            player2Nickname = "";
+            player2Score = "";
+
+
+
+            view.SetBoard(gameBoard);
+            view.SetPlayer1NameLabel(player1Nickname);
+            view.SetPlayer2NameLabel(player2Nickname);
+            view.SetPlayer1Score(player1Score);
+            view.SetPlayer2Score(player2Score);
+            view.SetSecondsLabel("");
+            view.SetNameTextBox("");
+
+            view.IsUserRegistered = false;
+            
+
+            //this.view = new BoggleView();
+            
+            //view.Clear();
+            //view.Refresh();
+
+            
         }
 
         private async void JoinGame(int time)
@@ -377,7 +415,7 @@ namespace BoggleClient
                         String result = await response.Content.ReadAsStringAsync();
                         userToken = (string)JsonConvert.DeserializeObject(result);
                         view.IsUserRegistered = true;
-                        
+                        gameState = "pending";
                     }
                     else
                     {
@@ -386,8 +424,10 @@ namespace BoggleClient
 
                 }
             }
-            catch(TaskCanceledException)
+            catch(Exception f)
             {
+                MessageBox.Show("Error registering");
+
             }
             finally
             {
