@@ -64,7 +64,7 @@ namespace BoggleClient
                 Label label = control as Label;
                 if (label != null)
                 {
-                    if(array[counter].ToString() == "Q")
+                    if (array[counter].ToString() == "Q")
                     {
                         label.Text = "QU";
                         label.Font = new Font("Microsoft Sans Serif", 24, FontStyle.Bold);
@@ -153,8 +153,23 @@ namespace BoggleClient
 
         public void SetWordsPlayed(List<string> p1, List<string> p2)
         {
+            string p1Words = "";
+            string p2Words = "";
 
+            foreach (string el in p1)
+            {
+                p1Words += "\n" + el;
+            }
+
+            foreach (string el in p2)
+            {
+                p2Words += "\n" + el;
+            }
+
+            Player1WordsPlayed.Text = p1Words;
+            Player2WordsPlayed.Text = p2Words;
         }
+    
 
         private void CancelRegisterUser_Click(object sender, EventArgs e)
         {
