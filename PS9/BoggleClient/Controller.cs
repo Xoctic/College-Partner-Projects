@@ -168,12 +168,14 @@ namespace BoggleClient
                             {
                                 response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "true");
                                 result = await response.Content.ReadAsStringAsync();
-                                activeUpdate(result);
+                                items = JsonConvert.DeserializeObject(result);
+                                activeUpdate(items);
                             }
                             break;
                       
                         case "completed":
-                            completedUpdate(response, items);
+
+                            completedUpdate(items);
 
                             break;
                         default:
@@ -200,11 +202,11 @@ namespace BoggleClient
 
         }
 
-        private void activeUpdate(string _result)
+        private void activeUpdate(dynamic items)
         {
            // HttpResponseMessage response = await client.GetAsync("BoggleService/games/" + gameID + "/" + "true");
             
-            dynamic items = JsonConvert.DeserializeObject(_result);
+            //dynamic items = JsonConvert.DeserializeObject(_result);
             timeLeft = items.TimeLeft;
             player1Score = items.Player1.Score;
             player2Score = items.Player2.Score;
@@ -214,7 +216,7 @@ namespace BoggleClient
 
         }
 
-        private void completedUpdate(HttpResponseMessage message, dynamic items)
+        private void completedUpdate(dynamic items)
         {
 
         }
