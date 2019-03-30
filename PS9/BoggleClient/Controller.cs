@@ -31,9 +31,9 @@ namespace BoggleClient
         private string gameID;
 
         /// <summary>
-        /// Variable to keep track if player is waiting to join game.
+        /// Variable to keep track if player attempted to join a game.
         /// </summary>
-        private bool isPending;
+        //private bool joinGameAttempted;
 
         /// <summary>
         /// Variable to store the URL of the server.
@@ -105,9 +105,16 @@ namespace BoggleClient
             view.CancelJoinGamePressed += CancelJoinGame;
             view.CancelRegisterPressed += CancelRegister;
             view.EnterPressedInWordTextBox += SendWord;
+            view.HelpMenuPressed += Helpmenu;
             myTimer.Tick += TimerEventProcessor;
             myTimer.Interval = 1000;
             gameBegun = false;
+        }
+
+        private void Helpmenu()
+        {
+            HelpMenu helpMenu = new HelpMenu();
+            helpMenu.Show();
         }
 
         private void CancelRegister()
@@ -169,6 +176,8 @@ namespace BoggleClient
                         case "active":
                             if(gameBegun == false)
                             {
+                                view.EnableControls(true);
+                                view.DisableControls(false);
                                 gameBegun = true;
                                 startGameUpdate(items);
                             }
@@ -249,35 +258,26 @@ namespace BoggleClient
 
         }
 
-        private void CancelJoinGame()
+        private async void CancelJoinGame()
         {
             tokenSource.Cancel();
-            view.Refresh();
+            myTimer.Stop();
+            myTimer = new System.Windows.Forms.Timer();
+
+            view.EnableControls(false);
+            using (HttpClient client = CreateClient(serverURL))
+            {
+                //tokenSource = new CancellationTokenSource();
+                StringContent content = new StringContent(JsonConvert.SerializeObject(userToken), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await client.PutAsync("BoggleService/games", content);
+                //should check to see if it is a 204
+                if (!response.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Something wrong with cancelling join game");
+                }
+            }
             view.EnableControls(true);
-            //try
-            //{
-            //    view.EnableControls(false);
-            //    using (HttpClient client = CreateClient(serverURL))
-            //    {
-            //        tokenSource = new CancellationTokenSource();
-            //        StringContent content = new StringContent(JsonConvert.SerializeObject(userToken), Encoding.UTF8, "application/json");
-            //        HttpResponseMessage response = await client.PutAsync("BoggleService/games", content, tokenSource.Token);
-            //        //should check to see if it is a 204
-            //        if(!response.IsSuccessStatusCode)
-            //        {
-            //            MessageBox.Show("Something wrong with cancelling join game");
-            //        }
-            //    }
 
-
-            //}
-            //catch(TaskCanceledException)
-            //{
-            //}
-            //finally
-            //{
-            //    view.EnableControls(true);
-            //}
         }
 
         private void QuitGame()
@@ -320,17 +320,17 @@ namespace BoggleClient
                             }
                             if (counter == 1)
                             {
-                                string test = item.ToString();
-                                test = test.Substring(12, test.Length - 12);
-                                test = test.Trim();
-                                if(test == "true")
-                                {
-                                    isPending = true;
-                                }
-                                if(test == "false")
-                                {
-                                    isPending = false;
-                                }
+                                //string test = item.ToString();
+                                //test = test.Substring(12, test.Length - 12);
+                                //test = test.Trim();
+                                //if(test == "true")
+                                //{
+                                //    isPending = true;
+                                //}
+                                //if(test == "false")
+                                //{
+                                //    isPending = false;
+                                //}
 
                             }
                             counter++;
@@ -348,7 +348,7 @@ namespace BoggleClient
             }
             finally
             {
-                view.EnableControls(true);
+                //view.EnableControls(true);
                 myTimer.Start();
             }
         }
@@ -392,6 +392,7 @@ namespace BoggleClient
             finally
             {
                 view.EnableControls(true);
+                view.RegistrationComplete = true;
             }
         }
 

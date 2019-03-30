@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
+  <data name="label1.Text" xml:space="preserve">
+    <value>To Register a Boggle game, enter a username and the correct server .  Click register user after information has been entered.                     Set the time limit to a amount no more than 120(which means 120 seconds).  Click the join game button and the game will pend until an opponent is found.                                                                                                                                                                                                                          Once the game has started, the grid will display the Boggle game.  Boggle rules apply.                                                                                     Enter valid words from the boggle grid at the bottom textBox then press enter to submit the given word.  Points will given or taken as needed.                                                                                                                                                                                                                                                        Once the timer ends the game ends.  The final scores will be displayed along with all words played by both players.                                                                                                                                                     </value>
+  </data>
 </root>

@@ -13,6 +13,7 @@ namespace BoggleClient
     public partial class BoggleView : Form, IBogleView
     {
         public bool IsUserRegistered { get; set; }
+        public bool RegistrationComplete { get; set; }
 
         public event Action<string, string> RegisterPressed;
 
@@ -26,6 +27,8 @@ namespace BoggleClient
 
         public event Action CancelRegisterPressed;
 
+        public event Action HelpMenuPressed;
+
         public BoggleView()
         {
             InitializeComponent();
@@ -36,8 +39,33 @@ namespace BoggleClient
             RegisterUserButton.Enabled = state && NameTextBox.Text.Length > 0 && ServerTextBox.Text.Length > 0;
             JoinGameButton.Enabled = state && IsUserRegistered && TimeTextBox.Text.Length > 0;
             QuitGameButton.Enabled = state && IsUserRegistered;
-            //Commented out code from Professors Example, possibly needed.
-            //showCompletedTasksButton.Enabled = state && IsUserRegistered;
+
+            ServerTextBox.Enabled = state;
+            NameTextBox.Enabled = state;
+            TimeTextBox.Enabled = state;
+            WordTextBox.Enabled = state;
+
+            foreach (Control control in BogleGrid.Controls)
+            {
+                if (control is Button)
+                {
+                    control.Enabled = state && IsUserRegistered;
+                }
+            }
+            if(RegistrationComplete == false)
+            {
+                CancelRegisterUser.Enabled = !state;
+            }
+            if(RegistrationComplete == true)
+            {
+                CancelJoinGameButton.Enabled = !state;
+            }
+        }
+
+        public void DisableControls(bool state)
+        {
+            RegisterUserButton.Enabled = state && NameTextBox.Text.Length > 0 && ServerTextBox.Text.Length > 0;
+            JoinGameButton.Enabled = state && IsUserRegistered && TimeTextBox.Text.Length > 0;
 
             ServerTextBox.Enabled = state;
             NameTextBox.Enabled = state;
@@ -50,10 +78,7 @@ namespace BoggleClient
                     control.Enabled = state && IsUserRegistered;
                 }
             }
-            CancelJoinGameButton.Enabled = !state;
-            CancelRegisterUser.Enabled = !state;
         }
-
         public void SetBoard(string board)
         {
             //int counter = 0;
@@ -155,6 +180,8 @@ namespace BoggleClient
 
         private void RegisterUserButton_Click(object sender, EventArgs e)
         {
+            CancelRegisterUser.Visible = true;
+            CancelRegisterUser.Enabled = true;
             RegisterPressed?.Invoke(NameTextBox.Text.Trim(), ServerTextBox.Text.Trim());
         }
 
@@ -249,6 +276,11 @@ namespace BoggleClient
         {
             CancelRegisterPressed?.Invoke();
             CancelRegisterUser.Visible = false;
+        }
+
+        private void helpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            HelpMenuPressed?.Invoke();
         }
     }
 }

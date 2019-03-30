@@ -21,6 +21,12 @@ namespace BoggleClient
         void EnableControls(bool state);
 
         /// <summary>
+        /// Disables controls of all buttons and textboxes while game is being played.
+        /// </summary>
+        /// <param name="state"></param>
+        void DisableControls(bool state);
+
+        /// <summary>
         /// Resets the game board.
         /// </summary>
         void Clear();
@@ -34,6 +40,11 @@ namespace BoggleClient
         /// Is the user currently registered?
         /// </summary>
         bool IsUserRegistered { get; set; }
+
+        /// <summary>
+        /// Is the registration complete?
+        /// </summary>
+        bool RegistrationComplete { get; set; }
 
         /// <summary>
         /// Fired when user must be registered.
@@ -60,5 +71,7 @@ namespace BoggleClient
         /// Fires when the cancel register button is pressed.
         /// </summary>
         event Action CancelRegisterPressed;
+
+        event Action HelpMenuPressed;
     }
 }
