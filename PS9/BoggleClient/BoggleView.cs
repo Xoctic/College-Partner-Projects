@@ -56,27 +56,101 @@ namespace BoggleClient
 
         public void SetBoard(string board)
         {
-            int counter = 0;
+            //int counter = 0;
             char[] array = board.ToCharArray();
 
-            foreach (Control control in BogleGrid.Controls)
-            {
-                Label label = control as Label;
-                if (label != null)
-                {
-                    if (array[counter].ToString() == "Q")
-                    {
-                        label.Text = "QU";
-                        label.Font = new Font("Microsoft Sans Serif", 24, FontStyle.Bold);
-                    }
-                    else
-                    {
-                        label.Text = array[counter].ToString();
-                    }
-                }
 
-                counter++;
+            for(int i = 1; i < 17; i++)
+            {
+                switch (i)
+                {
+                    case 1:
+                        cell1.Text = array[i - 1].ToString();
+                        break;
+
+                    case 2:
+                        cell2.Text = array[i - 1].ToString();
+                        break;
+
+                    case 3:
+                        cell3.Text = array[i - 1].ToString();
+                        break;
+
+                    case 4:
+                        cell4.Text = array[i - 1].ToString();
+                        break;
+
+                    case 5:
+                        cell5.Text = array[i - 1].ToString();
+                        break;
+
+                    case 6:
+                        cell6.Text = array[i - 1].ToString();
+                        break;
+
+                    case 7:
+                        cell7.Text = array[i - 1].ToString();
+                        break;
+
+                    case 8:
+                        cell8.Text = array[i - 1].ToString();
+                        break;
+
+                    case 9:
+                        cell9.Text = array[i - 1].ToString();
+                        break;
+
+                    case 10:
+                        cell10.Text = array[i - 1].ToString();
+                        break;
+
+                    case 11:
+                        cell11.Text = array[i - 1].ToString();
+                        break;
+
+                    case 12:
+                        cell12.Text = array[i - 1].ToString();
+                        break;
+
+                    case 13:
+                        cell13.Text = array[i - 1].ToString();
+                        break;
+
+                    case 14:
+                        cell14.Text = array[i - 1].ToString();
+                        break;
+
+                    case 15:
+                        cell15.Text = array[i - 1].ToString();
+                        break;
+
+                    case 16:
+                        cell16.Text = array[i - 1].ToString();
+                        break;
+
+                }
+                
             }
+
+
+            //foreach (Control control in BogleGrid.Controls)
+            //{
+            //    Label label = control as Label;
+            //    if (label != null)
+            //    {
+            //        if (array[counter].ToString() == "Q")
+            //        {
+            //            label.Text = "QU";
+            //            label.Font = new Font("Microsoft Sans Serif", 24, FontStyle.Bold);
+            //        }
+            //        else
+            //        {
+            //            label.Text = array[counter].ToString();
+            //        }
+            //    }
+
+            //    counter++;
+            //}
         }
 
         private void RegisterUserButton_Click(object sender, EventArgs e)
