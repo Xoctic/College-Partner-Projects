@@ -29,7 +29,7 @@ namespace BoggleTests
         public RestClient(string baseURL)
         {
             BaseAddress = new Uri(baseURL);
-            DefaultRequestHeaders.Add("Accept", "application/json");
+            DefaultRequestHeaders.Add("Accept", "application/json"); 
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace BoggleTests
         /// </summary>
         public async Task<Response> DoMethodAsync(string method, string url, dynamic data = null)
         {
-            StringContent content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+            StringContent content = new StringContent(JsonConvert.SerializeO bject(data), Encoding.UTF8, "application/json");
             HttpResponseMessage response;
 
             switch (method)
