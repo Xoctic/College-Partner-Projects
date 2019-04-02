@@ -490,10 +490,5 @@
             <param name="user">User to be added to users list</param>
             <returns>ID number of newly added user</returns>
         </member>
-        <member name="P:BoggleService.Models.UserInfo.Name">
-            <summary>
-            Name of user
-            </summary>
-        </member>
     </members>
 </doc>

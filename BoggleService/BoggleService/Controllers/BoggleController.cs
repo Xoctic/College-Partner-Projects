@@ -41,6 +41,7 @@ namespace BoggleService.Controllers
                 }
             }
         }
+
         // GET api/values
         public IEnumerable<string> Get()
         {
