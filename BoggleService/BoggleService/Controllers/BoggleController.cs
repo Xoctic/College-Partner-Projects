@@ -20,15 +20,16 @@ namespace BoggleService.Controllers
         /// <param name="user">User to be added to users list</param>
         /// <returns>ID number of newly added user</returns>
         [Route("BoggleService/RegisterUser")]
-        public string PostRegister(UserInfo user)
+        public string PostRegister([FromBody]string user)
         {
-            if (user.ToString() == "stall")
+            if (user == "stall")
             {
+                
                 Thread.Sleep(5000);
             }
             lock (sync)
             {
-                if (user == null || user.ToString().Trim().Length == 0)
+                if (user == null || user.Trim().Length == 0)
                 {
                     throw new HttpResponseException(HttpStatusCode.Forbidden);
                 }
@@ -69,15 +70,7 @@ namespace BoggleService.Controllers
 
 
 
-
-
-
-
-
-
-
-
-        private static Dictionary<String, UserInfo> users = new Dictionary<String, UserInfo>();
+        private static Dictionary<String, String> users = new Dictionary<String, String>();
         private static Dictionary<String, GameInfo> games = new Dictionary<String, GameInfo>();
         private static readonly object sync = new object();
 
