@@ -42,6 +42,31 @@ namespace BoggleService.Controllers
             }
         }
 
+        /// <summary>
+        /// Joins a game.
+        /// If user is null or is empty after trimming, responds with status code Forbidden.
+        /// Otherwise, creates a user, returns the user's token, and responds with status code Ok. 
+        /// </summary>
+        /// <param name="joinGameInfo">User to be added to users list</param>
+        /// <returns>ID number of newly added user</returns>
+        [Route("BoggleService/JoinGame")]
+        public string PostJoinGame(JoinGameInfo joinGameInfo)
+        {
+            lock (sync)
+            {
+                if (joinGameInfo.userToken == null || joinGameInfo.userToken.Trim().Length != 36 || !(users.ContainsKey(joinGameInfo.userToken)))
+                {
+                    throw new HttpResponseException(HttpStatusCode.Forbidden);
+                }
+                else
+                {
+
+                    //string userID = Guid.NewGuid().ToString();
+                    //users.Add(userID, user);
+                    //return userID;
+                }
+            }
+        }
         // GET api/values
         public IEnumerable<string> Get()
         {
