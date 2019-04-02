@@ -20,15 +20,16 @@ namespace BoggleService.Controllers
         /// <param name="user">User to be added to users list</param>
         /// <returns>ID number of newly added user</returns>
         [Route("BoggleService/RegisterUser")]
-        public string PostRegister(String user)
+        public string PostRegister([FromBody]string user)
         {
-            if (user.ToString() == "stall")
+            if (user == "stall")
             {
+                
                 Thread.Sleep(5000);
             }
             lock (sync)
             {
-                if (user == null || user.ToString().Trim().Length == 0)
+                if (user == null || user.Trim().Length == 0)
                 {
                     throw new HttpResponseException(HttpStatusCode.Forbidden);
                 }
@@ -66,14 +67,6 @@ namespace BoggleService.Controllers
         public void Delete(int id)
         {
         }
-
-
-
-
-
-
-
-
 
 
 
