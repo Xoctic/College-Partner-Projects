@@ -20,7 +20,7 @@ namespace BoggleService.Controllers
         /// <param name="user">User to be added to users list</param>
         /// <returns>ID number of newly added user</returns>
         [Route("BoggleService/RegisterUser")]
-        public string PostRegister(UserInfo user)
+        public string PostRegister(String user)
         {
             if (user.ToString() == "stall")
             {
@@ -77,7 +77,7 @@ namespace BoggleService.Controllers
 
 
 
-        private static Dictionary<String, UserInfo> users = new Dictionary<String, UserInfo>();
+        private static Dictionary<String, String> users = new Dictionary<String, String>();
         private static Dictionary<String, GameInfo> games = new Dictionary<String, GameInfo>();
         private static readonly object sync = new object();
 
