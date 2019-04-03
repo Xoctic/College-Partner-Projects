@@ -18,7 +18,12 @@ namespace BoggleService.Models
         /// <summary>
         /// Stores the game ID created when Join Game request is called.
         /// </summary>
-        public string gameID { get; set; }
+        public int gameID { get; set; }
+
+        /// <summary>
+        /// Stores the user ID that is awaiting a game.
+        /// </summary>
+        public string userToken { get; set; }
 
         /// <summary>
         /// Stores whether or not a game is pending.
