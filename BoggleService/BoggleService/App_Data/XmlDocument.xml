@@ -529,6 +529,16 @@
             <param name="gID"></param>
             <returns></returns>
         </member>
+        <member name="F:BoggleService.Controllers.BoggleController.users">
+            <summary>
+            A dictionary to store the key User Token which links to its value Nickname.
+            </summary>
+        </member>
+        <member name="F:BoggleService.Controllers.BoggleController.games">
+            <summary>
+            A dictionary to store the key gameID which links to its value GameInfo.
+            </summary>
+        </member>
         <member name="T:BoggleService.BoggleBoard">
             <summary>
             Represents a Boggle board.
@@ -596,44 +606,39 @@
             Stores the user token being passed into the server.
             </summary>
         </member>
-        <member name="F:BoggleService.Models.GameInfo.gameState">
+        <member name="T:BoggleService.Models.GameInfo">
+            <summary>
+            Class to store all of the game information needed for each individual game.
+            </summary>
+        </member>
+        <member name="P:BoggleService.Models.GameInfo.gameState">
             <summary>
             Stores the state of the game.
             </summary>
         </member>
-        <member name="F:BoggleService.Models.GameInfo.board">
+        <member name="F:BoggleService.Models.GameInfo.misterBoggle">
             <summary>
             Stores the board of this current game.
             </summary>
         </member>
-        <member name="F:BoggleService.Models.GameInfo.timeLimit">
+        <member name="P:BoggleService.Models.GameInfo.timeLimit">
             <summary>
             Stores the time limit of this game, which is the average time of both players.
             </summary>
         </member>
-        <member name="F:BoggleService.Models.GameInfo.timeLeft">
+        <member name="P:BoggleService.Models.GameInfo.timeLeft">
             <summary>
             Stores the time remaining for this current game.
             </summary>
         </member>
-        <member name="F:BoggleService.Models.GameInfo.player1Token">
-             <summary>
-            Stores the token of player 1. 
-             </summary>
-        </member>
-        <member name="F:BoggleService.Models.GameInfo.player2Token">
+        <member name="F:BoggleService.Models.GameInfo.player1">
             <summary>
-            Stores the token of player 2.
+            Stores the player information for player 1.
             </summary>
         </member>
-        <member name="F:BoggleService.Models.GameInfo.player1Words">
+        <member name="F:BoggleService.Models.GameInfo.player2">
             <summary>
-            Stores the key word with its int score for player 1 words
-            </summary>
-        </member>
-        <member name="F:BoggleService.Models.GameInfo.player2Words">
-            <summary>
-            Stores the key word with its int score for player 2 words
+            Stores the player information for player 2.
             </summary>
         </member>
         <member name="T:BoggleService.Models.PendingGameInfo">
@@ -661,39 +666,39 @@
             Stores whether or not a game is pending.
             </summary>
         </member>
-        <member name="T:BoggleService.Models.PendingOutput">
-            <summary>
-            Response that is sent to the client containing the gameID and the bool isPending.
-            </summary>
-        </member>
-        <member name="P:BoggleService.Models.PendingOutput.gameID">
-            <summary>
-            Stores the game ID created when Join Game request is called.
-            </summary>
-        </member>
-        <member name="P:BoggleService.Models.PendingOutput.isPending">
-            <summary>
-            Stores whether or not a game is pending.
-            </summary>
-        </member>
-        <member name="M:BoggleService.Models.UserInfo.#ctor(System.String)">
-            <summary>
-            constructor for information about a user if user has not joined a game yet
-            </summary>
-            <param name="_name"></param>
-        </member>
-        <member name="M:BoggleService.Models.UserInfo.#ctor(System.String,System.Int32)">
-            <summary>
-            constructor for information about a user if user has joined a game
-            _currentID is required for the following statement located in PlayWord in the API (finding a gameID with a userToken)
-            "Otherwise, records the trimmed Word as being played by UserToken in the game identified by gameID"
-            </summary>
-            <param name="_name"></param>
-            <param name="_currentID"></param>
-        </member>
         <member name="T:BoggleService.Models.PlayerInfo">
             <summary>
             Class to store the information of each player.
+            </summary>
+        </member>
+        <member name="P:BoggleService.Models.PlayerInfo.playerToken">
+            <summary>
+            Stores the token of this player.
+            </summary>
+        </member>
+        <member name="P:BoggleService.Models.PlayerInfo.nickName">
+            <summary>
+            Stores the nickName of the player.
+            </summary>
+        </member>
+        <member name="P:BoggleService.Models.PlayerInfo.score">
+            <summary>
+            Stores the current score of the player.
+            </summary>
+        </member>
+        <member name="F:BoggleService.Models.PlayerInfo.wordsPlayed">
+            <summary>
+            Stores the words played by the player.
+            </summary>
+        </member>
+        <member name="T:BoggleService.Models.PlayerWordsPlayed">
+            <summary>
+            Class to store the words played by the current player.
+            </summary>
+        </member>
+        <member name="F:BoggleService.Models.PlayerWordsPlayed.playerWordsPlayed">
+            <summary>
+            Stores the word played by the current player.
             </summary>
         </member>
         <member name="M:BoggleService.Models.UserInfo.#ctor(System.String)">

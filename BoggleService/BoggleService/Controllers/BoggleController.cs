@@ -36,7 +36,7 @@ namespace BoggleService.Controllers
                 else
                 {
                     string userID = Guid.NewGuid().ToString();
-                    users.Add(userID, new UserInfo(user));
+                    users.Add(userID, user);
                     return userID;
                 }
             }
@@ -136,7 +136,7 @@ namespace BoggleService.Controllers
             GameInfo temp = games[gameID];
 
 
-            if(temp.player1Token != play.userToken && temp.player2Token != play.userToken)
+            if(temp.player1.playerToken != play.userToken && temp.player2.playerToken != play.userToken)
             {
                 throw new HttpResponseException(HttpStatusCode.Forbidden);
             }
@@ -148,29 +148,29 @@ namespace BoggleService.Controllers
             play.word = play.word.Trim();
     
 
-            if(temp.player1Token == play.userToken)
+            if(temp.player1.playerToken == play.userToken)
             {
-                if(temp.player1Words.ContainsKey(play.word))
+                if(temp.player1.wordsPlayed.playerWordsPlayed.ContainsKey(play.word))
                 {
                     score = 0;
                 }
                 else
                 {
                     score = temp.misterBoggle.score(play.word);
-                    temp.player1Words.Add(play.word, score);
+                    temp.player1.wordsPlayed.playerWordsPlayed.Add(play.word, score);
                     games[_gameID] = temp;
                 }
             }
             else
             {
-                if(temp.player2Words.ContainsKey(play.word))
+                if(temp.player2.wordsPlayed.playerWordsPlayed.ContainsKey(play.word))
                 {
                     score = 0;
                 }
                 else
                 {
                     score = temp.misterBoggle.score(play.word);
-                    temp.player2Words.Add(play.word, score);
+                    temp.player2.wordsPlayed.playerWordsPlayed.Add(play.word, score);
                     games[_gameID] = temp;
                 }
             }

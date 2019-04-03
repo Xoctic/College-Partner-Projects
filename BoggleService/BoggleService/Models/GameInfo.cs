@@ -22,7 +22,7 @@ namespace BoggleService.Models
         /// Stores the board of this current game.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public BoggleBoard board;
+        public BoggleBoard misterBoggle;
 
         /// <summary>
         /// Stores the time limit of this game, which is the average time of both players.
