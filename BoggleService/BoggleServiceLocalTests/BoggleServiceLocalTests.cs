@@ -54,12 +54,9 @@ namespace BoggleServiceLocalTests
         {
             BoggleController controller = new BoggleController();
             string result = controller.PostRegister("Billy");
-            JoinGameInfo joinGame = new JoinGameInfo();
+            JoinGameInfo joinGame = new JoinGameInfo(80, "");
 
             //testing when userToken is invalid
-            joinGame.timeLimit = 80;
-            joinGame.userToken = "";
-
             try
             {
                 controller.PostJoinGame(joinGame);
@@ -72,7 +69,6 @@ namespace BoggleServiceLocalTests
             //testing when timeLimit < 5
             joinGame.userToken = Guid.NewGuid().ToString();
             joinGame.timeLimit = 0;
-
             try
             {
                 controller.PostJoinGame(joinGame);
@@ -105,12 +101,11 @@ namespace BoggleServiceLocalTests
         public void PostJoinGameTest2()
         {
             BoggleController controller = new BoggleController();
-            JoinGameInfo joinGame = new JoinGameInfo();
-
-            joinGame.userToken = controller.PostRegister("Billy");
-            joinGame.timeLimit = 10;
-
+            JoinGameInfo joinGame = new JoinGameInfo(10, controller.PostRegister("Billy"));
+            
             controller.PostJoinGame(joinGame);
+            
+            
 
             try
             {
@@ -129,10 +124,9 @@ namespace BoggleServiceLocalTests
         public void CancelJoinRequestTest()
         {
             BoggleController controller = new BoggleController();
-            JoinGameInfo joinGame = new JoinGameInfo();
+            JoinGameInfo joinGame = new JoinGameInfo(10, controller.PostRegister("Billy"));
 
-            joinGame.userToken = controller.PostRegister("Billy");
-            joinGame.timeLimit = 10;
+            
 
             controller.PostJoinGame(joinGame);
 
