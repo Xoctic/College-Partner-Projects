@@ -50,7 +50,7 @@ namespace BoggleService.Controllers
         /// <param name="joinGameInfo">User to be added to users list</param>
         /// <returns>ID number of newly added user</returns>
         [Route("BoggleService/JoinGame")]
-        public string PostJoinGame(JoinGameInfo joinGameInfo)
+        public PendingOutput PostJoinGame(JoinGameInfo joinGameInfo)
         {
             lock (sync)
             {
@@ -58,12 +58,37 @@ namespace BoggleService.Controllers
                 {
                     throw new HttpResponseException(HttpStatusCode.Forbidden);
                 }
+                else if(joinGameInfo.timeLimit < 5 || joinGameInfo.timeLimit > 120)
+                {
+                    throw new HttpResponseException(HttpStatusCode.Forbidden);
+                }
+                else if(pendingInfo.userToken == joinGameInfo.userToken)
+                {
+                    throw new HttpResponseException(HttpStatusCode.Conflict);
+                }
                 else
                 {
+                    PendingOutput output = new PendingOutput();
+                    if(pendingInfo.isPending == false)
+                    {
+                        gameID++;
+                        pendingInfo.gameID = gameID;
+                        pendingInfo.timeLimit = joinGameInfo.timeLimit;
+                        pendingInfo.userToken = joinGameInfo.userToken;
+                        //games.Add(gameID, );
+                        pendingInfo.isPending = true;
 
-                    //string userID = Guid.NewGuid().ToString();
-                    //users.Add(userID, user);
-                    //return userID;
+                        output.isPending = true;
+                        output.gameID = gameID;
+                        return output;
+                    }
+                    else
+                    {
+                        output.isPending = false;
+                        output.gameID = pendingInfo.gameID;
+                        pendingInfo = new PendingGameInfo();
+                        return output;
+                    }
                 }
             }
             return "hi";
@@ -132,10 +157,10 @@ namespace BoggleService.Controllers
         }
 
 
-
         private static Dictionary<String, String> users = new Dictionary<String, String>();
-        private static Dictionary<String, GameInfo> games = new Dictionary<String, GameInfo>();
+        private static Dictionary<int, GameInfo> games = new Dictionary<int, GameInfo>();
+        private static PendingGameInfo pendingInfo = new PendingGameInfo();
+        private static int gameID = 0;
         private static readonly object sync = new object();
-
     }
 }
