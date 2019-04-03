@@ -507,7 +507,7 @@
             </summary>
             <param name="token"></param>
         </member>
-        <member name="M:BoggleService.Controllers.BoggleController.PutPlayWord(System.Int32,System.String,System.String)">
+        <member name="M:BoggleService.Controllers.BoggleController.PutPlayWord(System.Int32,BoggleService.Models.PlayWordInput)">
             <summary>
             attempts to play a word
             </summary>
@@ -529,14 +529,49 @@
             <param name="gID"></param>
             <returns></returns>
         </member>
-        <member name="F:BoggleService.Controllers.BoggleController.users">
+        <member name="T:BoggleService.BoggleBoard">
             <summary>
-            A dictionary to store the key User Token which links to its value Nickname.
+            Represents a Boggle board.
             </summary>
         </member>
-        <member name="F:BoggleService.Controllers.BoggleController.games">
+        <member name="M:BoggleService.BoggleBoard.#ctor">
             <summary>
-            A dictionary to store the key gameID which links to its value GameInfo.
+            Creates a randomly-generated BoggleBoard 
+            </summary>
+        </member>
+        <member name="M:BoggleService.BoggleBoard.#ctor(System.String)">
+            <summary>
+            Creates a BoggleBoard from the provided 16-letter string.  The
+            method is case-insensitive.  If there aren't exactly 16 letters
+            in the string, throws an ArgumentException.  The string consists
+            of the first row, then the second row, then the third, then the fourth.
+            </summary>
+        </member>
+        <member name="M:BoggleService.BoggleBoard.MakeBoard(System.String)">
+            <summary>
+            Makes a board from the 16-letter string
+            </summary>
+        </member>
+        <member name="M:BoggleService.BoggleBoard.ToString">
+            <summary>
+            Returns the 16 letters that make up this board.  It is formed
+            by appending the first row to the second row to the third row
+            to the fourth row.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BoggleService.BoggleBoard.CanBeFormed(System.String)">
+            <summary>
+            Reports whether the provided word can be formed by tracking through
+            this Boggle board as described in the rules of Boggle.  The method
+            is case-insensitive.
+            </summary>
+        </member>
+        <member name="M:BoggleService.BoggleBoard.CanBeFormed(System.String,System.Int32,System.Int32,System.Boolean[0:,0:])">
+            <summary>
+            Reports whether the provided word can be formed by tracking through
+            this Boggle board by beginning at location [i,j] and avoiding any
+            squares marked as visited.
             </summary>
         </member>
         <member name="T:BoggleService.Models.JoinGameInfo">
@@ -625,6 +660,36 @@
             <summary>
             Stores whether or not a game is pending.
             </summary>
+        </member>
+        <member name="T:BoggleService.Models.PendingOutput">
+            <summary>
+            Response that is sent to the client containing the gameID and the bool isPending.
+            </summary>
+        </member>
+        <member name="P:BoggleService.Models.PendingOutput.gameID">
+            <summary>
+            Stores the game ID created when Join Game request is called.
+            </summary>
+        </member>
+        <member name="P:BoggleService.Models.PendingOutput.isPending">
+            <summary>
+            Stores whether or not a game is pending.
+            </summary>
+        </member>
+        <member name="M:BoggleService.Models.UserInfo.#ctor(System.String)">
+            <summary>
+            constructor for information about a user if user has not joined a game yet
+            </summary>
+            <param name="_name"></param>
+        </member>
+        <member name="M:BoggleService.Models.UserInfo.#ctor(System.String,System.Int32)">
+            <summary>
+            constructor for information about a user if user has joined a game
+            _currentID is required for the following statement located in PlayWord in the API (finding a gameID with a userToken)
+            "Otherwise, records the trimmed Word as being played by UserToken in the game identified by gameID"
+            </summary>
+            <param name="_name"></param>
+            <param name="_currentID"></param>
         </member>
         <member name="T:BoggleService.Models.PlayerInfo">
             <summary>
