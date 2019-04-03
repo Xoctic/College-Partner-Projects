@@ -44,8 +44,10 @@ namespace BoggleService.Controllers
 
         /// <summary>
         /// Joins a game.
-        /// If user is null or is empty after trimming, responds with status code Forbidden.
-        /// Otherwise, creates a user, returns the user's token, and responds with status code Ok. 
+        /// If UserToken is null or is not of length 36, responds with status code Forbidden.
+        /// If Timelimit is less than 5 or greateer than 120, responds with status code Forbidden.
+        /// If UserToken is already in a pending game, responds with status code Conflict.
+        /// Otherwise, attempts to join a pending game, returns the , and responds with status code Ok. 
         /// </summary>
         /// <param name="joinGameInfo">User to be added to users list</param>
         /// <returns>ID number of newly added user</returns>
@@ -54,7 +56,8 @@ namespace BoggleService.Controllers
         {
             lock (sync)
             {
-                if (joinGameInfo.userToken == null || joinGameInfo.userToken.Trim().Length != 36 || !(users.ContainsKey(joinGameInfo.userToken)))
+                //|| !(users.ContainsKey(joinGameInfo.userToken))
+                if (joinGameInfo.userToken == null || joinGameInfo.userToken.Trim().Length != 36)
                 {
                     throw new HttpResponseException(HttpStatusCode.Forbidden);
                 }
@@ -91,7 +94,6 @@ namespace BoggleService.Controllers
                     }
                 }
             }
-            return "hi";
         }
 
         [Route("BoggleService/CancelJoinGame")]
