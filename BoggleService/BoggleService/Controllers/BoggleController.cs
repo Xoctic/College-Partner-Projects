@@ -52,7 +52,7 @@ namespace BoggleService.Controllers
         /// <param name="joinGameInfo">User to be added to users list</param>
         /// <returns>ID number of newly added user</returns>
         [Route("BoggleService/JoinGame")]
-        public PendingOutput PostJoinGame(JoinGameInfo joinGameInfo)
+        public PendingGameInfo PostJoinGame(JoinGameInfo joinGameInfo)
         {
             lock (sync)
             {
@@ -71,7 +71,7 @@ namespace BoggleService.Controllers
                 }
                 else
                 {
-                    PendingOutput output = new PendingOutput();
+                    PendingGameInfo output = new PendingGameInfo();
                     if(pendingInfo.isPending == false)
                     {
                         gameID++;
@@ -215,8 +215,13 @@ namespace BoggleService.Controllers
         {
         }
 
-
+        /// <summary>
+        /// A dictionary to store the key User Token which links to its value Nickname.
+        /// </summary>
         private static Dictionary<String, String> users = new Dictionary<String, String>();
+        /// <summary>
+        /// A dictionary to store the key gameID which links to its value GameInfo.
+        /// </summary>
         private static Dictionary<int, GameInfo> games = new Dictionary<int, GameInfo>();
         private static PendingGameInfo pendingInfo = new PendingGameInfo();
         private static int gameID = 0;

@@ -10,6 +10,11 @@ namespace BoggleService.Models
     /// </summary>
     public class JoinGameInfo
     {
+        /// <summary>
+        /// Constructor to set the time limit and the user token.
+        /// </summary>
+        /// <param name="_timeLimit"></param>
+        /// <param name="_userToken"></param>
         public JoinGameInfo(int _timeLimit, string _userToken)
         {
             timeLimit = _timeLimit;

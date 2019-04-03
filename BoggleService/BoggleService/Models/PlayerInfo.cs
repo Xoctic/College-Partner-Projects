@@ -7,33 +7,33 @@ using System.Web;
 namespace BoggleService.Models
 {
     /// <summary>
-    /// Class to store the Pending Game Info when a Join Game request executes.
+    /// Class to store the information of each player.
     /// </summary>
     [DataContract]
-    public class PendingGameInfo
+    public class PlayerInfo
     {
         /// <summary>
-        /// Stores the time limit being passed into the server.
+        /// Stores the token of this player.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public int timeLimit { get; set; }
+        public string playerToken { get; set; }
 
         /// <summary>
-        /// Stores the game ID created when Join Game request is called.
+        /// Stores the nickName of the player.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public int gameID { get; set; }
+        public string nickName { get; set; }
 
         /// <summary>
-        /// Stores the user ID that is awaiting a game.
+        /// Stores the current score of the player.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public string userToken { get; set; }
+        public int score { get; set; }
 
         /// <summary>
-        /// Stores whether or not a game is pending.
+        /// Stores the words played by the player.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public bool isPending { get; set; }
+        public PlayerWordsPlayed wordsPlayed;
     }
 }

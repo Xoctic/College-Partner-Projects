@@ -1,32 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Web;
 
 namespace BoggleService.Models
 {
+    /// <summary>
+    /// Class to store all of the game information needed for each individual game.
+    /// </summary>
+    [DataContract]
     public class GameInfo
     {
-        private int startTime;
-        private int timeLimit;
-        public string player1Token;
-        public string player2Token;
-        public string gameState;
+        /// <summary>
+        /// Stores the state of the game.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public string gameState { get; set; }
 
-        //Constructor for a new game
-        public GameInfo(int _timeLimit, string _player1Token, string _player2Token)
-        {
-            startTime = DateTime.Now.Second;
-            timeLimit = _timeLimit;
-            player1Token = _player1Token;
-            player2Token = _player2Token;
-            gameState = "active";
-        }
+        /// <summary>
+        /// Stores the board of this current game.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public BoggleBoard board;
 
+        /// <summary>
+        /// Stores the time limit of this game, which is the average time of both players.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public int timeLimit { get; set; }
 
+        /// <summary>
+        /// Stores the time remaining for this current game.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public int timeLeft { get; set; }
 
-        public Dictionary<string, int> player1Words = new Dictionary<string, int>();
-        public Dictionary<string, int> player2Words = new Dictionary<string, int>();
+        /// <summary>
+        /// Stores the player information for player 1.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public PlayerInfo player1;
 
+        /// <summary>
+        /// Stores the player information for player 2.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public PlayerInfo player2;
     }
 }

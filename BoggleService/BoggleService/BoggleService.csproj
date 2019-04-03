@@ -170,7 +170,8 @@
     <Compile Include="Models\JoinGameInfo.cs" />
     <Compile Include="Models\GameInfo.cs" />
     <Compile Include="Models\PendingGameInfo.cs" />
-    <Compile Include="Models\PendingOutput.cs" />
+    <Compile Include="Models\PlayerInfo.cs" />
+    <Compile Include="Models\PlayerWordsPlayed.cs" />
     <Compile Include="Models\UserInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
