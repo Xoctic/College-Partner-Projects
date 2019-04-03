@@ -66,7 +66,44 @@ namespace BoggleService.Controllers
                     //return userID;
                 }
             }
+            return "hi";
         }
+
+        [Route("BoggleService/CancelJoinGame")]
+        public void PutCancelJoin(string token)
+        {
+            if(token == null || token.Length != 36)
+            {
+                throw new HttpResponseException(HttpStatusCode.Forbidden);
+            }
+
+
+        }
+
+
+        [Route("BoggleService/PlayWord/{gameID}")]
+        public void PutPlayWord(string gameID, string token, string word)
+        {
+            if(word == null || word == "" || word.Trim().Length > 30)
+            {
+
+            }
+        }
+
+
+        public bool validToken(string userToken)
+        {
+            return true;
+        }
+
+        public bool validID(string gID)
+        {
+
+            return true;
+        }
+
+
+
         // GET api/values
         public IEnumerable<string> Get()
         {

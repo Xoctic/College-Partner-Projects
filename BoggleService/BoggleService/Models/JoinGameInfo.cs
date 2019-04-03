@@ -10,6 +10,7 @@ namespace BoggleService.Models
     /// </summary>
     public class JoinGameInfo
     {
+
         /// <summary>
         /// Stores the time limit being passed into the server.
         /// </summary>

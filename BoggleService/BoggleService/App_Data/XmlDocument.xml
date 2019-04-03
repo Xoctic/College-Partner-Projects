@@ -490,5 +490,49 @@
             <param name="user">User to be added to users list</param>
             <returns>ID number of newly added user</returns>
         </member>
+        <member name="M:BoggleService.Controllers.BoggleController.PostJoinGame(BoggleService.Models.JoinGameInfo)">
+            <summary>
+            Joins a game.
+            If user is null or is empty after trimming, responds with status code Forbidden.
+            Otherwise, creates a user, returns the user's token, and responds with status code Ok. 
+            </summary>
+            <param name="joinGameInfo">User to be added to users list</param>
+            <returns>ID number of newly added user</returns>
+        </member>
+        <member name="T:BoggleService.Models.JoinGameInfo">
+            <summary>
+            Class to store the Game Info when a Join Game request executes.
+            </summary>
+        </member>
+        <member name="P:BoggleService.Models.JoinGameInfo.timeLimit">
+            <summary>
+            Stores the time limit being passed into the server.
+            </summary>
+        </member>
+        <member name="P:BoggleService.Models.JoinGameInfo.userToken">
+            <summary>
+            Stores the user token being passed into the server.
+            </summary>
+        </member>
+        <member name="T:BoggleService.Models.PendingGameInfo">
+            <summary>
+            Class to store the Pending Game Info when a Join Game request executes.
+            </summary>
+        </member>
+        <member name="P:BoggleService.Models.PendingGameInfo.timeLimit">
+            <summary>
+            Stores the time limit being passed into the server.
+            </summary>
+        </member>
+        <member name="P:BoggleService.Models.PendingGameInfo.gameID">
+            <summary>
+            Stores the game ID created when Join Game request is called.
+            </summary>
+        </member>
+        <member name="P:BoggleService.Models.PendingGameInfo.isPending">
+            <summary>
+            Stores whether or not a game is pending.
+            </summary>
+        </member>
     </members>
 </doc>
