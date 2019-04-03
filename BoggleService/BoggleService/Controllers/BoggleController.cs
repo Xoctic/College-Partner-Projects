@@ -36,7 +36,7 @@ namespace BoggleService.Controllers
                 else
                 {
                     string userID = Guid.NewGuid().ToString();
-                    users.Add(userID, user);
+                    users.Add(userID, new UserInfo(user));
                     return userID;
                 }
             }
@@ -77,7 +77,7 @@ namespace BoggleService.Controllers
                         pendingInfo.userToken = joinGameInfo.userToken;
                         //games.Add(gameID, );
                         pendingInfo.isPending = true;
-
+                        //users[pendingInfo.userToken].currentGameID = pendingInfo.gameID;
                         output.isPending = true;
                         output.gameID = gameID;
                         return output;
@@ -91,7 +91,7 @@ namespace BoggleService.Controllers
                     }
                 }
             }
-            return "hi";
+            //return "hi";
         }
 
         /// <summary>
@@ -121,17 +121,20 @@ namespace BoggleService.Controllers
         /// <param name="gameID"></param>
         /// <param name="token"></param>
         /// <param name="word"></param>
-        [Route("BoggleService/PlayWord/{gameID}")]
-        public void PutPlayWord(int gameID, string token, string word)
+        [Route("BoggleService/PlayWord/{_gameID}")]
+        public int PutPlayWord(int _gameID, PlayWordInput play)
         {
             int score = 0;
 
-            if(word == null || word == "" || word.Trim().Length > 30 || !validToken(token) || !validID(gameID))
+            if(play.word == null || play.word == "" || play.word.Trim().Length > 30 || !validToken(play.userToken) || !validID(_gameID))
             {
                 throw new HttpResponseException(HttpStatusCode.Forbidden);
             }
+
             GameInfo temp = games[gameID];
-            if(temp.player1Token != token && temp.player2Token != token)
+
+
+            if(temp.player1Token != play.userToken && temp.player2Token != play.userToken)
             {
                 throw new HttpResponseException(HttpStatusCode.Forbidden);
             }
@@ -139,17 +142,38 @@ namespace BoggleService.Controllers
             {
                 throw new HttpResponseException(HttpStatusCode.Conflict);
             }
-            word = word.Trim();
 
-            if(temp.player1Token == token)
+            play.word = play.word.Trim();
+    
+
+            if(temp.player1Token == play.userToken)
             {
-                
+                if(temp.player1Words.ContainsKey(play.word))
+                {
+                    score = 0;
+                }
+                else
+                {
+                    score = temp.misterBoggle.score(play.word);
+                    temp.player1Words.Add(play.word, score);
+                    games[_gameID] = temp;
+                }
             }
             else
             {
-
+                if(temp.player2Words.ContainsKey(play.word))
+                {
+                    score = 0;
+                }
+                else
+                {
+                    score = temp.misterBoggle.score(play.word);
+                    temp.player2Words.Add(play.word, score);
+                    games[_gameID] = temp;
+                }
             }
-            
+
+            return score;
 
         }
 
@@ -214,10 +238,11 @@ namespace BoggleService.Controllers
         }
 
 
-        private static Dictionary<String, String> users = new Dictionary<String, String>();
+        private static Dictionary<String, UserInfo> users = new Dictionary<String, UserInfo>();
         private static Dictionary<int, GameInfo> games = new Dictionary<int, GameInfo>();
         private static PendingGameInfo pendingInfo = new PendingGameInfo();
         private static int gameID = 0;
         private static readonly object sync = new object();
+        
     }
 }
