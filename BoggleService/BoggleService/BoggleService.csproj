@@ -171,6 +171,7 @@
     <Compile Include="Models\GameInfo.cs" />
     <Compile Include="Models\PendingGameInfo.cs" />
     <Compile Include="Models\PendingOutput.cs" />
+    <Compile Include="Models\UserInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

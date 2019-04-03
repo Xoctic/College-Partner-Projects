@@ -94,6 +94,10 @@ namespace BoggleService.Controllers
             return "hi";
         }
 
+        /// <summary>
+        /// cancels a pending game
+        /// </summary>
+        /// <param name="token"></param>
         [Route("BoggleService/CancelJoinGame")]
         public void PutCancelJoin(string token)
         {
@@ -101,31 +105,84 @@ namespace BoggleService.Controllers
             {
                 throw new HttpResponseException(HttpStatusCode.Forbidden);
             }
+            if(pendingInfo.userToken == null || pendingInfo.userToken != token)
+            {
+                throw new HttpResponseException(HttpStatusCode.Forbidden);
+            }
+
+            pendingInfo = new PendingGameInfo();
 
 
         }
 
-
+        /// <summary>
+        /// attempts to play a word
+        /// </summary>
+        /// <param name="gameID"></param>
+        /// <param name="token"></param>
+        /// <param name="word"></param>
         [Route("BoggleService/PlayWord/{gameID}")]
-        public void PutPlayWord(string gameID, string token, string word)
+        public void PutPlayWord(int gameID, string token, string word)
         {
-            if(word == null || word == "" || word.Trim().Length > 30)
+            int score = 0;
+
+            if(word == null || word == "" || word.Trim().Length > 30 || !validToken(token) || !validID(gameID))
+            {
+                throw new HttpResponseException(HttpStatusCode.Forbidden);
+            }
+            GameInfo temp = games[gameID];
+            if(temp.player1Token != token && temp.player2Token != token)
+            {
+                throw new HttpResponseException(HttpStatusCode.Forbidden);
+            }
+            if(temp.gameState != "active")
+            {
+                throw new HttpResponseException(HttpStatusCode.Conflict);
+            }
+            word = word.Trim();
+
+            if(temp.player1Token == token)
+            {
+                
+            }
+            else
             {
 
             }
+            
+
         }
 
-
+        /// <summary>
+        /// ensures that the userToken passed in is a valid token
+        /// </summary>
+        /// <param name="userToken"></param>
+        /// <returns></returns>
         public bool validToken(string userToken)
         {
+            if(userToken == null || userToken.Trim().Length != 36 || !users.ContainsKey(userToken))
+            {
+                return false;
+            }
+
             return true;
         }
 
-        public bool validID(string gID)
+        /// <summary>
+        /// esures the gameID passed in is a valid gameId
+        /// </summary>
+        /// <param name="gID"></param>
+        /// <returns></returns>
+        public bool validID(int gID)
         {
-
+            if(gID == null || !games.ContainsKey(gID))
+            {
+                return false;
+            }
             return true;
         }
+
+        
 
 
 
