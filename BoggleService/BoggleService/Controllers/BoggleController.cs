@@ -109,7 +109,43 @@ namespace BoggleService.Controllers
                         //Averages both players time limits
                         temp.TimeLimit = (games[gameId].TimeLimit + joinGameInput.timeLimit) / 2;
 
-                        games[gameId] = temp;
+                        //used only for testing purposes only
+                        if (testFlag)
+                        {
+                            switch (testScore)
+                            {
+                                case 11:
+                                //For 11 points ABANDONMENTS
+                                games[gameId].MisterBoggle = new BoggleBoard("ABANSVPDTORONEMN");
+                                break;
+
+                                case 5:
+                                //For 5 Points PENNAME
+                                games[gameId].MisterBoggle = new BoggleBoard("PENNLMNAOPQMRSTE");
+                                break;
+
+                                case 3:
+                                //For 3 Points PENNAE
+                                games[gameId].MisterBoggle = new BoggleBoard("PENNQRSATUVEWXYV");
+                                break;
+
+                                case 2:
+                                //For 2 Points PENNA
+                                games[gameId].MisterBoggle = new BoggleBoard("PENNABCADEFGHIJK");
+                                break;
+
+                                case 1:
+                                //For 1 Points PENS
+                                games[gameId].MisterBoggle = new BoggleBoard("PENSABCDEFGHIJKL");
+                                break;
+
+                                case 0:
+                                //For 0 Points A
+                                games[gameId].MisterBoggle = new BoggleBoard("ANBCDEFGHIJKLMNO");
+                                break;
+                            }
+                        }
+                        
 
                         output.IsPending = false;
                         output.GameID = pendingInfo.GameID;
@@ -325,6 +361,16 @@ namespace BoggleService.Controllers
             return true;
         }
 
+        public void Istesting(bool b)
+        {
+            testFlag = b;
+        }
+
+        public void setTestScore(int i)
+        {
+            testScore = i;
+        }
+
         /// <summary>
         /// A dictionary to store the key User Token which links to its value Nickname.
         /// </summary>
@@ -346,6 +392,17 @@ namespace BoggleService.Controllers
         private static string gameId = "G";
 
         private static int gameIDnum = 0;
+
+        /// <summary>
+        /// Flag to see if we are currently testing the server
+        /// </summary>
+        private bool testFlag = false;
+
+        /// <summary>
+        /// Integer to see what score we would like to test for
+        /// </summary>
+        private int testScore = 0;
+
 
         /// <summary>
         /// A sync lock used to make sure that at any time only 1 method can be running at a time during multi threading.
