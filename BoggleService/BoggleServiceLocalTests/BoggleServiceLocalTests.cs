@@ -1,4 +1,5 @@
-﻿using BoggleService.Controllers;
+﻿using BoggleService;
+using BoggleService.Controllers;
 using BoggleService.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -153,6 +154,15 @@ namespace BoggleServiceLocalTests
         [TestMethod]
         public void PlayWordTest()
         {
+            BoggleController controller = new BoggleController();
+            JoinGameInput joinGame = new JoinGameInput(10, controller.PostRegister("Billy"));
+            controller.PostJoinGame(joinGame);
+            joinGame.userToken = controller.PostRegister("Mr.Bean");
+            controller.PostJoinGame(joinGame);
+
+            BoggleBoard board = new BoggleBoard("MANIEETLDSPEIRED");
+
+
 
         }
 

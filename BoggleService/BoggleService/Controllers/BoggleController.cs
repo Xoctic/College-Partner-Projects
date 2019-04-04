@@ -59,8 +59,8 @@ namespace BoggleService.Controllers
         {
             lock (sync)
             {
-                //|| !(users.ContainsKey(joinGameInfo.userToken))
-                if (joinGameInput.userToken == null || joinGameInput.userToken.Trim().Length != 36)
+                
+                if (!validToken(joinGameInput.userToken))
                 {
                     throw new HttpResponseException(HttpStatusCode.Forbidden);
                 }
@@ -91,7 +91,7 @@ namespace BoggleService.Controllers
                         gameInfo.Player1.PlayerToken = joinGameInput.userToken;
                         gameInfo.Player1.NickName = users[joinGameInput.userToken];
                         games.Add(gameID, gameInfo);
-                        //users[pendingInfo.userToken].currentGameID = pendingInfo.gameID;
+                        
                         output.IsPending = true;
                         output.GameID = gameID;
                         return output;
@@ -197,7 +197,7 @@ namespace BoggleService.Controllers
                 }
 
                 return score;
-            }
+            } 
         }
 
         /// <summary>
