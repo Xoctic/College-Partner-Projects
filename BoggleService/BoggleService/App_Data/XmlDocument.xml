@@ -490,7 +490,7 @@
             <param name="user">User to be added to users list</param>
             <returns>ID number of newly added user</returns>
         </member>
-        <member name="M:BoggleService.Controllers.BoggleController.PostJoinGame(BoggleService.Models.JoinGameInfo)">
+        <member name="M:BoggleService.Controllers.BoggleController.PostJoinGame(BoggleService.Models.JoinGameInput)">
             <summary>
             Joins a game.
             If UserToken is null or is not of length 36, responds with status code Forbidden.
@@ -498,7 +498,7 @@
             If UserToken is already in a pending game, responds with status code Conflict.
             Otherwise, attempts to join a pending game, returns the , and responds with status code Ok. 
             </summary>
-            <param name="joinGameInfo">User to be added to users list</param>
+            <param name="joinGameInput">User to be added to users list</param>
             <returns>ID number of newly added user</returns>
         </member>
         <member name="M:BoggleService.Controllers.BoggleController.PutCancelJoin(System.String)">
@@ -584,26 +584,26 @@
             squares marked as visited.
             </summary>
         </member>
-        <member name="T:BoggleService.Models.JoinGameInfo">
+        <member name="T:BoggleService.Models.JoinGameInput">
             <summary>
             Class to store the Game Info when a Join Game request executes.
             </summary>
         </member>
-        <member name="M:BoggleService.Models.JoinGameInfo.#ctor(System.Int32,System.String)">
+        <member name="M:BoggleService.Models.JoinGameInput.#ctor(System.Int32,System.String)">
             <summary>
             Constructor to set the time limit and the user token.
             </summary>
             <param name="_timeLimit"></param>
             <param name="_userToken"></param>
         </member>
-        <member name="P:BoggleService.Models.JoinGameInfo.timeLimit">
-            <summary>
-            Stores the time limit being passed into the server.
-            </summary>
-        </member>
-        <member name="P:BoggleService.Models.JoinGameInfo.userToken">
+        <member name="P:BoggleService.Models.JoinGameInput.userToken">
             <summary>
             Stores the user token being passed into the server.
+            </summary>
+        </member>
+        <member name="P:BoggleService.Models.JoinGameInput.timeLimit">
+            <summary>
+            Stores the time limit being passed into the server.
             </summary>
         </member>
         <member name="T:BoggleService.Models.GameInfo">
@@ -618,7 +618,12 @@
         </member>
         <member name="F:BoggleService.Models.GameInfo.misterBoggle">
             <summary>
-            Stores the board of this current game.
+            Stores the Boggle Board object of this current game.
+            </summary>
+        </member>
+        <member name="F:BoggleService.Models.GameInfo.board">
+            <summary>
+            Stores the string version of the Boggle Board.
             </summary>
         </member>
         <member name="P:BoggleService.Models.GameInfo.timeLimit">
@@ -640,6 +645,12 @@
             <summary>
             Stores the player information for player 2.
             </summary>
+        </member>
+        <member name="M:BoggleService.Models.GameInfo.#ctor(System.Boolean)">
+            <summary>
+            Constructor that sets some of the instance variables based on if the paramter is true.
+            </summary>
+            <param name="setStuff"></param>
         </member>
         <member name="T:BoggleService.Models.PendingGameInfo">
             <summary>
@@ -700,21 +711,6 @@
             <summary>
             Stores the word played by the current player.
             </summary>
-        </member>
-        <member name="M:BoggleService.Models.UserInfo.#ctor(System.String)">
-            <summary>
-            constructor for information about a user if user has not joined a game yet
-            </summary>
-            <param name="_name"></param>
-        </member>
-        <member name="M:BoggleService.Models.UserInfo.#ctor(System.String,System.Int32)">
-            <summary>
-            constructor for information about a user if user has joined a game
-            _currentID is required for the following statement located in PlayWord in the API (finding a gameID with a userToken)
-            "Otherwise, records the trimmed Word as being played by UserToken in the game identified by gameID"
-            </summary>
-            <param name="_name"></param>
-            <param name="_currentID"></param>
         </member>
     </members>
 </doc>

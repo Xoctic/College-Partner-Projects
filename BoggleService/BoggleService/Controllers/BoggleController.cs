@@ -9,6 +9,9 @@ using System.Web.Http;
 
 namespace BoggleService.Controllers
 {
+    /// <summary>
+    /// Server controller that deals with all commands.
+    /// </summary>
     public class BoggleController : ApiController
     {
 
@@ -36,7 +39,7 @@ namespace BoggleService.Controllers
                 else
                 {
                     string userID = Guid.NewGuid().ToString();
-                    users.Add(userID, user);
+                    users.Add(userID, user.Trim());
                     return userID;
                 }
             }
@@ -49,46 +52,59 @@ namespace BoggleService.Controllers
         /// If UserToken is already in a pending game, responds with status code Conflict.
         /// Otherwise, attempts to join a pending game, returns the , and responds with status code Ok. 
         /// </summary>
-        /// <param name="joinGameInfo">User to be added to users list</param>
-        /// <returns>ID number of newly added user</returns>
+        /// <param name="joinGameInput">Input from the client which contains the user token and the time limit.</param>
+        /// <returns>A pending game info object which contains the game ID and the status of isPending</returns>
         [Route("BoggleService/JoinGame")]
-        public PendingGameInfo PostJoinGame(JoinGameInfo joinGameInfo)
+        public PendingGameInfo PostJoinGame(JoinGameInput joinGameInput)
         {
             lock (sync)
             {
                 //|| !(users.ContainsKey(joinGameInfo.userToken))
-                if (joinGameInfo.userToken == null || joinGameInfo.userToken.Trim().Length != 36)
+                if (joinGameInput.userToken == null || joinGameInput.userToken.Trim().Length != 36)
                 {
                     throw new HttpResponseException(HttpStatusCode.Forbidden);
                 }
-                else if(joinGameInfo.timeLimit < 5 || joinGameInfo.timeLimit > 120)
+                else if(joinGameInput.timeLimit < 5 || joinGameInput.timeLimit > 120)
                 {
                     throw new HttpResponseException(HttpStatusCode.Forbidden);
                 }
-                else if(pendingInfo.userToken == joinGameInfo.userToken)
+                else if(pendingInfo.UserToken == joinGameInput.userToken)
                 {
                     throw new HttpResponseException(HttpStatusCode.Conflict);
                 }
                 else
                 {
                     PendingGameInfo output = new PendingGameInfo();
-                    if(pendingInfo.isPending == false)
+                    if(pendingInfo.IsPending == false)
                     {
-                        gameID++;
-                        pendingInfo.gameID = gameID;
-                        pendingInfo.timeLimit = joinGameInfo.timeLimit;
-                        pendingInfo.userToken = joinGameInfo.userToken;
-                        //games.Add(gameID, );
-                        pendingInfo.isPending = true;
+                        gameIDnum++;
+                        gameID += gameIDnum;
+                        pendingInfo.GameID = gameID;
+                        pendingInfo.TimeLimit = joinGameInput.timeLimit;
+                        pendingInfo.UserToken = joinGameInput.userToken;
+                        pendingInfo.IsPending = true;
+
+                        GameInfo gameInfo = new GameInfo(true);
+                        gameInfo.GameState = "pending";
+                        gameInfo.TimeLimit = joinGameInput.timeLimit;
+                        gameInfo.Player1.PlayerToken = joinGameInput.userToken;
+                        gameInfo.Player1.NickName = users[joinGameInput.userToken];
+                        games.Add(gameID, gameInfo);
                         //users[pendingInfo.userToken].currentGameID = pendingInfo.gameID;
-                        output.isPending = true;
-                        output.gameID = gameID;
+                        output.IsPending = true;
+                        output.GameID = gameID;
                         return output;
                     }
                     else
                     {
-                        output.isPending = false;
-                        output.gameID = pendingInfo.gameID;
+                        games[gameID].Player2.PlayerToken = joinGameInput.userToken;
+                        games[gameID].Player2.NickName = users[joinGameInput.userToken];
+                        games[gameID].GameState = "active";
+                        //Averages both players time limits
+                        games[gameID].TimeLimit = (games[gameID].TimeLimit + joinGameInput.timeLimit) / 2;
+
+                        output.IsPending = false;
+                        output.GameID = pendingInfo.GameID;
                         pendingInfo = new PendingGameInfo();
                         return output;
                     }
@@ -103,80 +119,105 @@ namespace BoggleService.Controllers
         [Route("BoggleService/CancelJoinGame")]
         public void PutCancelJoin(string token)
         {
-            if(token == null || token.Length != 36)
+            lock (sync)
             {
-                throw new HttpResponseException(HttpStatusCode.Forbidden);
+                if (token == null || token.Length != 36)
+                {
+                    throw new HttpResponseException(HttpStatusCode.Forbidden);
+                }
+                if (pendingInfo.UserToken == null || pendingInfo.UserToken != token)
+                {
+                    throw new HttpResponseException(HttpStatusCode.Forbidden);
+                }
+                //Removes the pending game from games, and then creates a new pending Game Info.
+                games.Remove(pendingInfo.GameID);
+                pendingInfo = new PendingGameInfo();
             }
-            if(pendingInfo.userToken == null || pendingInfo.userToken != token)
-            {
-                throw new HttpResponseException(HttpStatusCode.Forbidden);
-            }
-
-            pendingInfo = new PendingGameInfo();
-
-
         }
 
         /// <summary>
         /// attempts to play a word
         /// </summary>
-        /// <param name="gameID"></param>
+        /// <param name="_gameID"></param>
         /// <param name="token"></param>
         /// <param name="word"></param>
         [Route("BoggleService/PlayWord/{_gameID}")]
-        public int PutPlayWord(int _gameID, PlayWordInput play)
+        public int PutPlayWord(string _gameID, PlayWordInput play)
         {
-            int score = 0;
-
-            if(play.word == null || play.word == "" || play.word.Trim().Length > 30 || !validToken(play.userToken) || !validID(_gameID))
+            lock (sync)
             {
-                throw new HttpResponseException(HttpStatusCode.Forbidden);
-            }
+                int score = 0;
 
-            GameInfo temp = games[gameID];
-
-
-            if(temp.player1.playerToken != play.userToken && temp.player2.playerToken != play.userToken)
-            {
-                throw new HttpResponseException(HttpStatusCode.Forbidden);
-            }
-            if(temp.gameState != "active")
-            {
-                throw new HttpResponseException(HttpStatusCode.Conflict);
-            }
-
-            play.word = play.word.Trim();
-    
-
-            if(temp.player1.playerToken == play.userToken)
-            {
-                if(temp.player1.wordsPlayed.playerWordsPlayed.ContainsKey(play.word))
+                if (play.word == null || play.word == "" || play.word.Trim().Length > 30 || !validToken(play.userToken) || !validID(_gameID))
                 {
-                    score = 0;
+                    throw new HttpResponseException(HttpStatusCode.Forbidden);
+                }
+
+                GameInfo temp = games[_gameID];
+
+
+                if (temp.Player1.PlayerToken != play.userToken && temp.Player2.PlayerToken != play.userToken)
+                {
+                    throw new HttpResponseException(HttpStatusCode.Forbidden);
+                }
+                if (temp.GameState != "active")
+                {
+                    throw new HttpResponseException(HttpStatusCode.Conflict);
+                }
+
+                play.word = play.word.Trim();
+
+
+                if (temp.Player1.PlayerToken == play.userToken)
+                {
+                    if (temp.Player1.WordsPlayed.playerWordsPlayed.ContainsKey(play.word))
+                    {
+                        score = 0;
+                    }
+                    else
+                    {
+                        score = temp.MisterBoggle.score(play.word);
+                        temp.Player1.WordsPlayed.playerWordsPlayed.Add(play.word, score);
+                        games[_gameID] = temp;
+                    }
                 }
                 else
                 {
-                    score = temp.misterBoggle.score(play.word);
-                    temp.player1.wordsPlayed.playerWordsPlayed.Add(play.word, score);
-                    games[_gameID] = temp;
+                    if (temp.Player2.WordsPlayed.playerWordsPlayed.ContainsKey(play.word))
+                    {
+                        score = 0;
+                    }
+                    else
+                    {
+                        score = temp.MisterBoggle.score(play.word);
+                        temp.Player2.WordsPlayed.playerWordsPlayed.Add(play.word, score);
+                        games[_gameID] = temp;
+                    }
                 }
+
+                return score;
             }
-            else
+        }
+
+        /// <summary>
+        /// Joins a game.
+        /// If UserToken is null or is not of length 36, responds with status code Forbidden.
+        /// If Timelimit is less than 5 or greateer than 120, responds with status code Forbidden.
+        /// If UserToken is already in a pending game, responds with status code Conflict.
+        /// Otherwise, attempts to join a pending game, returns the , and responds with status code Ok. 
+        /// </summary>
+        /// <param name="joinGameInput">User to be added to users list</param>
+        /// <returns>ID number of newly added user</returns>
+        [Route("BoggleService/JoinGame")]
+        public PendingGameInfo GetGameStatus(JoinGameInput joinGameInput)
+        {
+            lock (sync)
             {
-                if(temp.player2.wordsPlayed.playerWordsPlayed.ContainsKey(play.word))
+                if ()
                 {
-                    score = 0;
-                }
-                else
-                {
-                    score = temp.misterBoggle.score(play.word);
-                    temp.player2.wordsPlayed.playerWordsPlayed.Add(play.word, score);
-                    games[_gameID] = temp;
+                    throw new HttpResponseException(HttpStatusCode.Forbidden);
                 }
             }
-
-            return score;
-
         }
 
         /// <summary>
@@ -184,13 +225,12 @@ namespace BoggleService.Controllers
         /// </summary>
         /// <param name="userToken"></param>
         /// <returns></returns>
-        public bool validToken(string userToken)
+        private bool validToken(string userToken)
         {
             if(userToken == null || userToken.Trim().Length != 36 || !users.ContainsKey(userToken))
             {
                 return false;
             }
-
             return true;
         }
 
@@ -199,7 +239,7 @@ namespace BoggleService.Controllers
         /// </summary>
         /// <param name="gID"></param>
         /// <returns></returns>
-        public bool validID(int gID)
+        private bool validID(string gID)
         {
             if(gID == null || !games.ContainsKey(gID))
             {
@@ -208,48 +248,31 @@ namespace BoggleService.Controllers
             return true;
         }
 
-        
-
-
-
-        // GET api/values
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/values/5
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/values
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT api/values/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/values/5
-        public void Delete(int id)
-        {
-        }
-
         /// <summary>
         /// A dictionary to store the key User Token which links to its value Nickname.
         /// </summary>
         private static Dictionary<String, String> users = new Dictionary<String, String>();
+
         /// <summary>
-        /// A dictionary to store the key gameID which links to its value GameInfo.
+        /// A dictionary to store the string key gameID which links to its value GameInfo.
         /// </summary>
-        private static Dictionary<int, GameInfo> games = new Dictionary<int, GameInfo>();
+        private static Dictionary<String, GameInfo> games = new Dictionary<String, GameInfo>();
+
+        /// <summary>
+        /// The pending game info for the current pending game.
+        /// </summary>
         private static PendingGameInfo pendingInfo = new PendingGameInfo();
-        private static int gameID = 0;
-        private static readonly object sync = new object();
-        
+
+        /// <summary>
+        /// The initial ID of the first game.  Is incremented by 1 each time a new game is created in the PostJoinGame method.
+        /// </summary>
+        private static string gameID = "G";
+
+        private static int gameIDnum = 0;
+
+        /// <summary>
+        /// A sync lock used to make sure that at any time only 1 method can be running at a time during multi threading.
+        /// </summary>
+        private static readonly object sync = new object();       
     }
 }

@@ -155,48 +155,6 @@ namespace BoggleService
             return false;
         }
 
-        public int score(string word)
-        {
-            //check in the dictionary if the word is in the dictionary
-
-            if(!CanBeFormed(word))
-            {
-                return -1;
-            }
-            else
-            {
-                switch (word.Length)
-                {
-                    case 0:
-                        return -1;
-                    case 1:
-                        return 0;
-                    case 2:
-                        return 0;
-                    case 3:
-                        return 1;
-                    case 4:
-                        return 1;
-                    case 5:
-                        return 2;
-                    case 6:
-                        return 3;
-                    case 7:
-                        return 5;
-                    default:
-                        if (word.Length >= 8)
-                        {
-                            return 11;
-                        }
-                        break;     
-                }
-
-                return -2;
-            }
-                
-        }
-
-
         /// <summary>
         /// Reports whether the provided word can be formed by tracking through
         /// this Boggle board by beginning at location [i,j] and avoiding any
@@ -264,6 +222,47 @@ namespace BoggleService
             // We failed.  Unmark this square and return false.
             visited[i, j] = false;
             return false;
+        }
+
+        public int score(string word)
+        {
+            //check in the dictionary if the word is in the dictionary
+
+            if (!CanBeFormed(word))
+            {
+                return -1;
+            }
+            else
+            {
+                switch (word.Length)
+                {
+                    case 0:
+                        return -1;
+                    case 1:
+                        return 0;
+                    case 2:
+                        return 0;
+                    case 3:
+                        return 1;
+                    case 4:
+                        return 1;
+                    case 5:
+                        return 2;
+                    case 6:
+                        return 3;
+                    case 7:
+                        return 5;
+                    default:
+                        if (word.Length >= 8)
+                        {
+                            return 11;
+                        }
+                        break;
+                }
+
+                return -2;
+            }
+
         }
     }
 }

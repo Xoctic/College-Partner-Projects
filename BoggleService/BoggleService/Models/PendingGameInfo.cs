@@ -16,24 +16,24 @@ namespace BoggleService.Models
         /// Stores the time limit being passed into the server.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public int timeLimit { get; set; }
+        public int TimeLimit { get; set; }
 
         /// <summary>
         /// Stores the game ID created when Join Game request is called.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public int gameID { get; set; }
+        public string GameID { get; set; }
 
         /// <summary>
         /// Stores the user ID that is awaiting a game.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public string userToken { get; set; }
+        public string UserToken { get; set; }
 
         /// <summary>
         /// Stores whether or not a game is pending.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public bool isPending { get; set; }
+        public bool IsPending { get; set; }
     }
 }
