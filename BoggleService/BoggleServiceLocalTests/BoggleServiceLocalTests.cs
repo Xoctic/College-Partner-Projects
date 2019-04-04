@@ -162,6 +162,10 @@ namespace BoggleServiceLocalTests
 
             BoggleBoard board = new BoggleBoard("MANIEETLDSPEIRED");
 
+           // string gId = controller.getGameId();
+
+            
+
 
 
         }
