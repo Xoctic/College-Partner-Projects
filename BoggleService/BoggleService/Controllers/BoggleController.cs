@@ -22,7 +22,7 @@ namespace BoggleService.Controllers
         /// </summary>
         /// <param name="user">User to be added to users list</param>
         /// <returns>ID number of newly added user</returns>
-        [Route("BoggleService/RegisterUser")]
+        [Route("BoggleService/users")]
         public string PostRegister([FromBody]string user)
         {
             if (user == "stall")
@@ -54,7 +54,7 @@ namespace BoggleService.Controllers
         /// </summary>
         /// <param name="joinGameInput">Input from the client which contains the user token and the time limit.</param>
         /// <returns>A pending game info object which contains the game ID and the status of isPending</returns>
-        [Route("BoggleService/JoinGame")]
+        [Route("BoggleService/games")]
         public PendingGameInfo PostJoinGame(JoinGameInput joinGameInput)
         {
             lock (sync)
@@ -79,8 +79,8 @@ namespace BoggleService.Controllers
                     if(pendingInfo.IsPending == false)
                     {
                         gameIDnum++;
-                        gameID += gameIDnum;
-                        pendingInfo.GameID = gameID;
+                        gameId += gameIDnum;
+                        pendingInfo.GameID = gameId;
                         pendingInfo.TimeLimit = joinGameInput.timeLimit;
                         pendingInfo.UserToken = joinGameInput.userToken;
                         pendingInfo.IsPending = true;
@@ -90,19 +90,19 @@ namespace BoggleService.Controllers
                         gameInfo.TimeLimit = joinGameInput.timeLimit;
                         gameInfo.Player1.PlayerToken = joinGameInput.userToken;
                         gameInfo.Player1.NickName = users[joinGameInput.userToken];
-                        games.Add(gameID, gameInfo);
+                        games.Add(gameId, gameInfo);
                         //users[pendingInfo.userToken].currentGameID = pendingInfo.gameID;
                         output.IsPending = true;
-                        output.GameID = gameID;
+                        output.GameID = gameId;
                         return output;
                     }
                     else
                     {
-                        games[gameID].Player2.PlayerToken = joinGameInput.userToken;
-                        games[gameID].Player2.NickName = users[joinGameInput.userToken];
-                        games[gameID].GameState = "active";
+                        games[gameId].Player2.PlayerToken = joinGameInput.userToken;
+                        games[gameId].Player2.NickName = users[joinGameInput.userToken];
+                        games[gameId].GameState = "active";
                         //Averages both players time limits
-                        games[gameID].TimeLimit = (games[gameID].TimeLimit + joinGameInput.timeLimit) / 2;
+                        games[gameId].TimeLimit = (games[gameId].TimeLimit + joinGameInput.timeLimit) / 2;
 
                         output.IsPending = false;
                         output.GameID = pendingInfo.GameID;
@@ -117,7 +117,7 @@ namespace BoggleService.Controllers
         /// cancels a pending game
         /// </summary>
         /// <param name="token"></param>
-        [Route("BoggleService/CancelJoinGame")]
+        [Route("BoggleService/games")]
         public void PutCancelJoin(string token)
         {
             lock (sync)
@@ -139,22 +139,21 @@ namespace BoggleService.Controllers
         /// <summary>
         /// attempts to play a word
         /// </summary>
-        /// <param name="_gameID"></param>
-        /// <param name="token"></param>
-        /// <param name="word"></param>
-        [Route("BoggleService/PlayWord/{_gameID}")]
-        public int PutPlayWord(string _gameID, PlayWordInput play)
+        /// <param name="gameID"></param>
+        /// <param name="play"></param>
+        [Route("BoggleService/games/{gameID}")]
+        public int PutPlayWord(string gameID, PlayWordInput play)
         {
             lock (sync)
             {
                 int score = 0;
 
-                if (play.word == null || play.word == "" || play.word.Trim().Length > 30 || !validToken(play.userToken) || !validID(_gameID))
+                if (play.word == null || play.word == "" || play.word.Trim().Length > 30 || !validToken(play.userToken) || !validID(gameID))
                 {
                     throw new HttpResponseException(HttpStatusCode.Forbidden);
                 }
 
-                GameInfo temp = games[_gameID];
+                GameInfo temp = games[gameID];
 
 
                 if (temp.Player1.PlayerToken != play.userToken && temp.Player2.PlayerToken != play.userToken)
@@ -179,7 +178,7 @@ namespace BoggleService.Controllers
                     {
                         score = temp.MisterBoggle.score(play.word);
                         temp.Player1.WordsPlayed.playerWordsPlayed.Add(play.word, score);
-                        games[_gameID] = temp;
+                        games[gameID] = temp;
                     }
                 }
                 else
@@ -192,7 +191,7 @@ namespace BoggleService.Controllers
                     {
                         score = temp.MisterBoggle.score(play.word);
                         temp.Player2.WordsPlayed.playerWordsPlayed.Add(play.word, score);
-                        games[_gameID] = temp;
+                        games[gameID] = temp;
                     }
                 }
 
@@ -207,16 +206,26 @@ namespace BoggleService.Controllers
         /// If UserToken is already in a pending game, responds with status code Conflict.
         /// Otherwise, attempts to join a pending game, returns the , and responds with status code Ok. 
         /// </summary>
-        /// <param name="joinGameInput">User to be added to users list</param>
+        /// <param name="gameID">User to be added to users list</param>
+        /// <param name="brief">User to be added to users list</param>
         /// <returns>ID number of newly added user</returns>
-        [Route("BoggleService/JoinGame")]
-        public PendingGameInfo GetGameStatus(JoinGameInput joinGameInput)
+        [Route("BoggleService/games/{gameID}/{brief}")]
+        public GameInfo GetGameStatus(string gameID, bool brief)
         {
             lock (sync)
             {
-                if ()
+                //if ()
+                //{
+                //    throw new HttpResponseException(HttpStatusCode.Forbidden);
+                //}
+                GameInfo output = new GameInfo(false);
+                if (brief == true)
                 {
-                    throw new HttpResponseException(HttpStatusCode.Forbidden);
+
+                }
+                else
+                {
+
                 }
             }
         }
@@ -267,7 +276,7 @@ namespace BoggleService.Controllers
         /// <summary>
         /// The initial ID of the first game.  Is incremented by 1 each time a new game is created in the PostJoinGame method.
         /// </summary>
-        private static string gameID = "G";
+        private static string gameId = "G";
 
         private static int gameIDnum = 0;
 
