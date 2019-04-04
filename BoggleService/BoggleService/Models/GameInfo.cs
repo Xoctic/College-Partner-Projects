@@ -54,6 +54,12 @@ namespace BoggleService.Models
         [DataMember(EmitDefaultValue = false)]
         public PlayerInfo Player2;
 
+
+
+
+
+
+
         public GameInfo(BoggleBoard board)
         {
             MisterBoggle = board;
