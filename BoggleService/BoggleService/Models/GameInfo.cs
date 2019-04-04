@@ -54,6 +54,14 @@ namespace BoggleService.Models
         [DataMember(EmitDefaultValue = false)]
         public PlayerInfo Player2;
 
+        public GameInfo(BoggleBoard board)
+        {
+            MisterBoggle = board;
+            Board = board.ToString();
+            Player1 = new PlayerInfo();
+            Player2 = new PlayerInfo();
+        }
+
         /// <summary>
         /// Constructor that sets some of the instance variables based on if the paramter is true.
         /// </summary>
