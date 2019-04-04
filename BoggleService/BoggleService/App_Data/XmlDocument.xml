@@ -565,6 +565,16 @@
             The initial ID of the first game.  Is incremented by 1 each time a new game is created in the PostJoinGame method.
             </summary>
         </member>
+        <member name="F:BoggleService.Controllers.BoggleController.testFlag">
+            <summary>
+            Flag to see if we are currently testing the server
+            </summary>
+        </member>
+        <member name="F:BoggleService.Controllers.BoggleController.testScore">
+            <summary>
+            Integer to see what score we would like to test for
+            </summary>
+        </member>
         <member name="F:BoggleService.Controllers.BoggleController.sync">
             <summary>
             A sync lock used to make sure that at any time only 1 method can be running at a time during multi threading.

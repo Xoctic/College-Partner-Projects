@@ -105,6 +105,8 @@ namespace BoggleService.Controllers
                         temp.Player2 = new PlayerInfo();
                         temp.Player2.PlayerToken = joinGameInput.userToken;
                         temp.Player2.Nickname = users[joinGameInput.userToken];
+                        temp.Player1.WordsPlayed = new PlayerWordsPlayed();
+                        temp.Player2.WordsPlayed = new PlayerWordsPlayed();
                         temp.GameState = "active";
                         //Averages both players time limits
                         temp.TimeLimit = (games[gameId].TimeLimit + joinGameInput.timeLimit) / 2;
