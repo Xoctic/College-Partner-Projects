@@ -168,6 +168,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\BoggleBoard.cs" />
+    <Compile Include="Models\GameTimeUpdater.cs" />
     <Compile Include="Models\JoinGameInput.cs" />
     <Compile Include="Models\GameInfo.cs" />
     <Compile Include="Models\PendingGameInfo.cs" />

@@ -106,6 +106,10 @@ namespace BoggleService.Controllers
                         temp.Player1.WordsPlayed = new PlayerWordsPlayed();
                         temp.Player2.WordsPlayed = new PlayerWordsPlayed();
                         temp.GameState = "active";
+                        temp.startTime = DateTime.Now.Second;
+
+                        
+
                         //Averages both players time limits
                         temp.TimeLimit = (games[gameId].TimeLimit + joinGameInput.timeLimit) / 2;
 
@@ -161,11 +165,11 @@ namespace BoggleService.Controllers
         /// </summary>
         /// <param name="token"></param>
         [Route("BoggleService/games")]
-        public void PutCancelJoin(string token)
+        public void PutCancelJoin([FromBody]string token)
         {
             lock (sync)
             {
-                if (token == null || token.Length != 36)
+                if (!(validToken(token)))
                 {
                     throw new HttpResponseException(HttpStatusCode.Forbidden);
                 }
@@ -261,8 +265,13 @@ namespace BoggleService.Controllers
                 {
                     throw new HttpResponseException(HttpStatusCode.Forbidden);
                 }
+                if(games[gameID].GameState == "active")
+                {
+                   games[gameID].calculateTimeLeft();
+                }
                 GameInfo output = new GameInfo();
                 GameInfo temp = games[gameID];
+
                 if (brief == true)
                 {
                     if(temp.GameState == "pending")
@@ -354,7 +363,7 @@ namespace BoggleService.Controllers
         /// <returns></returns>
         private bool validID(string gID)
         {
-            if(gID == null || !games.ContainsKey(gID))
+            if(gID == null || gID.Trim().Length != 0 || !games.ContainsKey(gID))
             {
                 return false;
             }
@@ -391,6 +400,14 @@ namespace BoggleService.Controllers
         /// </summary>
         private static PendingGameInfo pendingInfo = new PendingGameInfo();
 
+
+        private static int startTime;
+
+        private static int currentTime;
+
+
+
+        private static HashSet<GameTimeUpdater> gameUpdaters = new HashSet<GameTimeUpdater>();
         /// <summary>
         /// The initial ID of the first game.  Is incremented by 1 each time a new game is created in the PostJoinGame method.
         /// </summary>
