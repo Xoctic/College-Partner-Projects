@@ -481,6 +481,11 @@
             </summary>
             <param name="documentPath">The physical path to XML document.</param>
         </member>
+        <member name="T:BoggleService.Controllers.BoggleController">
+            <summary>
+            Server controller that deals with all commands.
+            </summary>
+        </member>
         <member name="M:BoggleService.Controllers.BoggleController.PostRegister(System.String)">
             <summary>
             Registers a new user.
@@ -498,8 +503,8 @@
             If UserToken is already in a pending game, responds with status code Conflict.
             Otherwise, attempts to join a pending game, returns the , and responds with status code Ok. 
             </summary>
-            <param name="joinGameInput">User to be added to users list</param>
-            <returns>ID number of newly added user</returns>
+            <param name="joinGameInput">Input from the client which contains the user token and the time limit.</param>
+            <returns>A pending game info object which contains the game ID and the status of isPending</returns>
         </member>
         <member name="M:BoggleService.Controllers.BoggleController.PutCancelJoin(System.String)">
             <summary>
@@ -507,13 +512,24 @@
             </summary>
             <param name="token"></param>
         </member>
-        <member name="M:BoggleService.Controllers.BoggleController.PutPlayWord(System.Int32,BoggleService.Models.PlayWordInput)">
+        <member name="M:BoggleService.Controllers.BoggleController.PutPlayWord(System.String,BoggleService.Models.PlayWordInput)">
             <summary>
             attempts to play a word
             </summary>
             <param name="gameID"></param>
-            <param name="token"></param>
-            <param name="word"></param>
+            <param name="play"></param>
+        </member>
+        <member name="M:BoggleService.Controllers.BoggleController.GetGameStatus(System.String,System.Boolean)">
+            <summary>
+            Joins a game.
+            If UserToken is null or is not of length 36, responds with status code Forbidden.
+            If Timelimit is less than 5 or greateer than 120, responds with status code Forbidden.
+            If UserToken is already in a pending game, responds with status code Conflict.
+            Otherwise, attempts to join a pending game, returns the , and responds with status code Ok. 
+            </summary>
+            <param name="gameID">User to be added to users list</param>
+            <param name="brief">User to be added to users list</param>
+            <returns>ID number of newly added user</returns>
         </member>
         <member name="M:BoggleService.Controllers.BoggleController.validToken(System.String)">
             <summary>
@@ -522,7 +538,7 @@
             <param name="userToken"></param>
             <returns></returns>
         </member>
-        <member name="M:BoggleService.Controllers.BoggleController.validID(System.Int32)">
+        <member name="M:BoggleService.Controllers.BoggleController.validID(System.String)">
             <summary>
             esures the gameID passed in is a valid gameId
             </summary>
@@ -536,7 +552,22 @@
         </member>
         <member name="F:BoggleService.Controllers.BoggleController.games">
             <summary>
-            A dictionary to store the key gameID which links to its value GameInfo.
+            A dictionary to store the string key gameID which links to its value GameInfo.
+            </summary>
+        </member>
+        <member name="F:BoggleService.Controllers.BoggleController.pendingInfo">
+            <summary>
+            The pending game info for the current pending game.
+            </summary>
+        </member>
+        <member name="F:BoggleService.Controllers.BoggleController.gameId">
+            <summary>
+            The initial ID of the first game.  Is incremented by 1 each time a new game is created in the PostJoinGame method.
+            </summary>
+        </member>
+        <member name="F:BoggleService.Controllers.BoggleController.sync">
+            <summary>
+            A sync lock used to make sure that at any time only 1 method can be running at a time during multi threading.
             </summary>
         </member>
         <member name="T:BoggleService.BoggleBoard">
@@ -611,68 +642,67 @@
             Class to store all of the game information needed for each individual game.
             </summary>
         </member>
-        <member name="P:BoggleService.Models.GameInfo.gameState">
+        <member name="P:BoggleService.Models.GameInfo.GameState">
             <summary>
             Stores the state of the game.
             </summary>
         </member>
-        <member name="F:BoggleService.Models.GameInfo.misterBoggle">
+        <member name="F:BoggleService.Models.GameInfo.MisterBoggle">
             <summary>
             Stores the Boggle Board object of this current game.
             </summary>
         </member>
-        <member name="F:BoggleService.Models.GameInfo.board">
+        <member name="F:BoggleService.Models.GameInfo.Board">
             <summary>
             Stores the string version of the Boggle Board.
             </summary>
         </member>
-        <member name="P:BoggleService.Models.GameInfo.timeLimit">
+        <member name="P:BoggleService.Models.GameInfo.TimeLimit">
             <summary>
             Stores the time limit of this game, which is the average time of both players.
             </summary>
         </member>
-        <member name="P:BoggleService.Models.GameInfo.timeLeft">
+        <member name="P:BoggleService.Models.GameInfo.TimeLeft">
             <summary>
             Stores the time remaining for this current game.
             </summary>
         </member>
-        <member name="F:BoggleService.Models.GameInfo.player1">
+        <member name="F:BoggleService.Models.GameInfo.Player1">
             <summary>
             Stores the player information for player 1.
             </summary>
         </member>
-        <member name="F:BoggleService.Models.GameInfo.player2">
+        <member name="F:BoggleService.Models.GameInfo.Player2">
             <summary>
             Stores the player information for player 2.
             </summary>
         </member>
-        <member name="M:BoggleService.Models.GameInfo.#ctor(System.Boolean)">
+        <member name="M:BoggleService.Models.GameInfo.#ctor">
             <summary>
-            Constructor that sets some of the instance variables based on if the paramter is true.
+            Empty constructor.
             </summary>
-            <param name="setStuff"></param>
         </member>
         <member name="T:BoggleService.Models.PendingGameInfo">
             <summary>
             Class to store the Pending Game Info when a Join Game request executes.
             </summary>
         </member>
-        <member name="P:BoggleService.Models.PendingGameInfo.timeLimit">
+        <member name="P:BoggleService.Models.PendingGameInfo.TimeLimit">
             <summary>
             Stores the time limit being passed into the server.
             </summary>
         </member>
-        <member name="P:BoggleService.Models.PendingGameInfo.gameID">
+        <member name="P:BoggleService.Models.PendingGameInfo.GameID">
             <summary>
             Stores the game ID created when Join Game request is called.
             </summary>
         </member>
-        <member name="P:BoggleService.Models.PendingGameInfo.userToken">
+        <member name="P:BoggleService.Models.PendingGameInfo.UserToken">
             <summary>
             Stores the user ID that is awaiting a game.
             </summary>
         </member>
-        <member name="P:BoggleService.Models.PendingGameInfo.isPending">
+        <member name="P:BoggleService.Models.PendingGameInfo.IsPending">
             <summary>
             Stores whether or not a game is pending.
             </summary>
@@ -682,22 +712,22 @@
             Class to store the information of each player.
             </summary>
         </member>
-        <member name="P:BoggleService.Models.PlayerInfo.playerToken">
+        <member name="P:BoggleService.Models.PlayerInfo.PlayerToken">
             <summary>
             Stores the token of this player.
             </summary>
         </member>
-        <member name="P:BoggleService.Models.PlayerInfo.nickName">
+        <member name="P:BoggleService.Models.PlayerInfo.Nickname">
             <summary>
             Stores the nickName of the player.
             </summary>
         </member>
-        <member name="P:BoggleService.Models.PlayerInfo.score">
+        <member name="P:BoggleService.Models.PlayerInfo.Score">
             <summary>
             Stores the current score of the player.
             </summary>
         </member>
-        <member name="F:BoggleService.Models.PlayerInfo.wordsPlayed">
+        <member name="F:BoggleService.Models.PlayerInfo.WordsPlayed">
             <summary>
             Stores the words played by the player.
             </summary>
@@ -710,6 +740,28 @@
         <member name="F:BoggleService.Models.PlayerWordsPlayed.playerWordsPlayed">
             <summary>
             Stores the word played by the current player.
+            </summary>
+        </member>
+        <member name="T:BoggleService.Models.PlayWordInput">
+            <summary>
+            Class that stores the input Info when a play word request executes.
+            </summary>
+        </member>
+        <member name="M:BoggleService.Models.PlayWordInput.#ctor(System.String,System.String)">
+            <summary>
+            Constructor to set the userToken and word from the input.
+            </summary>
+            <param name="u"></param>
+            <param name="w"></param>
+        </member>
+        <member name="P:BoggleService.Models.PlayWordInput.userToken">
+            <summary>
+            Stores the token of the user.
+            </summary>
+        </member>
+        <member name="P:BoggleService.Models.PlayWordInput.word">
+            <summary>
+            Stores the word of the user.
             </summary>
         </member>
     </members>

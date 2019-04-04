@@ -85,12 +85,13 @@ namespace BoggleService.Controllers
                         pendingInfo.UserToken = joinGameInput.userToken;
                         pendingInfo.IsPending = true;
 
-                        GameInfo gameInfo = new GameInfo(true);
+                        GameInfo gameInfo = new GameInfo();
                         gameInfo.GameState = "pending";
                         gameInfo.TimeLimit = joinGameInput.timeLimit;
+                        gameInfo.Player1 = new PlayerInfo();
                         gameInfo.Player1.PlayerToken = joinGameInput.userToken;
-                        gameInfo.Player1.NickName = users[joinGameInput.userToken];
-                        games.Add(gameID, gameInfo);
+                        gameInfo.Player1.Nickname = users[joinGameInput.userToken];
+                        games.Add(gameId, gameInfo);
                         
                         output.IsPending = true;
                         output.GameID = gameId;
@@ -98,11 +99,17 @@ namespace BoggleService.Controllers
                     }
                     else
                     {
-                        games[gameId].Player2.PlayerToken = joinGameInput.userToken;
-                        games[gameId].Player2.NickName = users[joinGameInput.userToken];
-                        games[gameId].GameState = "active";
+                        GameInfo temp = games[gameId];
+                        temp.MisterBoggle = new BoggleBoard();
+                        temp.Board = temp.MisterBoggle.ToString();
+                        temp.Player2 = new PlayerInfo();
+                        temp.Player2.PlayerToken = joinGameInput.userToken;
+                        temp.Player2.Nickname = users[joinGameInput.userToken];
+                        temp.GameState = "active";
                         //Averages both players time limits
-                        games[gameId].TimeLimit = (games[gameId].TimeLimit + joinGameInput.timeLimit) / 2;
+                        temp.TimeLimit = (games[gameId].TimeLimit + joinGameInput.timeLimit) / 2;
+
+                        games[gameId] = temp;
 
                         output.IsPending = false;
                         output.GameID = pendingInfo.GameID;
@@ -214,19 +221,79 @@ namespace BoggleService.Controllers
         {
             lock (sync)
             {
-                //if ()
-                //{
-                //    throw new HttpResponseException(HttpStatusCode.Forbidden);
-                //}
-                GameInfo output = new GameInfo(false);
+                if (!validID(gameID))
+                {
+                    throw new HttpResponseException(HttpStatusCode.Forbidden);
+                }
+                GameInfo output = new GameInfo();
+                GameInfo temp = games[gameID];
                 if (brief == true)
                 {
-
+                    if(temp.GameState == "pending")
+                    {
+                        output.GameState = "pending";
+                        return output;
+                    }
+                    if(temp.GameState == "active")
+                    {
+                        output.GameState = "active";
+                        output.TimeLeft = temp.TimeLeft;
+                        output.Player1 = new PlayerInfo();
+                        output.Player1.Score = temp.Player1.Score;
+                        output.Player2 = new PlayerInfo();
+                        output.Player2.Score = temp.Player2.Score;
+                        return output;
+                    }
+                    if(temp.GameState == "completed")
+                    {
+                        output.GameState = "completed";
+                        output.Player1 = new PlayerInfo();
+                        output.Player1.Score = temp.Player1.Score;
+                        output.Player2 = new PlayerInfo();
+                        output.Player2.Score = temp.Player2.Score;
+                        return output;
+                    }
                 }
                 else
                 {
+                    if (temp.GameState == "pending")
+                    {
+                        output.GameState = "pending";
+                        return output;
+                    }
+                    if(temp.GameState == "active")
+                    {
+                        output.GameState = "active";
+                        output.Board = temp.Board;
+                        output.TimeLimit = temp.TimeLimit;
+                        output.TimeLeft = temp.TimeLeft;
+                        output.Player1 = new PlayerInfo();
+                        output.Player1.Nickname = temp.Player1.Nickname;
+                        output.Player1.Score = temp.Player1.Score;
+                        output.Player2 = new PlayerInfo();
+                        output.Player2.Nickname = temp.Player2.Nickname;
+                        output.Player2.Score = temp.Player2.Score;
+                        return output;
+                    }
+                    if(temp.GameState == "completed")
+                    {
+                        output.GameState = "completed";
+                        output.Board = temp.Board;
+                        output.TimeLimit = temp.TimeLimit;
+                        output.Player1 = new PlayerInfo();
+                        output.Player1.Nickname = temp.Player1.Nickname;
+                        output.Player1.Score = temp.Player1.Score;
+                        output.Player1.WordsPlayed = temp.Player1.WordsPlayed;
+                        output.Player2 = new PlayerInfo();
+                        output.Player2.Nickname = temp.Player2.Nickname;
+                        output.Player2.Score = temp.Player2.Score;
+                        output.Player2.WordsPlayed = temp.Player2.WordsPlayed;
 
+                        return output;
+                    }
                 }
+                //We should never to this line of code.
+                return output;
             }
         }
 

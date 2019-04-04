@@ -22,7 +22,7 @@ namespace BoggleService.Models
         /// Stores the nickName of the player.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public string NickName { get; set; }
+        public string Nickname { get; set; }
 
         /// <summary>
         /// Stores the current score of the player.

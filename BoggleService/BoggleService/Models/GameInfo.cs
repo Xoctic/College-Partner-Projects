@@ -63,18 +63,11 @@ namespace BoggleService.Models
         }
 
         /// <summary>
-        /// Constructor that sets some of the instance variables based on if the paramter is true.
+        /// Empty constructor.
         /// </summary>
-        /// <param name="setObjects"></param>
-        public GameInfo(bool setObjects)
+        public GameInfo()
         {
-            if(setObjects == true)
-            {
-                MisterBoggle = new BoggleBoard();
-                Board = MisterBoggle.ToString();
-                Player1 = new PlayerInfo();
-                Player2 = new PlayerInfo();
-            }
+            
         }
     }
 }
