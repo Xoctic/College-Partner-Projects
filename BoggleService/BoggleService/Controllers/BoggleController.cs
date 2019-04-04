@@ -363,7 +363,7 @@ namespace BoggleService.Controllers
         /// <returns></returns>
         private bool validID(string gID)
         {
-            if(gID == null || gID.Trim().Length != 0 || !games.ContainsKey(gID))
+            if(gID == null || gID.Trim().Length == 0 || !games.ContainsKey(gID))
             {
                 return false;
             }
