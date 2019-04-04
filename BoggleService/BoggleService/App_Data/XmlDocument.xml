@@ -625,6 +625,11 @@
             squares marked as visited.
             </summary>
         </member>
+        <member name="T:BoggleService.Models.GameTimeUpdater">
+            <summary>
+            Updates the TimeLeft variable of each in
+            </summary>
+        </member>
         <member name="T:BoggleService.Models.JoinGameInput">
             <summary>
             Class to store the Game Info when a Join Game request executes.

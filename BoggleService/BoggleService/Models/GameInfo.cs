@@ -55,8 +55,17 @@ namespace BoggleService.Models
         public PlayerInfo Player2;
 
 
+        [DataMember(EmitDefaultValue = false)]
+        public int startTime;
 
+       // public int currentTime;
 
+        
+        public void calculateTimeLeft()
+        {
+            TimeLeft = TimeLimit - (DateTime.Now.Second - startTime);
+
+        }
 
 
 
