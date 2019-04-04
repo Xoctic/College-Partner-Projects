@@ -69,6 +69,7 @@ namespace BoggleService.Controllers
                 {
                     throw new HttpResponseException(HttpStatusCode.Conflict);
                 }
+               
                 else
                 {
                     PendingGameInfo output = new PendingGameInfo();
@@ -111,7 +112,7 @@ namespace BoggleService.Controllers
             {
                 throw new HttpResponseException(HttpStatusCode.Forbidden);
             }
-
+            
             pendingInfo = new PendingGameInfo();
 
 
