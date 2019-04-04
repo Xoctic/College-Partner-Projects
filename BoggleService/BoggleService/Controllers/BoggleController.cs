@@ -1,9 +1,7 @@
 ﻿using BoggleService.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading;
 using System.Web.Http;
 
@@ -361,15 +359,20 @@ namespace BoggleService.Controllers
             return true;
         }
 
-        public void Istesting(bool b)
-        {
-            testFlag = b;
-        }
+        //public void Istesting(bool b)
+        //{
+        //    testFlag = b;
+        //}
 
-        public void setTestScore(int i)
-        {
-            testScore = i;
-        }
+        //public void setTestScore(int i)
+        //{
+        //    testScore = i;
+        //}
+
+        //public string getGameID()
+        //{
+        //    return gameId;
+        //}
 
         /// <summary>
         /// A dictionary to store the key User Token which links to its value Nickname.
@@ -396,12 +399,12 @@ namespace BoggleService.Controllers
         /// <summary>
         /// Flag to see if we are currently testing the server
         /// </summary>
-        private bool testFlag = false;
+        public bool testFlag = false;
 
         /// <summary>
         /// Integer to see what score we would like to test for
         /// </summary>
-        private int testScore = 0;
+        public int testScore = 0;
 
 
         /// <summary>

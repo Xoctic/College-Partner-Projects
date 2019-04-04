@@ -155,12 +155,26 @@ namespace BoggleServiceLocalTests
         public void PlayWordTest()
         {
             BoggleController controller = new BoggleController();
-            JoinGameInput joinGame = new JoinGameInput(10, controller.PostRegister("Billy"));
+            controller.testFlag = true;
+            controller.testScore = 11;
+            JoinGameInput joinGame;
+            string player1 = controller.PostRegister("Billy");
+            string player2 = controller.PostRegister("Mr. Bean");
+
+
+            joinGame = new JoinGameInput(10, player1);
             controller.PostJoinGame(joinGame);
-            joinGame.userToken = controller.PostRegister("Mr.Bean");
+            joinGame.userToken = player2;
             controller.PostJoinGame(joinGame);
 
-            BoggleBoard board = new BoggleBoard("MANIEETLDSPEIRED");
+            PlayWordInput input = new PlayWordInput(player1, "ABANDONMENTS");
+
+            int score = controller.PutPlayWord("G1", input);
+
+            Assert.IsTrue(score == 11);
+            
+
+
 
            // string gId = controller.getGameId();
 
