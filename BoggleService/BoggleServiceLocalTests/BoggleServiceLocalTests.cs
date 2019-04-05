@@ -118,6 +118,21 @@ namespace BoggleServiceLocalTests
             }
         }
 
+        [TestMethod]
+        public void PostJoinGameTest3()
+        {
+            BoggleController controller = new BoggleController();
+            JoinGameInput joinGame = new JoinGameInput(10, controller.PostRegister("Billy"));
+
+            controller.PostJoinGame(joinGame);
+
+            joinGame.userToken = controller.PostRegister("Dog");
+
+            controller.PostJoinGame(joinGame);
+
+            
+        }
+
         /// <summary>
         /// Tests when usertoken passed in is invalid (null or not 36 characters long)
         /// </summary>
