@@ -63,7 +63,8 @@ namespace BoggleService.Models
         
         public void calculateTimeLeft()
         {
-            TimeLeft = TimeLimit - (DateTime.Now.Second - startTime);
+            TimeLeft = TimeLimit - (((DateTime.Now.Minute * 60) + DateTime.Now.Second) - startTime);
+
         }
 
         /// <summary>

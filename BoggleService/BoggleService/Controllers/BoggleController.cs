@@ -108,7 +108,7 @@ namespace BoggleService.Controllers
                         temp.Player1.WordsPlayed = new List<PlayedWord>();
                         temp.Player2.WordsPlayed = new List<PlayedWord>();
                         temp.GameState = "active";
-                        temp.startTime = DateTime.Now.Second;
+                        temp.startTime = (DateTime.Now.Minute * 60) + DateTime.Now.Second;
 
                         
 
