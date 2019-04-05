@@ -168,12 +168,11 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\BoggleBoard.cs" />
-    <Compile Include="Models\GameTimeUpdater.cs" />
     <Compile Include="Models\JoinGameInput.cs" />
     <Compile Include="Models\GameInfo.cs" />
     <Compile Include="Models\PendingGameInfo.cs" />
     <Compile Include="Models\PlayerInfo.cs" />
-    <Compile Include="Models\PlayerWordsPlayed.cs" />
+    <Compile Include="Models\PlayedWord.cs" />
     <Compile Include="Models\PlayWordInput.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -103,8 +103,8 @@ namespace BoggleService.Controllers
                         temp.Player2 = new PlayerInfo();
                         temp.Player2.PlayerToken = joinGameInput.userToken;
                         temp.Player2.Nickname = users[joinGameInput.userToken];
-                        temp.Player1.WordsPlayed = new PlayerWordsPlayed();
-                        temp.Player2.WordsPlayed = new PlayerWordsPlayed();
+                        temp.Player1.WordsPlayed = new List<PlayedWord>();
+                        temp.Player2.WordsPlayed = new List<PlayedWord>();
                         temp.GameState = "active";
                         temp.startTime = DateTime.Now.Second;
 
@@ -213,11 +213,11 @@ namespace BoggleService.Controllers
                 }
 
                 play.word = play.word.Trim();
-
+                PlayedWord playedWord = new PlayedWord(play.word);
 
                 if (temp.Player1.PlayerToken == play.userToken)
                 {
-                    if (temp.Player1.WordsPlayed.playerWordsPlayed.ContainsKey(play.word))
+                    if (temp.Player1.WordsPlayed.Contains(play.word))
                     {
                         score = 0;
                     }
@@ -267,7 +267,11 @@ namespace BoggleService.Controllers
                 }
                 if(games[gameID].GameState == "active")
                 {
-                   games[gameID].calculateTimeLeft();
+                    games[gameID].calculateTimeLeft();
+                    if(games[gameID].TimeLeft <= 0)
+                    {
+                        games[gameID].GameState = "completed";
+                    }
                 }
                 GameInfo output = new GameInfo();
                 GameInfo temp = games[gameID];
@@ -400,19 +404,14 @@ namespace BoggleService.Controllers
         /// </summary>
         private static PendingGameInfo pendingInfo = new PendingGameInfo();
 
-
-        private static int startTime;
-
-        private static int currentTime;
-
-
-
-        private static HashSet<GameTimeUpdater> gameUpdaters = new HashSet<GameTimeUpdater>();
         /// <summary>
-        /// The initial ID of the first game.  Is incremented by 1 each time a new game is created in the PostJoinGame method.
+        /// The initial ID of the first game.
         /// </summary>
         private static string gameId = "G";
 
+        /// <summary>
+        /// Game ID counter, which is incremented each time a new game is created.
+        /// </summary>
         private static int gameIDnum = 0;
 
         /// <summary>
@@ -424,7 +423,6 @@ namespace BoggleService.Controllers
         /// Integer to see what score we would like to test for
         /// </summary>
         public int testScore = 0;
-
 
         /// <summary>
         /// A sync lock used to make sure that at any time only 1 method can be running at a time during multi threading.
