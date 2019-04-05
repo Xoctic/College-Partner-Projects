@@ -312,6 +312,22 @@ namespace BoggleServiceLocalTests
             Assert.IsTrue(score == 0);
         }
 
+
+        [TestMethod]
+        public void gameStatusTest()
+        {
+            BoggleController controller = new BoggleController();
+            JoinGameInput joinGame;
+            GameInfo info;
+            string player1 = controller.PostRegister("Billy");
+            string player2 = controller.PostRegister("Mr. Bean");
+
+            joinGame = new JoinGameInput(10, player1);
+            info = controller.GetGameStatus("G1", true);
+
+            Assert.IsTrue(info.GameState == "pending");
+        }
+
         
 
 
