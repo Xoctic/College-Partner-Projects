@@ -703,6 +703,21 @@
             Empty constructor.
             </summary>
         </member>
+        <member name="T:BoggleService.Models.JoinGameOutput">
+            <summary>
+            Class specifically designed to be set only for return value of PostJoinGame 
+            </summary>
+        </member>
+        <member name="P:BoggleService.Models.JoinGameOutput.GameID">
+            <summary>
+            Stores the game ID created when Join Game request is called.
+            </summary>
+        </member>
+        <member name="P:BoggleService.Models.JoinGameOutput.IsPending">
+            <summary>
+            Stores whether or not a game is pending.
+            </summary>
+        </member>
         <member name="T:BoggleService.Models.PendingGameInfo">
             <summary>
             Class to store the Pending Game Info when a Join Game request executes.
