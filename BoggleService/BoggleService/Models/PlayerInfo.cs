@@ -31,9 +31,9 @@ namespace BoggleService.Models
         public int Score { get; set; }
 
         /// <summary>
-        /// Stores the words played by the player.
+        /// List that stores each word that is played by the player.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public PlayerWordsPlayed WordsPlayed;
+        public List<PlayedWord> WordsPlayed;
     }
 }
