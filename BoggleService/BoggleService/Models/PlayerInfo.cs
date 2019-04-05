@@ -35,8 +35,5 @@ namespace BoggleService.Models
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
         public List<PlayedWord> WordsPlayed;
-
-        [DataMember(EmitDefaultValue = false)]
-        public Dictionary<string, int> wordsPlayedDictionary;
     }
 }

@@ -53,7 +53,7 @@ namespace BoggleService.Controllers
         /// <param name="joinGameInput">Input from the client which contains the user token and the time limit.</param>
         /// <returns>A pending game info object which contains the game ID and the status of isPending</returns>
         [Route("BoggleService/games")]
-        public PendingGameInfo PostJoinGame(JoinGameInput joinGameInput)
+        public JoinGameOutput PostJoinGame(JoinGameInput joinGameInput)
         {
             lock (sync)
             {
@@ -73,7 +73,7 @@ namespace BoggleService.Controllers
                
                 else
                 {
-                    PendingGameInfo output = new PendingGameInfo();
+                    JoinGameOutput output = new JoinGameOutput();
                     if(pendingInfo.IsPending == false)
                     {
                         gameIDnum++;
@@ -151,7 +151,6 @@ namespace BoggleService.Controllers
                                 break;
                             }
                         }
-                        
 
                         output.IsPending = false;
                         output.GameID = pendingInfo.GameID;

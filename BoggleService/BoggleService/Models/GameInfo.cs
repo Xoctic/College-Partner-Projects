@@ -64,11 +64,12 @@ namespace BoggleService.Models
         public void calculateTimeLeft()
         {
             TimeLeft = TimeLimit - (DateTime.Now.Second - startTime);
-
         }
 
-
-
+        /// <summary>
+        /// User for Testing purposes only.
+        /// </summary>
+        /// <param name="board"></param>
         public GameInfo(BoggleBoard board)
         {
             MisterBoggle = board;

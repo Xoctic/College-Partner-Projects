@@ -692,6 +692,12 @@
             Stores the player information for player 2.
             </summary>
         </member>
+        <member name="M:BoggleService.Models.GameInfo.#ctor(BoggleService.BoggleBoard)">
+            <summary>
+            User for Testing purposes only.
+            </summary>
+            <param name="board"></param>
+        </member>
         <member name="M:BoggleService.Models.GameInfo.#ctor">
             <summary>
             Empty constructor.

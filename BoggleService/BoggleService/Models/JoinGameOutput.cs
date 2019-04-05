@@ -1,30 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Web;
 
 namespace BoggleService.Models
 {
     /// <summary>
-    /// Class to store the Pending Game Info when a Join Game request executes.
+    /// Class specifically designed to be set only for return value of PostJoinGame 
     /// </summary>
-    public class PendingGameInfo
+    public class JoinGameOutput
     {
-        /// <summary>
-        /// Stores the time limit being passed into the server.
-        /// </summary>
-        public int TimeLimit { get; set; }
-
         /// <summary>
         /// Stores the game ID created when Join Game request is called.
         /// </summary>
         public string GameID { get; set; }
-
-        /// <summary>
-        /// Stores the user ID that is awaiting a game.
-        /// </summary>
-        public string UserToken { get; set; }
 
         /// <summary>
         /// Stores whether or not a game is pending.
