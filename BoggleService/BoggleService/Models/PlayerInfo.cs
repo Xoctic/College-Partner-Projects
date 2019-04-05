@@ -27,7 +27,7 @@ namespace BoggleService.Models
         /// <summary>
         /// Stores the current score of the player.
         /// </summary>
-        [DataMember(EmitDefaultValue = false)]
+        [DataMember(EmitDefaultValue = true)]
         public int Score { get; set; }
 
         /// <summary>

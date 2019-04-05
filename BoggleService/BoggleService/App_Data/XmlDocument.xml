@@ -570,16 +570,6 @@
             Game ID counter, which is incremented each time a new game is created.
             </summary>
         </member>
-        <member name="F:BoggleService.Controllers.BoggleController.testFlag">
-            <summary>
-            Flag to see if we are currently testing the server
-            </summary>
-        </member>
-        <member name="F:BoggleService.Controllers.BoggleController.testScore">
-            <summary>
-            Integer to see what score we would like to test for
-            </summary>
-        </member>
         <member name="F:BoggleService.Controllers.BoggleController.sync">
             <summary>
             A sync lock used to make sure that at any time only 1 method can be running at a time during multi threading.
@@ -701,21 +691,6 @@
         <member name="M:BoggleService.Models.GameInfo.#ctor">
             <summary>
             Empty constructor.
-            </summary>
-        </member>
-        <member name="T:BoggleService.Models.JoinGameOutput">
-            <summary>
-            Class specifically designed to be set only for return value of PostJoinGame 
-            </summary>
-        </member>
-        <member name="P:BoggleService.Models.JoinGameOutput.GameID">
-            <summary>
-            Stores the game ID created when Join Game request is called.
-            </summary>
-        </member>
-        <member name="P:BoggleService.Models.JoinGameOutput.IsPending">
-            <summary>
-            Stores whether or not a game is pending.
             </summary>
         </member>
         <member name="T:BoggleService.Models.PendingGameInfo">
