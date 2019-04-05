@@ -231,8 +231,9 @@ namespace BoggleService.Controllers
                         score = temp.MisterBoggle.score(play.word);
                         playedWord.Score = score;
                         temp.Player1.WordsPlayed.Add(playedWord);
-                        games[gameID] = temp;
                     }
+                    temp.Player1.Score += score;
+                    games[gameID] = temp;
                 }
                 else
                 {
@@ -248,8 +249,9 @@ namespace BoggleService.Controllers
                         score = temp.MisterBoggle.score(play.word);
                         playedWord.Score = score;
                         temp.Player2.WordsPlayed.Add(playedWord);
-                        games[gameID] = temp;
                     }
+                    temp.Player2.Score += score;
+                    games[gameID] = temp;
                 }
 
                 return score;
