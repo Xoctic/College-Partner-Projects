@@ -2,6 +2,7 @@
 
 using System;
 using System.IO;
+using BoggleService.Models;
 
 namespace BoggleService
 {
@@ -230,7 +231,7 @@ namespace BoggleService
             //check in the dictionary if the word is in the dictionary
 
             //Use its Copy to Output Directory property to Copy if Newer.  Access it from your code with the pathname
-            StreamReader s = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + "dictionary.txt");
+            StreamReader s = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + "\\dictionary.txt");
             string line = s.ReadLine();
             bool inDictionary = false;
 

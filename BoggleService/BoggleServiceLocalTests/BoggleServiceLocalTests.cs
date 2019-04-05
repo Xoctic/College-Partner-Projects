@@ -323,6 +323,7 @@ namespace BoggleServiceLocalTests
             string player2 = controller.PostRegister("Mr. Bean");
 
             joinGame = new JoinGameInput(10, player1);
+            controller.PostJoinGame(joinGame);
             info = controller.GetGameStatus("G1", true);
 
             Assert.IsTrue(info.GameState == "pending");
