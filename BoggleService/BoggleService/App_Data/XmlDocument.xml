@@ -562,7 +562,12 @@
         </member>
         <member name="F:BoggleService.Controllers.BoggleController.gameId">
             <summary>
-            The initial ID of the first game.  Is incremented by 1 each time a new game is created in the PostJoinGame method.
+            The initial ID of the first game.
+            </summary>
+        </member>
+        <member name="F:BoggleService.Controllers.BoggleController.gameIDnum">
+            <summary>
+            Game ID counter, which is incremented each time a new game is created.
             </summary>
         </member>
         <member name="F:BoggleService.Controllers.BoggleController.testFlag">
@@ -623,11 +628,6 @@
             Reports whether the provided word can be formed by tracking through
             this Boggle board by beginning at location [i,j] and avoiding any
             squares marked as visited.
-            </summary>
-        </member>
-        <member name="T:BoggleService.Models.GameTimeUpdater">
-            <summary>
-            Updates the TimeLeft variable of each in
             </summary>
         </member>
         <member name="T:BoggleService.Models.JoinGameInput">
@@ -744,18 +744,29 @@
         </member>
         <member name="F:BoggleService.Models.PlayerInfo.WordsPlayed">
             <summary>
-            Stores the words played by the player.
+            List that stores each word that is played by the player.
             </summary>
         </member>
-        <member name="T:BoggleService.Models.PlayerWordsPlayed">
+        <member name="T:BoggleService.Models.PlayedWord">
             <summary>
-            Class to store the words played by the current player.
+            Class to store each word played by a player
             </summary>
         </member>
-        <member name="F:BoggleService.Models.PlayerWordsPlayed.playerWordsPlayed">
+        <member name="F:BoggleService.Models.PlayedWord.Word">
             <summary>
-            Stores the word played by the current player.
+            Stores the word played.
             </summary>
+        </member>
+        <member name="F:BoggleService.Models.PlayedWord.Score">
+            <summary>
+            Stores the score for the word played.
+            </summary>
+        </member>
+        <member name="M:BoggleService.Models.PlayedWord.#ctor(System.String)">
+            <summary>
+            Constructor to set the Word.
+            </summary>
+            <param name="_Word"></param>
         </member>
         <member name="T:BoggleService.Models.PlayWordInput">
             <summary>

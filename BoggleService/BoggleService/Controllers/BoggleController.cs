@@ -103,6 +103,8 @@ namespace BoggleService.Controllers
                         temp.Player2 = new PlayerInfo();
                         temp.Player2.PlayerToken = joinGameInput.userToken;
                         temp.Player2.Nickname = users[joinGameInput.userToken];
+                        //temp.Player1.wordsPlayedDictionary = new Dictionary<string, int>();
+                        //temp.Player2.wordsPlayedDictionary = new Dictionary<string, int>();
                         temp.Player1.WordsPlayed = new List<PlayedWord>();
                         temp.Player2.WordsPlayed = new List<PlayedWord>();
                         temp.GameState = "active";
@@ -217,27 +219,36 @@ namespace BoggleService.Controllers
 
                 if (temp.Player1.PlayerToken == play.userToken)
                 {
-                    if (temp.Player1.WordsPlayed.Contains(play.word))
+                    int index = temp.Player1.WordsPlayed.FindIndex(f => f.Word == play.word);
+
+                    if (index >= 0)
                     {
+                        playedWord.Score = 0;
                         score = 0;
+                        temp.Player1.WordsPlayed.Add(playedWord);
                     }
                     else
                     {
                         score = temp.MisterBoggle.score(play.word);
-                        temp.Player1.WordsPlayed.playerWordsPlayed.Add(play.word, score);
+                        playedWord.Score = score;
+                        temp.Player1.WordsPlayed.Add(playedWord);
                         games[gameID] = temp;
                     }
                 }
                 else
                 {
-                    if (temp.Player2.WordsPlayed.playerWordsPlayed.ContainsKey(play.word))
+                    int index = temp.Player2.WordsPlayed.FindIndex(f => f.Word == play.word);
+                    if (index >= 0)
                     {
+                        playedWord.Score = 0;
                         score = 0;
+                        temp.Player2.WordsPlayed.Add(playedWord);
                     }
                     else
                     {
                         score = temp.MisterBoggle.score(play.word);
-                        temp.Player2.WordsPlayed.playerWordsPlayed.Add(play.word, score);
+                        playedWord.Score = score;
+                        temp.Player2.WordsPlayed.Add(playedWord);
                         games[gameID] = temp;
                     }
                 }
