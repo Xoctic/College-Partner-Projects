@@ -54,37 +54,19 @@ namespace BoggleService.Models
         [DataMember(EmitDefaultValue = false)]
         public PlayerInfo Player2;
 
-
+        /// <summary>
+        /// Stores the time of day once the game starts.
+        /// </summary>
         [DataMember(EmitDefaultValue = false)]
         public int startTime;
-
-       // public int currentTime;
-
         
+        /// <summary>
+        /// Helper method to calculate the TimeLeft based on the time of day.
+        /// </summary>
         public void calculateTimeLeft()
         {
             TimeLeft = TimeLimit - (((DateTime.Now.Minute * 60) + DateTime.Now.Second) - startTime);
 
-        }
-
-        /// <summary>
-        /// User for Testing purposes only.
-        /// </summary>
-        /// <param name="board"></param>
-        public GameInfo(BoggleBoard board)
-        {
-            MisterBoggle = board;
-            Board = board.ToString();
-            Player1 = new PlayerInfo();
-            Player2 = new PlayerInfo();
-        }
-
-        /// <summary>
-        /// Empty constructor.
-        /// </summary>
-        public GameInfo()
-        {
-            
         }
     }
 }

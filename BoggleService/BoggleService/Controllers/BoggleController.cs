@@ -8,18 +8,17 @@ using System.Web.Http;
 namespace BoggleService.Controllers
 {
     /// <summary>
-    /// Server controller that deals with all commands.
+    /// Server controller that deals with a multitude of commands.
     /// </summary>
     public class BoggleController : ApiController
     {
-
         /// <summary>
-        /// Registers a new user.
+        /// Registers a new user with a provided string Nickname.
         /// If user is null or is empty after trimming, responds with status code Forbidden.
         /// Otherwise, creates a user, returns the user's token, and responds with status code Ok. 
         /// </summary>
-        /// <param name="user">User to be added to users list</param>
-        /// <returns>ID number of newly added user</returns>
+        /// <param name="user">String sser nickname to be added to users</param>
+        /// <returns>A unique string user token of the newly added user</returns>
         [Route("BoggleService/users")]
         public string PostRegister([FromBody]string user)
         {
@@ -44,14 +43,14 @@ namespace BoggleService.Controllers
         }
 
         /// <summary>
-        /// Joins a game.
-        /// If UserToken is null or is not of length 36, responds with status code Forbidden.
-        /// If Timelimit is less than 5 or greateer than 120, responds with status code Forbidden.
-        /// If UserToken is already in a pending game, responds with status code Conflict.
-        /// Otherwise, attempts to join a pending game, returns the , and responds with status code Ok. 
+        /// Attempts to join a game, depending on if a game is pending or not.
+        /// If UserToken is null, not of length 36, or not a token in users, responds with status code Forbidden.
+        /// If Timelimit is less than 5 or greater than 120, responds with status code Forbidden.
+        /// If UserToken is already in a pending game,  responds with status code Conflict.
+        /// Otherwise, attempts to join a pending game, returns the gameID and game pending, and responds with status code Ok. 
         /// </summary>
-        /// <param name="joinGameInput">Input from the client which contains the user token and the time limit.</param>
-        /// <returns>A pending game info object which contains the game ID and the status of isPending</returns>
+        /// <param name="joinGameInput">Input object from the client which contains the user token and the time limit</param>
+        /// <returns>A pending game info object which contains the game ID and a pending game status</returns>
         [Route("BoggleService/games")]
         public PendingGameInfo PostJoinGame(JoinGameInput joinGameInput)
         {
@@ -109,47 +108,8 @@ namespace BoggleService.Controllers
                         temp.GameState = "active";
                         temp.startTime = (DateTime.Now.Minute * 60) + DateTime.Now.Second;
 
-                        
-
                         //Averages both players time limits
                         temp.TimeLimit = (games[gameId].TimeLimit + joinGameInput.timeLimit) / 2;
-
-                        //used only for testing purposes only
-                        //if (testFlag)
-                        //{
-                        //    switch (testScore)
-                        //    {
-                        //        case 11:
-                        //        //For 11 points ABANDONMENTS
-                        //        games[gameId].MisterBoggle = new BoggleBoard("ABANSVPDTORONEMN");
-                        //        break;
-
-                        //        case 5:
-                        //        //For 5 Points PENNAME
-                        //        games[gameId].MisterBoggle = new BoggleBoard("PENNLMNAOPQMRSTE");
-                        //        break;
-
-                        //        case 3:
-                        //        //For 3 Points PENNAE
-                        //        games[gameId].MisterBoggle = new BoggleBoard("PENNQRSATUVEWXYV");
-                        //        break;
-
-                        //        case 2:
-                        //        //For 2 Points PENNA
-                        //        games[gameId].MisterBoggle = new BoggleBoard("PENNABCADEFGHIJK");
-                        //        break;
-
-                        //        case 1:
-                        //        //For 1 Points PENS
-                        //        games[gameId].MisterBoggle = new BoggleBoard("PENSABCDEFGHIJKL");
-                        //        break;
-
-                        //        case 0:
-                        //        //For 0 Points A
-                        //        games[gameId].MisterBoggle = new BoggleBoard("ANBCDEFGHIJKLMNO");
-                        //        break;
-                        //    }
-                        //}
 
                         pendingInfo.IsPending = false;
                         output.IsPending = false;
@@ -161,9 +121,11 @@ namespace BoggleService.Controllers
         }
 
         /// <summary>
-        /// cancels a pending game
+        /// Attempts to cancel a pending game.
+        /// If UserToken is null, not of length 36, or not a token in users, responds with status code Forbidden.
+        /// Otherwise, remoes user token from the pending game and responds witht status code 204(NoContent).
         /// </summary>
-        /// <param name="token"></param>
+        /// <param name="token">String user token</param>
         [Route("BoggleService/games")]
         public void PutCancelJoin([FromBody]string token)
         {
@@ -184,10 +146,16 @@ namespace BoggleService.Controllers
         }
 
         /// <summary>
-        /// attempts to play a word
+        /// Plays a word and returns its score depending if it is valid or not.
+        /// If UserToken is null, not of length 36, or not a token in users, responds with status code Forbidden.
+        /// If GameID is null, or not found in games, responds with status code Forbidden.
+        /// If the string word input is null or empty, responds with status code Forbidden.
+        /// If game stats is anything other than "active", responds with status code Conflict.
+        /// Otherwise, attempts to join a pending game, returns the , and responds with status code Ok.
         /// </summary>
-        /// <param name="gameID"></param>
-        /// <param name="play"></param>
+        /// <param name="gameID">Input string of a game ID</param>
+        /// <param name="play">Input object which contains the user token and the word played</param>
+        /// /// <returns>Score of string word input</returns>
         [Route("BoggleService/games/{gameID}")]
         public int PutPlayWord(string gameID, PlayWordInput play)
         {
@@ -254,15 +222,13 @@ namespace BoggleService.Controllers
         }
 
         /// <summary>
-        /// Joins a game.
-        /// If UserToken is null or is not of length 36, responds with status code Forbidden.
-        /// If Timelimit is less than 5 or greateer than 120, responds with status code Forbidden.
-        /// If UserToken is already in a pending game, responds with status code Conflict.
-        /// Otherwise, attempts to join a pending game, returns the , and responds with status code Ok. 
+        /// Attempts to join a game, depending on if a game is pending or not.
+        /// Otherwise, returns information about the game name by gameID.
+        /// Note that the information returned depends on whether brief is true or false. Responds with status code Ok. 
         /// </summary>
-        /// <param name="gameID">User to be added to users list</param>
-        /// <param name="brief">User to be added to users list</param>
-        /// <returns>ID number of newly added user</returns>
+        /// <param name="gameID">Input string of a game ID</param>
+        /// <param name="brief">Input boolean ,true for minimal information, false for maximum information</param>
+        /// <returns>A GameInfo object which contains information depending on brief</returns>
         [Route("BoggleService/games/{gameID}/{brief}")]
         public GameInfo GetGameStatus(string gameID, bool brief)
         {
@@ -381,21 +347,6 @@ namespace BoggleService.Controllers
             return true;
         }
 
-        //public void Istesting(bool b)
-        //{
-        //    testFlag = b;
-        //}
-
-        //public void setTestScore(int i)
-        //{
-        //    testScore = i;
-        //}
-
-        //public string getGameID()
-        //{
-        //    return gameId;
-        //}
-
         /// <summary>
         /// A dictionary to store the key User Token which links to its value Nickname.
         /// </summary>
@@ -420,16 +371,6 @@ namespace BoggleService.Controllers
         /// Game ID counter, which is incremented each time a new game is created.
         /// </summary>
         private static int gameIDnum = 0;
-
-        /// <summary>
-        /// Flag to see if we are currently testing the server
-        /// </summary>
-        //public bool testFlag = false;
-
-        /// <summary>
-        /// Integer to see what score we would like to test for
-        /// </summary>
-        //public int testScore = 0;
 
         /// <summary>
         /// A sync lock used to make sure that at any time only 1 method can be running at a time during multi threading.

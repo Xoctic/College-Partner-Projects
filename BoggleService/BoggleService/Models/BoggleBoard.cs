@@ -226,9 +226,13 @@ namespace BoggleService
             return false;
         }
 
+        /// <summary>
+        /// Score method tha calculates the score for a word depending on its length.
+        /// </summary>
+        /// <param name="word"></param>
+        /// <returns></returns>
         public int score(string word)
         {
-
             //Ensures the the word being compared to dictionary.txt is always capitalized
             word = word.ToUpper();
             //Use its Copy to Output Directory property to Copy if Newer.  Access it from your code with the pathname
@@ -249,10 +253,7 @@ namespace BoggleService
             if(!inDictionary)
             {
                 return -1;
-            }
-            
-
-          
+            }        
 
             if (!CanBeFormed(word))
             {
@@ -285,7 +286,6 @@ namespace BoggleService
                         }
                         break;
                 }
-
                 //We should never reach this line
                 return 0;
             }

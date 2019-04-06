@@ -5,13 +5,6 @@ using System.Dynamic;
 using static System.Net.HttpStatusCode;
 using static System.Net.Http.HttpMethod;
 using System.Diagnostics;
-using System;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Dynamic;
-using static System.Net.HttpStatusCode;
-using static System.Net.Http.HttpMethod;
-using System.Diagnostics;
 using BoggleService.Models;
 
 namespace BoggleTests
@@ -35,8 +28,6 @@ namespace BoggleTests
 
         // Command line arguments to IIS_EXPRESS
         private const string ARGUMENTS = @"/site:""BoggleService"" /apppool:""Clr4IntegratedAppPool"" /config:""..\..\..\.vs\config\applicationhost.config""";
-
-        
 
         /// <summary>
         /// Starts IIS
@@ -88,7 +79,6 @@ namespace BoggleTests
         }
 
         //private RestClient client = new RestClient("http://localhost:60000/BoggleService/");
-
 
         //Tests register user with an emppty string as the name
         [TestMethod]
@@ -241,10 +231,7 @@ namespace BoggleTests
             input = new PlayWordInput("clerenge", "Hi");
             r3 = client.DoMethodAsync("PUT", "games/G1", input).Result;
 
-            Assert.AreEqual(Forbidden, r3.Status);
-
-
-            
+            Assert.AreEqual(Forbidden, r3.Status);          
         }
 
         //Tests all response codes within the gameStatus method
@@ -266,15 +253,7 @@ namespace BoggleTests
             r3 = client.DoMethodAsync("GET", "games/G1/true").Result;
 
             Assert.AreEqual(OK, r3.Status);
-
         }
-
-
-    }
-
-
-
-   
-
+    } 
 }
 
