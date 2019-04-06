@@ -499,7 +499,7 @@
             <summary>
             Attempts to join a game, depending on if a game is pending or not.
             If UserToken is null, not of length 36, or not a token in users, responds with status code Forbidden.
-            If Timelimit is less than 5 or greateer than 120, responds with status code Forbidden.
+            If Timelimit is less than 5 or greater than 120, responds with status code Forbidden.
             If UserToken is already in a pending game,  responds with status code Conflict.
             Otherwise, attempts to join a pending game, returns the gameID and game pending, and responds with status code Ok. 
             </summary>

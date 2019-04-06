@@ -76,7 +76,8 @@ namespace BoggleService.Controllers
                     if(pendingInfo.IsPending == false)
                     {
                         gameIDnum++;
-                        gameId += gameIDnum;
+                        string letterG = "G";
+                        gameId = letterG + gameIDnum;
                         pendingInfo = new PendingGameInfo();
                         pendingInfo.GameID = gameId;
                         pendingInfo.TimeLimit = joinGameInput.timeLimit;
