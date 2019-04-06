@@ -166,166 +166,166 @@ namespace BoggleServiceLocalTests
 
         }
 
-        [TestMethod]
-        public void PlayWordTest1()
-        {
-            BoggleController controller = new BoggleController();
-            controller.testFlag = true;
-            controller.testScore = 11;
-            JoinGameInput joinGame;
-            string player1 = controller.PostRegister("Billy");
-            string player2 = controller.PostRegister("Mr. Bean");
+        //[TestMethod]
+        //public void PlayWordTest1()
+        //{
+        //    BoggleController controller = new BoggleController();
+        //    controller.testFlag = true;
+        //    controller.testScore = 11;
+        //    JoinGameInput joinGame;
+        //    string player1 = controller.PostRegister("Billy");
+        //    string player2 = controller.PostRegister("Mr. Bean");
 
 
-            joinGame = new JoinGameInput(10, player1);
-            controller.PostJoinGame(joinGame);
-            joinGame.userToken = player2;
-            controller.PostJoinGame(joinGame);
+        //    joinGame = new JoinGameInput(10, player1);
+        //    controller.PostJoinGame(joinGame);
+        //    joinGame.userToken = player2;
+        //    controller.PostJoinGame(joinGame);
 
-            PlayWordInput input = new PlayWordInput(player1, "ABANDONMENTS");
+        //    PlayWordInput input = new PlayWordInput(player1, "ABANDONMENTS");
 
-            int score = controller.PutPlayWord("G1", input);
+        //    int score = controller.PutPlayWord("G1", input);
 
-            Assert.IsTrue(score == 11);
+        //    Assert.IsTrue(score == 11);
 
 
             
 
 
 
-           // string gId = controller.getGameId();
+        //   // string gId = controller.getGameId();
 
             
 
 
 
-        }
+        //}
 
 
-        [TestMethod]
-        public void PlayWordTest2()
-        {
-            BoggleController controller = new BoggleController();
-            controller.testFlag = true;
-            controller.testScore = 5;
-            JoinGameInput joinGame;
-            string player1 = controller.PostRegister("Billy");
-            string player2 = controller.PostRegister("Mr. Bean");
+        //[TestMethod]
+        //public void PlayWordTest2()
+        //{
+        //    BoggleController controller = new BoggleController();
+        //    controller.testFlag = true;
+        //    controller.testScore = 5;
+        //    JoinGameInput joinGame;
+        //    string player1 = controller.PostRegister("Billy");
+        //    string player2 = controller.PostRegister("Mr. Bean");
 
 
-            joinGame = new JoinGameInput(10, player1);
-            controller.PostJoinGame(joinGame);
-            joinGame.userToken = player2;
-            controller.PostJoinGame(joinGame);
+        //    joinGame = new JoinGameInput(10, player1);
+        //    controller.PostJoinGame(joinGame);
+        //    joinGame.userToken = player2;
+        //    controller.PostJoinGame(joinGame);
 
-            PlayWordInput input = new PlayWordInput(player1, "PENNAME");
+        //    PlayWordInput input = new PlayWordInput(player1, "PENNAME");
 
-            int score = controller.PutPlayWord("G1", input);
+        //    int score = controller.PutPlayWord("G1", input);
 
-            Assert.IsTrue(score == 5);
-        }
-
-
-
-        [TestMethod]
-        public void PlayWordTest3()
-        {
-            BoggleController controller = new BoggleController();
-            controller.testFlag = true;
-            controller.testScore = 3;
-            JoinGameInput joinGame;
-            string player1 = controller.PostRegister("Billy");
-            string player2 = controller.PostRegister("Mr. Bean");
+        //    Assert.IsTrue(score == 5);
+        //}
 
 
-            joinGame = new JoinGameInput(10, player1);
-            controller.PostJoinGame(joinGame);
-            joinGame.userToken = player2;
-            controller.PostJoinGame(joinGame);
 
-            PlayWordInput input = new PlayWordInput(player1, "PENNAE");
-
-            int score = controller.PutPlayWord("G1", input);
-
-            Assert.IsTrue(score == 3);
-        }
-
-
-        [TestMethod]
-        public void PlayWordTest4()
-        {
-            BoggleController controller = new BoggleController();
-            controller.testFlag = true;
-            controller.testScore = 2;
-            JoinGameInput joinGame;
-            string player1 = controller.PostRegister("Billy");
-            string player2 = controller.PostRegister("Mr. Bean");
+        //[TestMethod]
+        //public void PlayWordTest3()
+        //{
+        //    BoggleController controller = new BoggleController();
+        //    controller.testFlag = true;
+        //    controller.testScore = 3;
+        //    JoinGameInput joinGame;
+        //    string player1 = controller.PostRegister("Billy");
+        //    string player2 = controller.PostRegister("Mr. Bean");
 
 
-            joinGame = new JoinGameInput(10, player1);
-            controller.PostJoinGame(joinGame);
-            joinGame.userToken = player2;
-            controller.PostJoinGame(joinGame);
+        //    joinGame = new JoinGameInput(10, player1);
+        //    controller.PostJoinGame(joinGame);
+        //    joinGame.userToken = player2;
+        //    controller.PostJoinGame(joinGame);
 
-            PlayWordInput input = new PlayWordInput(player1, "PENNA");
+        //    PlayWordInput input = new PlayWordInput(player1, "PENNAE");
 
-            int score = controller.PutPlayWord("G1", input);
+        //    int score = controller.PutPlayWord("G1", input);
 
-            Assert.IsTrue(score == 2);
-        }
-
-
-        [TestMethod]
-        public void  PlayWordTest5()
-        {
-            BoggleController controller = new BoggleController();
-            controller.testFlag = true;
-            controller.testScore = 1;
-            JoinGameInput joinGame;
-            string player1 = controller.PostRegister("Billy");
-            string player2 = controller.PostRegister("Mr. Bean");
+        //    Assert.IsTrue(score == 3);
+        //}
 
 
-            joinGame = new JoinGameInput(10, player1);
-            controller.PostJoinGame(joinGame);
-            joinGame.userToken = player2;
-            controller.PostJoinGame(joinGame);
-
-            PlayWordInput input = new PlayWordInput(player1, "PENS");
-
-            int score = controller.PutPlayWord("G1", input);
-
-            Assert.IsTrue(score == 1);
-
-            score = controller.PutPlayWord("G1", input);
-
-            Assert.IsTrue(score == 0);
-
-        }
+        //[TestMethod]
+        //public void PlayWordTest4()
+        //{
+        //    BoggleController controller = new BoggleController();
+        //    controller.testFlag = true;
+        //    controller.testScore = 2;
+        //    JoinGameInput joinGame;
+        //    string player1 = controller.PostRegister("Billy");
+        //    string player2 = controller.PostRegister("Mr. Bean");
 
 
-        [TestMethod]
-        public void PlayWordTest6()
-        {
-            BoggleController controller = new BoggleController();
-            controller.testFlag = true;
-            controller.testScore = 0;
-            JoinGameInput joinGame;
-            string player1 = controller.PostRegister("Billy");
-            string player2 = controller.PostRegister("Mr. Bean");
+        //    joinGame = new JoinGameInput(10, player1);
+        //    controller.PostJoinGame(joinGame);
+        //    joinGame.userToken = player2;
+        //    controller.PostJoinGame(joinGame);
+
+        //    PlayWordInput input = new PlayWordInput(player1, "PENNA");
+
+        //    int score = controller.PutPlayWord("G1", input);
+
+        //    Assert.IsTrue(score == 2);
+        //}
 
 
-            joinGame = new JoinGameInput(10, player1);
-            controller.PostJoinGame(joinGame);
-            joinGame.userToken = player2;
-            controller.PostJoinGame(joinGame);
+        //[TestMethod]
+        //public void  PlayWordTest5()
+        //{
+        //    BoggleController controller = new BoggleController();
+        //    controller.testFlag = true;
+        //    controller.testScore = 1;
+        //    JoinGameInput joinGame;
+        //    string player1 = controller.PostRegister("Billy");
+        //    string player2 = controller.PostRegister("Mr. Bean");
 
-            PlayWordInput input = new PlayWordInput(player1, "A");
 
-            int score = controller.PutPlayWord("G1", input);
+        //    joinGame = new JoinGameInput(10, player1);
+        //    controller.PostJoinGame(joinGame);
+        //    joinGame.userToken = player2;
+        //    controller.PostJoinGame(joinGame);
 
-            Assert.IsTrue(score == 0);
-        }
+        //    PlayWordInput input = new PlayWordInput(player1, "PENS");
+
+        //    int score = controller.PutPlayWord("G1", input);
+
+        //    Assert.IsTrue(score == 1);
+
+        //    score = controller.PutPlayWord("G1", input);
+
+        //    Assert.IsTrue(score == 0);
+
+        //}
+
+
+        //[TestMethod]
+        //public void PlayWordTest6()
+        //{
+        //    BoggleController controller = new BoggleController();
+        //    controller.testFlag = true;
+        //    controller.testScore = 0;
+        //    JoinGameInput joinGame;
+        //    string player1 = controller.PostRegister("Billy");
+        //    string player2 = controller.PostRegister("Mr. Bean");
+
+
+        //    joinGame = new JoinGameInput(10, player1);
+        //    controller.PostJoinGame(joinGame);
+        //    joinGame.userToken = player2;
+        //    controller.PostJoinGame(joinGame);
+
+        //    PlayWordInput input = new PlayWordInput(player1, "A");
+
+        //    int score = controller.PutPlayWord("G1", input);
+
+        //    Assert.IsTrue(score == 0);
+        //}
 
 
         [TestMethod]
@@ -343,6 +343,8 @@ namespace BoggleServiceLocalTests
 
             Assert.IsTrue(info.GameState == "pending");
         }
+
+
 
         
 

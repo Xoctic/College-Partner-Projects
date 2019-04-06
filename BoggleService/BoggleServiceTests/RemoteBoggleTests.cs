@@ -87,14 +87,14 @@ namespace BoggleTests
             IISAgent.Stop();
         }
 
-        private RestClient client = new RestClient("http://localhost:60000/BoggleService/");
+        //private RestClient client = new RestClient("http://localhost:60000/BoggleService/");
 
 
         //Tests register user with an emppty string as the name
         [TestMethod]
         public void TestMethod1()
         {
-            
+            RestClient client = new RestClient("http://localhost:60000/BoggleService/");
             string user = "";
             Response r = client.DoMethodAsync("POST", "users", user).Result;
             Assert.AreEqual(Forbidden, r.Status);
@@ -104,6 +104,7 @@ namespace BoggleTests
         [TestMethod]
         public void TestMethod2()
         {
+            RestClient client = new RestClient("http://localhost:60000/BoggleService/");
             string user = null;
             Response r = client.DoMethodAsync("POST", "users", user).Result;
             Assert.AreEqual(Forbidden, r.Status);
@@ -113,6 +114,7 @@ namespace BoggleTests
         [TestMethod]
         public void TestMethod3()
         {
+            RestClient client = new RestClient("http://localhost:60000/BoggleService/");
             string user = "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllll";
             Response r = client.DoMethodAsync("POST", "users", user).Result;
             Assert.AreEqual(Forbidden, r.Status);
@@ -122,14 +124,17 @@ namespace BoggleTests
         [TestMethod]
         public void TestMethod4()
         {
+            RestClient client = new RestClient("http://localhost:60000/BoggleService/");
             string user = "Aric";
             Response r = client.DoMethodAsync("POST", "users", user).Result;
             Assert.AreEqual(OK, r.Status);
         }
 
+        //Tests all conflicts involved with the join game method
         [TestMethod]
         public void TestMethod5()
         {
+            RestClient client = new RestClient("http://localhost:60000/BoggleService/");
             string user1 = "Aric";
             string user2 = "Andrew";
             Response r1 = client.DoMethodAsync("POST", "users", user1).Result;
@@ -168,11 +173,108 @@ namespace BoggleTests
                 Assert.AreEqual(Conflict, r3.Status);
             }
 
+            r3 = client.DoMethodAsync("POST", "games", goodJoinGame2).Result;
+            Assert.AreEqual(OK, r3.Status);
+        }
 
+        //Tests all conflicts involved with cancelJoinGame method
+        [TestMethod]
+        public void TestMethod6()
+        {
+            RestClient client = new RestClient("http://localhost:60000/BoggleService/");
+            string user1 = "Aric";
+            Response r1 = client.DoMethodAsync("POST", "users", user1).Result;
+            Assert.AreEqual(OK, r1.Status);
+            string user1Token = r1.Data;
+            JoinGameInput goodJoinGame1 = new JoinGameInput(50, r1.Data);
+
+
+            r1 = client.DoMethodAsync("POST", "games", goodJoinGame1).Result;
+            Assert.AreEqual(OK, r1.Status);
+
+            r1 = client.DoMethodAsync("PUT", "games", user1Token).Result;
+            Assert.AreEqual(NoContent, r1.Status);
+
+            r1 = client.DoMethodAsync("PUT", "games", "whoyoucallinpinheadlarrypatrickstar???").Result;
+            Assert.AreEqual(Forbidden, r1.Status);
+        }
+
+        //Tests all response codes for method put play word
+        [TestMethod]
+        public void TestMethod7()
+        {
+            RestClient client = new RestClient("http://localhost:60000/BoggleService/");
+            string user1 = "Aric";
+            string user2 = "Andrew";
+            Response r1 = client.DoMethodAsync("POST", "users", user1).Result;
+            Response r2 = client.DoMethodAsync("POST", "users", user2).Result;
+            Assert.AreEqual(OK, r1.Status);
+            Assert.AreEqual(OK, r2.Status);
+
+            string user1Token = r1.Data;
+            string user2Token = r2.Data;
+
+            JoinGameInput goodJoinGame1 = new JoinGameInput(50, r1.Data);
+            JoinGameInput goodJoinGame2 = new JoinGameInput(100, r2.Data);
+
+            Response r3 = client.DoMethodAsync("POST", "games", goodJoinGame1).Result;
+            Assert.AreEqual(OK, r3.Status);
+
+            r3 = client.DoMethodAsync("POST", "games", goodJoinGame2).Result;
+            Assert.AreEqual(OK, r3.Status);
+
+            PlayWordInput input = new PlayWordInput(user1Token, null);
+            r3 = client.DoMethodAsync("PUT", "games/G1", input).Result;
+
+            Assert.AreEqual(Forbidden, r3.Status);
+
+            input = new PlayWordInput(user1Token, "lllllllllllllllllllllllllllllllllll");
+            r3 = client.DoMethodAsync("PUT", "games/G1", input).Result;
+
+            Assert.AreEqual(Forbidden, r3.Status);
+
+            input = new PlayWordInput(user1Token, "Hi");
+            r3 = client.DoMethodAsync("PUT", "games/GG3", input).Result;
+
+            Assert.AreEqual(Forbidden, r3.Status);
+
+            input = new PlayWordInput("clerenge", "Hi");
+            r3 = client.DoMethodAsync("PUT", "games/G1", input).Result;
+
+            Assert.AreEqual(Forbidden, r3.Status);
+
+
+            
+        }
+
+        //Tests all response codes within the gameStatus method
+        [TestMethod]
+        public void TestMethod8()
+        {
+            RestClient client = new RestClient("http://localhost:60000/BoggleService/");
+            string user1 = "Aric";
+            string user2 = "Andrew";
+            Response r1 = client.DoMethodAsync("POST", "users", user1).Result;
+            Response r2 = client.DoMethodAsync("POST", "users", user2).Result;
+            Assert.AreEqual(OK, r1.Status);
+            Assert.AreEqual(OK, r2.Status);
+
+            Response r3 = client.DoMethodAsync("GET", "games/G11/true").Result;
+
+            Assert.AreEqual(Forbidden, r3.Status);
+
+            r3 = client.DoMethodAsync("GET", "games/G1/true").Result;
+
+            Assert.AreEqual(OK, r3.Status);
 
         }
 
 
     }
+
+
+
+   
+
 }
 
