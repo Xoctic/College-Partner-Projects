@@ -170,7 +170,6 @@
     <Compile Include="Models\BoggleBoard.cs" />
     <Compile Include="Models\JoinGameInput.cs" />
     <Compile Include="Models\GameInfo.cs" />
-    <Compile Include="Models\JoinGameOutput.cs" />
     <Compile Include="Models\PendingGameInfo.cs" />
     <Compile Include="Models\PlayerInfo.cs" />
     <Compile Include="Models\PlayedWord.cs" />

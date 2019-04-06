@@ -53,7 +53,7 @@ namespace BoggleService.Controllers
         /// <param name="joinGameInput">Input from the client which contains the user token and the time limit.</param>
         /// <returns>A pending game info object which contains the game ID and the status of isPending</returns>
         [Route("BoggleService/games")]
-        public JoinGameOutput PostJoinGame(JoinGameInput joinGameInput)
+        public PendingGameInfo PostJoinGame(JoinGameInput joinGameInput)
         {
             lock (sync)
             {
@@ -73,11 +73,12 @@ namespace BoggleService.Controllers
                
                 else
                 {
-                    JoinGameOutput output = new JoinGameOutput();
+                    PendingGameInfo output = new PendingGameInfo();
                     if(pendingInfo.IsPending == false)
                     {
                         gameIDnum++;
                         gameId += gameIDnum;
+                        pendingInfo = new PendingGameInfo();
                         pendingInfo.GameID = gameId;
                         pendingInfo.TimeLimit = joinGameInput.timeLimit;
                         pendingInfo.UserToken = joinGameInput.userToken;
@@ -103,8 +104,6 @@ namespace BoggleService.Controllers
                         temp.Player2 = new PlayerInfo();
                         temp.Player2.PlayerToken = joinGameInput.userToken;
                         temp.Player2.Nickname = users[joinGameInput.userToken];
-                        //temp.Player1.wordsPlayedDictionary = new Dictionary<string, int>();
-                        //temp.Player2.wordsPlayedDictionary = new Dictionary<string, int>();
                         temp.Player1.WordsPlayed = new List<PlayedWord>();
                         temp.Player2.WordsPlayed = new List<PlayedWord>();
                         temp.GameState = "active";
@@ -116,45 +115,45 @@ namespace BoggleService.Controllers
                         temp.TimeLimit = (games[gameId].TimeLimit + joinGameInput.timeLimit) / 2;
 
                         //used only for testing purposes only
-                        if (testFlag)
-                        {
-                            switch (testScore)
-                            {
-                                case 11:
-                                //For 11 points ABANDONMENTS
-                                games[gameId].MisterBoggle = new BoggleBoard("ABANSVPDTORONEMN");
-                                break;
+                        //if (testFlag)
+                        //{
+                        //    switch (testScore)
+                        //    {
+                        //        case 11:
+                        //        //For 11 points ABANDONMENTS
+                        //        games[gameId].MisterBoggle = new BoggleBoard("ABANSVPDTORONEMN");
+                        //        break;
 
-                                case 5:
-                                //For 5 Points PENNAME
-                                games[gameId].MisterBoggle = new BoggleBoard("PENNLMNAOPQMRSTE");
-                                break;
+                        //        case 5:
+                        //        //For 5 Points PENNAME
+                        //        games[gameId].MisterBoggle = new BoggleBoard("PENNLMNAOPQMRSTE");
+                        //        break;
 
-                                case 3:
-                                //For 3 Points PENNAE
-                                games[gameId].MisterBoggle = new BoggleBoard("PENNQRSATUVEWXYV");
-                                break;
+                        //        case 3:
+                        //        //For 3 Points PENNAE
+                        //        games[gameId].MisterBoggle = new BoggleBoard("PENNQRSATUVEWXYV");
+                        //        break;
 
-                                case 2:
-                                //For 2 Points PENNA
-                                games[gameId].MisterBoggle = new BoggleBoard("PENNABCADEFGHIJK");
-                                break;
+                        //        case 2:
+                        //        //For 2 Points PENNA
+                        //        games[gameId].MisterBoggle = new BoggleBoard("PENNABCADEFGHIJK");
+                        //        break;
 
-                                case 1:
-                                //For 1 Points PENS
-                                games[gameId].MisterBoggle = new BoggleBoard("PENSABCDEFGHIJKL");
-                                break;
+                        //        case 1:
+                        //        //For 1 Points PENS
+                        //        games[gameId].MisterBoggle = new BoggleBoard("PENSABCDEFGHIJKL");
+                        //        break;
 
-                                case 0:
-                                //For 0 Points A
-                                games[gameId].MisterBoggle = new BoggleBoard("ANBCDEFGHIJKLMNO");
-                                break;
-                            }
-                        }
+                        //        case 0:
+                        //        //For 0 Points A
+                        //        games[gameId].MisterBoggle = new BoggleBoard("ANBCDEFGHIJKLMNO");
+                        //        break;
+                        //    }
+                        //}
 
+                        pendingInfo.IsPending = false;
                         output.IsPending = false;
                         output.GameID = pendingInfo.GameID;
-                        pendingInfo = new PendingGameInfo();
                         return output;
                     }
                 }
@@ -203,19 +202,16 @@ namespace BoggleService.Controllers
 
                 GameInfo temp = games[gameID];
 
-
                 if (temp.Player1.PlayerToken != play.userToken && temp.Player2.PlayerToken != play.userToken)
                 {
                     throw new HttpResponseException(HttpStatusCode.Forbidden);
                 }
-                if (temp.GameState != "active")
+                if (temp.GameState == "completed" || temp.GameState == "pending" )
                 {
                     throw new HttpResponseException(HttpStatusCode.Conflict);
                 }
-
                 play.word = play.word.Trim();
                 PlayedWord playedWord = new PlayedWord(play.word);
-
                 if (temp.Player1.PlayerToken == play.userToken)
                 {
                     int index = temp.Player1.WordsPlayed.FindIndex(f => f.Word == play.word);
@@ -253,7 +249,6 @@ namespace BoggleService.Controllers
                     temp.Player2.Score += score;
                     games[gameID] = temp;
                 }
-
                 return score;
             } 
         }
@@ -429,12 +424,12 @@ namespace BoggleService.Controllers
         /// <summary>
         /// Flag to see if we are currently testing the server
         /// </summary>
-        public bool testFlag = false;
+        //public bool testFlag = false;
 
         /// <summary>
         /// Integer to see what score we would like to test for
         /// </summary>
-        public int testScore = 0;
+        //public int testScore = 0;
 
         /// <summary>
         /// A sync lock used to make sure that at any time only 1 method can be running at a time during multi threading.

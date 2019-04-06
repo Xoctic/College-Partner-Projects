@@ -228,8 +228,9 @@ namespace BoggleService
 
         public int score(string word)
         {
-            //check in the dictionary if the word is in the dictionary
 
+            //Ensures the the word being compared to dictionary.txt is always capitalized
+            word = word.ToUpper();
             //Use its Copy to Output Directory property to Copy if Newer.  Access it from your code with the pathname
             StreamReader s = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + "//dictionary.txt");
             string line = s.ReadLine();
@@ -241,6 +242,7 @@ namespace BoggleService
                 {
                     inDictionary = true;
                 }
+
                 line = s.ReadLine();
             }
 
@@ -284,7 +286,8 @@ namespace BoggleService
                         break;
                 }
 
-                return -2;
+                //We should never reach this line
+                return 0;
             }
 
         }
