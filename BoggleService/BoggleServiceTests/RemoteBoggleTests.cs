@@ -5,6 +5,14 @@ using System.Dynamic;
 using static System.Net.HttpStatusCode;
 using static System.Net.Http.HttpMethod;
 using System.Diagnostics;
+using System;
+using System.Text;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Dynamic;
+using static System.Net.HttpStatusCode;
+using static System.Net.Http.HttpMethod;
+using System.Diagnostics;
+using BoggleService.Models;
 
 namespace BoggleTests
 {
@@ -27,7 +35,9 @@ namespace BoggleTests
 
         // Command line arguments to IIS_EXPRESS
         private const string ARGUMENTS = @"/site:""BoggleService"" /apppool:""Clr4IntegratedAppPool"" /config:""..\..\..\.vs\config\applicationhost.config""";
-       
+
+        
+
         /// <summary>
         /// Starts IIS
         /// </summary>
@@ -77,7 +87,90 @@ namespace BoggleTests
             IISAgent.Stop();
         }
 
+        private RestClient client = new RestClient("http://localhost:60000/BoggleService/");
 
+
+        //Tests register user with an emppty string as the name
+        [TestMethod]
+        public void TestMethod1()
+        {
+            
+            string user = "";
+            Response r = client.DoMethodAsync("POST", "users", user).Result;
+            Assert.AreEqual(Forbidden, r.Status);
+        }
+
+        //Tests register user with a null string as the name
+        [TestMethod]
+        public void TestMethod2()
+        {
+            string user = null;
+            Response r = client.DoMethodAsync("POST", "users", user).Result;
+            Assert.AreEqual(Forbidden, r.Status);
+        }
+
+        //Tests register user with a larger than 50 character string as the name
+        [TestMethod]
+        public void TestMethod3()
+        {
+            string user = "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllll";
+            Response r = client.DoMethodAsync("POST", "users", user).Result;
+            Assert.AreEqual(Forbidden, r.Status);
+        }
+
+        //Tests register user with a valid string as the name
+        [TestMethod]
+        public void TestMethod4()
+        {
+            string user = "Aric";
+            Response r = client.DoMethodAsync("POST", "users", user).Result;
+            Assert.AreEqual(OK, r.Status);
+        }
+
+        [TestMethod]
+        public void TestMethod5()
+        {
+            string user1 = "Aric";
+            string user2 = "Andrew";
+            Response r1 = client.DoMethodAsync("POST", "users", user1).Result;
+            Response r2 = client.DoMethodAsync("POST", "users", user2).Result;
+            Assert.AreEqual(OK, r1.Status);
+            Assert.AreEqual(OK, r2.Status);
+
+            JoinGameInput badJoinGame1 = new JoinGameInput(1, r1.Data);
+            JoinGameInput badJoinGame2 = new JoinGameInput(150, r2.Data);
+            JoinGameInput badJoinGame3 = new JoinGameInput(100, "poop");
+
+
+            JoinGameInput goodJoinGame1 = new JoinGameInput(50, r1.Data);
+            JoinGameInput goodJoinGame2 = new JoinGameInput(100, r2.Data);
+            
+
+            Response r3 = client.DoMethodAsync("POST", "games", badJoinGame1).Result;
+            Assert.AreEqual(Forbidden, r3.Status);
+
+            r3 = client.DoMethodAsync("POST", "games", badJoinGame2).Result;
+            Assert.AreEqual(Forbidden, r3.Status);
+
+            r3 = client.DoMethodAsync("POST", "games", badJoinGame3).Result;
+            Assert.AreEqual(Forbidden, r3.Status);
+
+
+            r3 = client.DoMethodAsync("POST", "games", goodJoinGame1).Result;
+            Assert.AreEqual(OK, r3.Status);
+
+            try
+            {
+                r3 = client.DoMethodAsync("POST", "games", goodJoinGame1).Result;
+            }
+            catch
+            {
+                Assert.AreEqual(Conflict, r3.Status);
+            }
+
+
+
+        }
 
 
     }

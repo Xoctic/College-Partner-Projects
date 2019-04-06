@@ -30,7 +30,7 @@ namespace BoggleService.Controllers
             }
             lock (sync)
             {
-                if (user == null || user.Trim().Length == 0)
+                if (user == null || user.Trim().Length == 0 || user.Trim().Length > 50)
                 {
                     throw new HttpResponseException(HttpStatusCode.Forbidden);
                 }
