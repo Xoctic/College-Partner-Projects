@@ -112,9 +112,10 @@ namespace BoggleService.Controllers
                         //Averages both players time limits
                         temp.TimeLimit = (games[gameId].TimeLimit + joinGameInput.timeLimit) / 2;
 
-                        pendingInfo.IsPending = false;
+                        //pendingInfo.IsPending = false;
                         output.IsPending = false;
                         output.GameID = pendingInfo.GameID;
+                        pendingInfo = new PendingGameInfo();
                         return output;
                     }
                 }
@@ -168,14 +169,14 @@ namespace BoggleService.Controllers
                 {
                     throw new HttpResponseException(HttpStatusCode.Forbidden);
                 }
-
+                games[gameID].calculateTimeLeft();
                 GameInfo temp = games[gameID];
 
                 if (temp.Player1.PlayerToken != play.userToken && temp.Player2.PlayerToken != play.userToken)
                 {
                     throw new HttpResponseException(HttpStatusCode.Forbidden);
                 }
-                if (temp.GameState == "completed" || temp.GameState == "pending" )
+                if (temp.GameState == "completed" || temp.GameState == "pending" || temp.TimeLeft <= 0)
                 {
                     throw new HttpResponseException(HttpStatusCode.Conflict);
                 }

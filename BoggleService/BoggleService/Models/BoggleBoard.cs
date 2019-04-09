@@ -250,12 +250,12 @@ namespace BoggleService
                 line = s.ReadLine();
             }
 
-            if(!inDictionary)
+            if(!inDictionary && word.Length >= 3)
             {
                 return -1;
             }        
 
-            if (!CanBeFormed(word))
+            if (!CanBeFormed(word) && word.Length >= 3)
             {
                 return -1;
             }
