@@ -1,6 +1,7 @@
 ﻿using BoggleService.Models;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Net;
 using System.Threading;
 using System.Web.Http;
@@ -12,6 +13,34 @@ namespace BoggleService.Controllers
     /// </summary>
     public class BoggleController : ApiController
     {
+        //Connection string to the database
+        private static string DB;
+
+
+        
+        static BoggleController()
+        {
+            // Saves the connection string for the database.  A connection string contains the
+            // information necessary to connect with the database server.  When you create a
+            // DB, there is generally a way to obtain the connection string.  From the Server
+            // Explorer pane, obtain the properties of DB to see the connection string.
+
+            // The connection string of my BoggleDB.mdf shows as
+            //
+            //    Data Source = Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename="C:\Users\Aric Campbell\Source\Repos\u1188031\BoggleService\BoggleDB\App_Data\BoggleDB.mdf";Integrated Security=True
+            //
+            // Unfortunately, this is absolute pathname on my computer, which means that it
+            // won't work if the solution is moved.  Fortunately, it can be shorted to
+            //
+            //    Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\ BoggleDB.mdf;Integrated Security=True
+            //
+            // You should shorten yours this way as well.
+            //
+            // Rather than build the connection string into the program, I store it in the Web.config
+            // file where it can be easily found and changed.  You should do that too.
+            DB = ConfigurationManager.ConnectionStrings["BoggleDB"].ConnectionString;
+        }
+
 
         /// <summary>
         /// Registers a new user.
