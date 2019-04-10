@@ -1,10 +1,8 @@
 ﻿// Written by Joe Zachary for CS 3500, November 2012.
 
 using System;
-using System.IO;
-using BoggleService.Models;
 
-namespace BoggleService
+namespace Boggle
 {
     /// <summary>
     /// Represents a Boggle board.
@@ -17,22 +15,22 @@ namespace BoggleService
         // The 16 cubes that make up a standard Boggle Board
         private string[] cubes =
             {
-                "RIFOBX",
-                "IFEHEY",
-                "DENOWS",
-                "UTOKND",
-                "HMSRAO",
-                "LUPETS",
-                "ACITOA",
-                "YLGKUE",
-                "QBMJOA",
-                "EHISPN",
-                "VETIGN",
-                "BALIYT",
-                "EZAVND",
-                "RALESC",
-                "UWILRG",
-                "PACEMD"
+                "LRYTTE",
+                "ANAEEG",
+                "AFPKFS",
+                "YLDEVR",
+                "VTHRWE",
+                "IDSYTT",
+                "XLDERI",
+                "ZNRNHL",
+                "EGHWNE",
+                "OATTOW",
+                "HCPOAS",
+                "OBBAOJ",
+                "SEOTIS",
+                "MTOICU",
+                "ENSIEU",
+                "NMIQHU"
             };
 
         /// <summary>
@@ -157,6 +155,7 @@ namespace BoggleService
             return false;
         }
 
+
         /// <summary>
         /// Reports whether the provided word can be formed by tracking through
         /// this Boggle board by beginning at location [i,j] and avoiding any
@@ -224,72 +223,6 @@ namespace BoggleService
             // We failed.  Unmark this square and return false.
             visited[i, j] = false;
             return false;
-        }
-
-        /// <summary>
-        /// Score method tha calculates the score for a word depending on its length.
-        /// </summary>
-        /// <param name="word"></param>
-        /// <returns></returns>
-        public int score(string word)
-        {
-            //Ensures the the word being compared to dictionary.txt is always capitalized
-            word = word.ToUpper();
-            //Use its Copy to Output Directory property to Copy if Newer.  Access it from your code with the pathname
-            StreamReader s = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + "//dictionary.txt");
-            string line = s.ReadLine();
-            bool inDictionary = false;
-
-            while(line != null)
-            {
-                if (line == word)
-                {
-                    inDictionary = true;
-                }
-
-                line = s.ReadLine();
-            }
-
-            if(!inDictionary && word.Length >= 3)
-            {
-                return -1;
-            }        
-
-            if (!CanBeFormed(word) && word.Length >= 3)
-            {
-                return -1;
-            }
-            else
-            {
-                switch (word.Length)
-                {
-                    case 0:
-                        return -1;
-                    case 1:
-                        return 0;
-                    case 2:
-                        return 0;
-                    case 3:
-                        return 1;
-                    case 4:
-                        return 1;
-                    case 5:
-                        return 2;
-                    case 6:
-                        return 3;
-                    case 7:
-                        return 5;
-                    default:
-                        if (word.Length >= 8)
-                        {
-                            return 11;
-                        }
-                        break;
-                }
-                //We should never reach this line
-                return 0;
-            }
-
         }
     }
 }
