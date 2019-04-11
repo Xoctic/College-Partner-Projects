@@ -14,102 +14,102 @@ namespace BoggleService.Controllers
     /// </summary>
     public class BoggleController : ApiController
     {
-        //Connection string to the database
-        private static string DB;
+        ////Connection string to the database
+        //private static string DB;
 
          
 
-        static BoggleController()
-        {
-            // Saves the connection string for the database.  A connection string contains the
-            // information necessary to connect with the database server.  When you create a
-            // DB, there is generally a way to obtain the connection string.  From the Server
-            // Explorer pane, obtain the properties of DB to see the connection string.
+        //static BoggleController()
+        //{
+        //    // Saves the connection string for the database.  A connection string contains the
+        //    // information necessary to connect with the database server.  When you create a
+        //    // DB, there is generally a way to obtain the connection string.  From the Server
+        //    // Explorer pane, obtain the properties of DB to see the connection string.
 
-            // The connection string of my BoggleDB.mdf shows as
-            //
-            //    Data Source = Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename="C:\Users\Aric Campbell\Source\Repos\u1188031\BoggleService\BoggleDB\App_Data\BoggleDB.mdf";Integrated Security=True
-            //
-            // Unfortunately, this is absolute pathname on my computer, which means that it
-            // won't work if the solution is moved.  Fortunately, it can be shorted to
-            //
-            //    Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\ BoggleDB.mdf;Integrated Security=True
-            //
-            // You should shorten yours this way as well.
-            //
-            // Rather than build the connection string into the program, I store it in the Web.config
-            // file where it can be easily found and changed.  You should do that too.
-            DB = ConfigurationManager.ConnectionStrings["BoggleDB"].ConnectionString;
-        }
-
-
+        //    // The connection string of my BoggleDB.mdf shows as
+        //    //
+        //    //    Data Source = Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename="C:\Users\Aric Campbell\Source\Repos\u1188031\BoggleService\BoggleDB\App_Data\BoggleDB.mdf";Integrated Security=True
+        //    //
+        //    // Unfortunately, this is absolute pathname on my computer, which means that it
+        //    // won't work if the solution is moved.  Fortunately, it can be shorted to
+        //    //
+        //    //    Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\ BoggleDB.mdf;Integrated Security=True
+        //    //
+        //    // You should shorten yours this way as well.
+        //    //
+        //    // Rather than build the connection string into the program, I store it in the Web.config
+        //    // file where it can be easily found and changed.  You should do that too.
+        //    DB = ConfigurationManager.ConnectionStrings["BoggleDB"].ConnectionString;
+        //}
 
 
-        [Route("BoggleService/users")]
-        public string PostRegister2([FromBody]string user)
-        {
-            if (user == "stall")
-            {
 
-                Thread.Sleep(5000);
-            }
-            if (user == null || user.Trim().Length == 0 || user.Trim().Length > 50)
-            {
-                throw new HttpResponseException(HttpStatusCode.Forbidden);
-            }
 
-            // The first step to using the DB is opening a connection to it.  Creating it in a
-            // using block guarantees that the connection will be closed when control leaves
-            // the block.  As you'll see below, I also follow this pattern for SQLTransactions,
-            // SqlCommands, and SqlDataReaders.
-            using (SqlConnection conn = new SqlConnection(DB))
-            {
-                // Connections must be opened
-                conn.Open();
+        //[Route("BoggleService/users")]
+        //public string PostRegister2([FromBody]string user)
+        //{
+        //    if (user == "stall")
+        //    {
 
-                // Database commands should be executed within a transaction.  When commands 
-                // are executed within a transaction, either all of the commands will succeed
-                // or all will be canceled.  You don't have to worry about some of the commands
-                // changing the DB and others failing.
-                using (SqlTransaction trans = conn.BeginTransaction())
-                {
-                    //An SqlCommand executes a Sql statement on the database.
-                    //Figure out what statement is needed to register a user
-                    //The first parameter is the statement, second is the connection, third is the transaction
-                    //
-                    // Note that I use symbols like @UserID as placeholders for values that need to appear
-                    // in the statement.  You will see below how the placeholders are replaced.  You may be
-                    // tempted to simply paste the values into the string, but this is a BAD IDEA that violates
-                    // a cardinal rule of DB Security 101.  By using the placeholder approach, you don't have
-                    // to worry about escaping special characters and you don't have to worry about one form
-                    // of the SQL injection attack.
-                    using (SqlCommand command = new SqlCommand("insert into Users (UserID, Nickname) values(@UserID, @Nickname)", conn, trans))
-                    {
-                        //Generate a randomized userID
-                        string userID = Guid.NewGuid().ToString();
+        //        Thread.Sleep(5000);
+        //    }
+        //    if (user == null || user.Trim().Length == 0 || user.Trim().Length > 50)
+        //    {
+        //        throw new HttpResponseException(HttpStatusCode.Forbidden);
+        //    }
 
-                        //This is where placeholders are replaced
-                        command.Parameters.AddWithValue("@UserID", userID);
-                        command.Parameters.AddWithValue("@Nickname", user.Trim().ToString());
+        //    // The first step to using the DB is opening a connection to it.  Creating it in a
+        //    // using block guarantees that the connection will be closed when control leaves
+        //    // the block.  As you'll see below, I also follow this pattern for SQLTransactions,
+        //    // SqlCommands, and SqlDataReaders.
+        //    using (SqlConnection conn = new SqlConnection(DB))
+        //    {
+        //        // Connections must be opened
+        //        conn.Open();
 
-                        if(command.ExecuteNonQuery() != 1)
-                        {
-                            throw new Exception("Query failed unexpectedly");
-                        }
+        //        // Database commands should be executed within a transaction.  When commands 
+        //        // are executed within a transaction, either all of the commands will succeed
+        //        // or all will be canceled.  You don't have to worry about some of the commands
+        //        // changing the DB and others failing.
+        //        using (SqlTransaction trans = conn.BeginTransaction())
+        //        {
+        //            //An SqlCommand executes a Sql statement on the database.
+        //            //Figure out what statement is needed to register a user
+        //            //The first parameter is the statement, second is the connection, third is the transaction
+        //            //
+        //            // Note that I use symbols like @UserID as placeholders for values that need to appear
+        //            // in the statement.  You will see below how the placeholders are replaced.  You may be
+        //            // tempted to simply paste the values into the string, but this is a BAD IDEA that violates
+        //            // a cardinal rule of DB Security 101.  By using the placeholder approach, you don't have
+        //            // to worry about escaping special characters and you don't have to worry about one form
+        //            // of the SQL injection attack.
+        //            using (SqlCommand command = new SqlCommand("insert into Users (UserID, Nickname) values(@UserID, @Nickname)", conn, trans))
+        //            {
+        //                //Generate a randomized userID
+        //                string userID = Guid.NewGuid().ToString();
 
-                        // Immediately before each return that appears within the scope of a transaction, it is
-                        // important to commit the transaction.  Otherwise, the transaction will be aborted and
-                        // rolled back as soon as control leaves the scope of the transaction. 
-                        trans.Commit();
-                        return userID;
+        //                //This is where placeholders are replaced
+        //                command.Parameters.AddWithValue("@UserID", userID);
+        //                command.Parameters.AddWithValue("@Nickname", user.Trim().ToString());
+
+        //                if(command.ExecuteNonQuery() != 1)
+        //                {
+        //                    throw new Exception("Query failed unexpectedly");
+        //                }
+
+        //                // Immediately before each return that appears within the scope of a transaction, it is
+        //                // important to commit the transaction.  Otherwise, the transaction will be aborted and
+        //                // rolled back as soon as control leaves the scope of the transaction. 
+        //                trans.Commit();
+        //                return userID;
                         
-                    }
-                }
-            }
+        //            }
+        //        }
+        //    }
 
 
                 
-        }
+        //}
 
 
 
