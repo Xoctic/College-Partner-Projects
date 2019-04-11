@@ -14,8 +14,8 @@ namespace BoggleService.Controllers
     /// </summary>
     public class BoggleController : ApiController
     {
-        ////Connection string to the database
-        //private static string DB;
+        //Connection string to the database
+        private static string DB;
 
 
 
@@ -150,7 +150,7 @@ namespace BoggleService.Controllers
         [Route("BoggleService/games")]
         public PendingGameInfo PostJoinGame2(JoinGameInput joinGameInput)
         {
-            if (!validToken(joinGameInput.userToken))
+            if (joinGameInput.userToken == null)
             {
                 throw new HttpResponseException(HttpStatusCode.Forbidden);
             }
@@ -163,14 +163,91 @@ namespace BoggleService.Controllers
                 throw new HttpResponseException(HttpStatusCode.Conflict);
             }
 
-
             using (SqlConnection conn = new SqlConnection(DB))
             {
                 conn.Open();
                 using (SqlTransaction trans = conn.BeginTransaction())
                 {
+                    // Here, the SqlCommand is a select query.  We are interested in whether joinGameInput.userToken exists in
+                    // the Users table.
+                    using (SqlCommand command = new SqlCommand("select UserID from Users where UserID = @UserID", conn, trans))
+                    {
+                        command.Parameters.AddWithValue("@UserID", joinGameInput.userToken);
+
+                        // This executes a query (i.e. a select statement).  The result is an
+                        // SqlDataReader that you can use to iterate through the rows in the response.
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            // In this we don't actually need to read any data; we only need
+                            // to know whether a row was returned.
+                            if (!reader.HasRows)
+                            {
+                                reader.Close();
+                                trans.Commit();
+                                throw new HttpResponseException(HttpStatusCode.Forbidden);
+                            }
+                        }
+                    }
+
                     PendingGameInfo output = new PendingGameInfo();
- 
+                    if (pendingInfo.IsPending == false)
+                    {
+                        gameIDnum++;
+                        string letterG = "G";
+                        gameId = letterG + gameIDnum;
+                        pendingInfo = new PendingGameInfo();
+                        pendingInfo.GameID = gameId;
+                        pendingInfo.TimeLimit = joinGameInput.timeLimit;
+                        pendingInfo.UserToken = joinGameInput.userToken;
+                        pendingInfo.IsPending = true;
+
+                        using (SqlCommand command = new SqlCommand("insert into Games (Player1, TimeLimit, GameState) values(@Player1, @TimeLimit, @GameState)", conn, trans))
+                        {
+                           
+                            command.Parameters.AddWithValue("@Player1", joinGameInput.userToken.Trim());
+                            command.Parameters.AddWithValue("@TimeLimit", joinGameInput.timeLimit);
+                            command.Parameters.AddWithValue("@GameState", "pending");
+
+                            // We execute the command with the ExecuteScalar method, which will return to
+                            // us the requested auto-generated ItemID.
+                            string itemID = command.ExecuteScalar().ToString();
+                            trans.Commit();
+                            return itemID;
+                        }
+                        GameInfo gameInfo = new GameInfo();
+                        gameInfo.GameState = "pending";
+                        gameInfo.TimeLimit = joinGameInput.timeLimit;
+                        gameInfo.Player1 = new PlayerInfo();
+                        gameInfo.Player1.PlayerToken = joinGameInput.userToken;
+                        gameInfo.Player1.Nickname = users[joinGameInput.userToken];
+                        games.Add(gameId, gameInfo);
+
+                        output.IsPending = true;
+                        output.GameID = gameId;
+                        return output;
+                    }
+                    else
+                    {
+                        GameInfo temp = games[gameId];
+                        temp.MisterBoggle = new BoggleBoard();
+                        temp.Board = temp.MisterBoggle.ToString();
+                        temp.Player2 = new PlayerInfo();
+                        temp.Player2.PlayerToken = joinGameInput.userToken;
+                        temp.Player2.Nickname = users[joinGameInput.userToken];
+                        temp.Player1.WordsPlayed = new List<PlayedWord>();
+                        temp.Player2.WordsPlayed = new List<PlayedWord>();
+                        temp.GameState = "active";
+                        temp.startTime = (DateTime.Now.Minute * 60) + DateTime.Now.Second;
+
+                        //Averages both players time limits
+                        temp.TimeLimit = (games[gameId].TimeLimit + joinGameInput.timeLimit) / 2;
+
+                        //pendingInfo.IsPending = false;
+                        output.IsPending = false;
+                        output.GameID = pendingInfo.GameID;
+                        pendingInfo = new PendingGameInfo();
+                        return output;
+                    }
                 }
             }
         } 
