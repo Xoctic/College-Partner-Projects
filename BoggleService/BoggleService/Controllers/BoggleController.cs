@@ -14,33 +14,33 @@ namespace BoggleService.Controllers
     /// </summary>
     public class BoggleController : ApiController
     {
-        ////Connection string to the database
-        //private static string DB;
+        //Connection string to the database
+        private static string DB;
 
-         
 
-        //static BoggleController()
-        //{
-        //    // Saves the connection string for the database.  A connection string contains the
-        //    // information necessary to connect with the database server.  When you create a
-        //    // DB, there is generally a way to obtain the connection string.  From the Server
-        //    // Explorer pane, obtain the properties of DB to see the connection string.
 
-        //    // The connection string of my BoggleDB.mdf shows as
-        //    //
-        //    //    Data Source = Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename="C:\Users\Aric Campbell\Source\Repos\u1188031\BoggleService\BoggleDB\App_Data\BoggleDB.mdf";Integrated Security=True
-        //    //
-        //    // Unfortunately, this is absolute pathname on my computer, which means that it
-        //    // won't work if the solution is moved.  Fortunately, it can be shorted to
-        //    //
-        //    //    Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\ BoggleDB.mdf;Integrated Security=True
-        //    //
-        //    // You should shorten yours this way as well.
-        //    //
-        //    // Rather than build the connection string into the program, I store it in the Web.config
-        //    // file where it can be easily found and changed.  You should do that too.
-        //    DB = ConfigurationManager.ConnectionStrings["BoggleDB"].ConnectionString;
-        //}
+        static BoggleController()
+        {
+            // Saves the connection string for the database.  A connection string contains the
+            // information necessary to connect with the database server.  When you create a
+            // DB, there is generally a way to obtain the connection string.  From the Server
+            // Explorer pane, obtain the properties of DB to see the connection string.
+
+            // The connection string of my BoggleDB.mdf shows as
+            //
+            //    Data Source = Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename="C:\Users\Aric Campbell\Source\Repos\u1188031\BoggleService\BoggleDB\App_Data\BoggleDB.mdf";Integrated Security=True
+            //
+            // Unfortunately, this is absolute pathname on my computer, which means that it
+            // won't work if the solution is moved.  Fortunately, it can be shorted to
+            //
+            //    Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\ BoggleDB.mdf;Integrated Security=True
+            //
+            // You should shorten yours this way as well.
+            //
+            // Rather than build the connection string into the program, I store it in the Web.config
+            // file where it can be easily found and changed.  You should do that too.
+            DB = ConfigurationManager.ConnectionStrings["BoggleDB"].ConnectionString;
+        }
 
 
         /// <summary>
@@ -73,71 +73,69 @@ namespace BoggleService.Controllers
             }
         }
 
-        //[Route("BoggleService/users")]
-        //public string PostRegister2([FromBody]string user)
-        //{
-        //    if (user == "stall")
-        //    {
+        [Route("BoggleService/users")]
+        public string PostRegister2([FromBody]string user)
+        {
+            if (user == "stall")
+            {
 
-        //        Thread.Sleep(5000);
-        //    }
-        //    if (user == null || user.Trim().Length == 0 || user.Trim().Length > 50)
-        //    {
-        //        throw new HttpResponseException(HttpStatusCode.Forbidden);
-        //    }
+                Thread.Sleep(5000);
+            }
+            if (user == null || user.Trim().Length == 0 || user.Trim().Length > 50)
+            {
+                throw new HttpResponseException(HttpStatusCode.Forbidden);
+            }
 
-        //    // The first step to using the DB is opening a connection to it.  Creating it in a
-        //    // using block guarantees that the connection will be closed when control leaves
-        //    // the block.  As you'll see below, I also follow this pattern for SQLTransactions,
-        //    // SqlCommands, and SqlDataReaders.
-        //    using (SqlConnection conn = new SqlConnection(DB))
-        //    {
-        //        // Connections must be opened
-        //        conn.Open();
+            // The first step to using the DB is opening a connection to it.  Creating it in a
+            // using block guarantees that the connection will be closed when control leaves
+            // the block.  As you'll see below, I also follow this pattern for SQLTransactions,
+            // SqlCommands, and SqlDataReaders.
+            using (SqlConnection conn = new SqlConnection(DB))
+            {
+                // Connections must be opened
+                conn.Open();
 
-        //        // Database commands should be executed within a transaction.  When commands 
-        //        // are executed within a transaction, either all of the commands will succeed
-        //        // or all will be canceled.  You don't have to worry about some of the commands
-        //        // changing the DB and others failing.
-        //        using (SqlTransaction trans = conn.BeginTransaction())
-        //        {
-        //            //An SqlCommand executes a Sql statement on the database.
-        //            //Figure out what statement is needed to register a user
-        //            //The first parameter is the statement, second is the connection, third is the transaction
-        //            //
-        //            // Note that I use symbols like @UserID as placeholders for values that need to appear
-        //            // in the statement.  You will see below how the placeholders are replaced.  You may be
-        //            // tempted to simply paste the values into the string, but this is a BAD IDEA that violates
-        //            // a cardinal rule of DB Security 101.  By using the placeholder approach, you don't have
-        //            // to worry about escaping special characters and you don't have to worry about one form
-        //            // of the SQL injection attack.
-        //            using (SqlCommand command = new SqlCommand("insert into Users (UserID, Nickname) values(@UserID, @Nickname)", conn, trans))
-        //            {
-        //                //Generate a randomized userID
-        //                string userID = Guid.NewGuid().ToString();
+                // Database commands should be executed within a transaction.  When commands 
+                // are executed within a transaction, either all of the commands will succeed
+                // or all will be canceled.  You don't have to worry about some of the commands
+                // changing the DB and others failing.
+                using (SqlTransaction trans = conn.BeginTransaction())
+                {
+                    //An SqlCommand executes a Sql statement on the database.
+                    //Figure out what statement is needed to register a user
+                    //The first parameter is the statement, second is the connection, third is the transaction
+                    //
+                    // Note that I use symbols like @UserID as placeholders for values that need to appear
+                    // in the statement.  You will see below how the placeholders are replaced.  You may be
+                    // tempted to simply paste the values into the string, but this is a BAD IDEA that violates
+                    // a cardinal rule of DB Security 101.  By using the placeholder approach, you don't have
+                    // to worry about escaping special characters and you don't have to worry about one form
+                    // of the SQL injection attack.
+                    using (SqlCommand command = new SqlCommand("insert into Users (UserID, Nickname) values(@UserID, @Nickname)", conn, trans))
+                    {
+                        //Generate a randomized userID
+                        string userID = Guid.NewGuid().ToString();
 
-        //                //This is where placeholders are replaced
-        //                command.Parameters.AddWithValue("@UserID", userID);
-        //                command.Parameters.AddWithValue("@Nickname", user.Trim().ToString());
+                        //This is where placeholders are replaced
+                        command.Parameters.AddWithValue("@UserID", userID);
+                        command.Parameters.AddWithValue("@Nickname", user.Trim().ToString());
 
-        //                if(command.ExecuteNonQuery() != 1)
-        //                {
-        //                    throw new Exception("Query failed unexpectedly");
-        //                }
+                        if (command.ExecuteNonQuery() != 1)
+                        {
+                            throw new Exception("Query failed unexpectedly");
+                        }
 
-        //                // Immediately before each return that appears within the scope of a transaction, it is
-        //                // important to commit the transaction.  Otherwise, the transaction will be aborted and
-        //                // rolled back as soon as control leaves the scope of the transaction. 
-        //                trans.Commit();
-        //                return userID;
-                        
-        //            }
-        //        }
-        //    }
+                        // Immediately before each return that appears within the scope of a transaction, it is
+                        // important to commit the transaction.  Otherwise, the transaction will be aborted and
+                        // rolled back as soon as control leaves the scope of the transaction. 
+                        trans.Commit();
+                        return userID;
 
+                    }
+                }
+            }
 
-                
-        //}
+        }
 
         /// <summary>
         /// Adds a player to the games table
@@ -150,7 +148,7 @@ namespace BoggleService.Controllers
         [Route("BoggleService/games")]
         public PendingGameInfo PostJoinGame2(JoinGameInput joinGameInput)
         {
-            if (!validToken(joinGameInput.userToken))
+            if (joinGameInput.userToken == null)
             {
                 throw new HttpResponseException(HttpStatusCode.Forbidden);
             }
@@ -163,14 +161,91 @@ namespace BoggleService.Controllers
                 throw new HttpResponseException(HttpStatusCode.Conflict);
             }
 
-
             using (SqlConnection conn = new SqlConnection(DB))
             {
                 conn.Open();
                 using (SqlTransaction trans = conn.BeginTransaction())
                 {
+                    // Here, the SqlCommand is a select query.  We are interested in whether joinGameInput.userToken exists in
+                    // the Users table.
+                    using (SqlCommand command = new SqlCommand("select UserID from Users where UserID = @UserID", conn, trans))
+                    {
+                        command.Parameters.AddWithValue("@UserID", joinGameInput.userToken);
+
+                        // This executes a query (i.e. a select statement).  The result is an
+                        // SqlDataReader that you can use to iterate through the rows in the response.
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            // In this we don't actually need to read any data; we only need
+                            // to know whether a row was returned.
+                            if (!reader.HasRows)
+                            {
+                                reader.Close();
+                                trans.Commit();
+                                throw new HttpResponseException(HttpStatusCode.Forbidden);
+                            }
+                        }
+                    }
+
                     PendingGameInfo output = new PendingGameInfo();
- 
+                    if (pendingInfo.IsPending == false)
+                    {
+                        gameIDnum++;
+                        string letterG = "G";
+                        gameId = letterG + gameIDnum;
+                        pendingInfo = new PendingGameInfo();
+                        pendingInfo.GameID = gameId;
+                        pendingInfo.TimeLimit = joinGameInput.timeLimit;
+                        pendingInfo.UserToken = joinGameInput.userToken;
+                        pendingInfo.IsPending = true;
+
+                        using (SqlCommand command = new SqlCommand("insert into Games (Player1, TimeLimit, GameState) values(@Player1, @TimeLimit, @GameState)", conn, trans))
+                        {
+                           
+                            command.Parameters.AddWithValue("@Player1", joinGameInput.userToken.Trim());
+                            command.Parameters.AddWithValue("@TimeLimit", joinGameInput.timeLimit);
+                            command.Parameters.AddWithValue("@GameState", "pending");
+
+                            // We execute the command with the ExecuteScalar method, which will return to
+                            // us the requested auto-generated ItemID.
+                            string itemID = command.ExecuteScalar().ToString();
+                            trans.Commit();
+                            return itemID;
+                        }
+                        GameInfo gameInfo = new GameInfo();
+                        gameInfo.GameState = "pending";
+                        gameInfo.TimeLimit = joinGameInput.timeLimit;
+                        gameInfo.Player1 = new PlayerInfo();
+                        gameInfo.Player1.PlayerToken = joinGameInput.userToken;
+                        gameInfo.Player1.Nickname = users[joinGameInput.userToken];
+                        games.Add(gameId, gameInfo);
+
+                        output.IsPending = true;
+                        output.GameID = gameId;
+                        return output;
+                    }
+                    else
+                    {
+                        GameInfo temp = games[gameId];
+                        temp.MisterBoggle = new BoggleBoard();
+                        temp.Board = temp.MisterBoggle.ToString();
+                        temp.Player2 = new PlayerInfo();
+                        temp.Player2.PlayerToken = joinGameInput.userToken;
+                        temp.Player2.Nickname = users[joinGameInput.userToken];
+                        temp.Player1.WordsPlayed = new List<PlayedWord>();
+                        temp.Player2.WordsPlayed = new List<PlayedWord>();
+                        temp.GameState = "active";
+                        temp.startTime = (DateTime.Now.Minute * 60) + DateTime.Now.Second;
+
+                        //Averages both players time limits
+                        temp.TimeLimit = (games[gameId].TimeLimit + joinGameInput.timeLimit) / 2;
+
+                        //pendingInfo.IsPending = false;
+                        output.IsPending = false;
+                        output.GameID = pendingInfo.GameID;
+                        pendingInfo = new PendingGameInfo();
+                        return output;
+                    }
                 }
             }
         }
