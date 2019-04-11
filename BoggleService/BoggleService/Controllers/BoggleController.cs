@@ -43,6 +43,37 @@ namespace BoggleService.Controllers
         }
 
 
+        /// <summary>
+        /// Registers a new user with a provided string Nickname.
+        /// If user is null or is empty after trimming, responds with status code Forbidden.
+        /// Otherwise, creates a user, returns the user's token, and responds with status code Ok. 
+        /// </summary>
+        /// <param name="user">String sser nickname to be added to users</param>
+        /// <returns>A unique string user token of the newly added user</returns>
+        [Route("BoggleService/users")]
+        public string PostRegister([FromBody]string user)
+        {
+            if (user == "stall")
+            {
+
+                Thread.Sleep(5000);
+            }
+            lock (sync)
+            {
+                if (user == null || user.Trim().Length == 0 || user.Trim().Length > 50)
+                {
+                    throw new HttpResponseException(HttpStatusCode.Forbidden);
+                }
+                else
+                {
+                    string userID = Guid.NewGuid().ToString();
+                    users.Add(userID, user.Trim());
+                    return userID;
+                }
+            }
+        }
+
+
 
 
         [Route("BoggleService/users")]
@@ -111,39 +142,44 @@ namespace BoggleService.Controllers
                 
         }
 
-
-
-
-
         /// <summary>
-        /// Registers a new user with a provided string Nickname.
-        /// If user is null or is empty after trimming, responds with status code Forbidden.
-        /// Otherwise, creates a user, returns the user's token, and responds with status code Ok. 
+        /// Adds a player to the games table
+        /// if usertoken in joinGameInput is invalid, responds with status code Forbidden
+        /// if timeLimit in joinGameInput is less than 5 or greater than 120, responds with status code Forbidden
+        /// if the pending games userToken equals the userToken in joinGameInput, responds with a status code Conflict
         /// </summary>
-        /// <param name="user">String sser nickname to be added to users</param>
-        /// <returns>A unique string user token of the newly added user</returns>
-        [Route("BoggleService/users")]
-        public string PostRegister([FromBody]string user)
+        /// <param name="joinGameInput"></param>
+        /// <returns></returns>
+        [Route("BoggleService/games")]
+        public PendingGameInfo PostJoinGame2(JoinGameInput joinGameInput)
         {
-            if (user == "stall")
+            if (!validToken(joinGameInput.userToken))
             {
-                
-                Thread.Sleep(5000);
+                throw new HttpResponseException(HttpStatusCode.Forbidden);
             }
-            lock (sync)
+            else if (joinGameInput.timeLimit < 5 || joinGameInput.timeLimit > 120)
             {
-                if (user == null || user.Trim().Length == 0 || user.Trim().Length > 50)
+                throw new HttpResponseException(HttpStatusCode.Forbidden);
+            }
+            else if (pendingInfo.UserToken == joinGameInput.userToken)
+            {
+                throw new HttpResponseException(HttpStatusCode.Conflict);
+            }
+
+
+            using (SqlConnection conn = new SqlConnection(DB))
+            {
+                conn.Open();
+                using (SqlTransaction trans = conn.BeginTransaction())
                 {
-                    throw new HttpResponseException(HttpStatusCode.Forbidden);
-                }
-                else
-                {
-                    string userID = Guid.NewGuid().ToString();
-                    users.Add(userID, user.Trim());
-                    return userID;
+                    PendingGameInfo output = new PendingGameInfo();
+ 
                 }
             }
         }
+
+
+        
 
         /// <summary>
         /// Attempts to join a game, depending on if a game is pending or not.
