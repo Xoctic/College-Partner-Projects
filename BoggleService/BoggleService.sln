@@ -18,8 +18,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoggleServiceLocalTests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerGrader", "ServerGrader\ServerGrader.csproj", "{BB5EC1B9-2AA7-4AF6-B745-DD9356D2B7E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoggleDBProj", "BoggleDB\BoggleDBProj.csproj", "{5A67FEF4-72E7-48B4-8A15-C7AE5A88AFA4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,10 +28,6 @@ Global
 		{71936E2C-E15E-44DE-ABFF-B69805FAE163}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71936E2C-E15E-44DE-ABFF-B69805FAE163}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71936E2C-E15E-44DE-ABFF-B69805FAE163}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BB5EC1B9-2AA7-4AF6-B745-DD9356D2B7E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BB5EC1B9-2AA7-4AF6-B745-DD9356D2B7E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BB5EC1B9-2AA7-4AF6-B745-DD9356D2B7E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BB5EC1B9-2AA7-4AF6-B745-DD9356D2B7E0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1CF87FE2-1E17-42E4-AEF9-CCC25A5551C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1CF87FE2-1E17-42E4-AEF9-CCC25A5551C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CF87FE2-1E17-42E4-AEF9-CCC25A5551C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -42,10 +36,10 @@ Global
 		{3C7CBD31-8F6C-4DBF-A708-AA7E610E5D5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C7CBD31-8F6C-4DBF-A708-AA7E610E5D5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C7CBD31-8F6C-4DBF-A708-AA7E610E5D5C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5A67FEF4-72E7-48B4-8A15-C7AE5A88AFA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5A67FEF4-72E7-48B4-8A15-C7AE5A88AFA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5A67FEF4-72E7-48B4-8A15-C7AE5A88AFA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5A67FEF4-72E7-48B4-8A15-C7AE5A88AFA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB5EC1B9-2AA7-4AF6-B745-DD9356D2B7E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB5EC1B9-2AA7-4AF6-B745-DD9356D2B7E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB5EC1B9-2AA7-4AF6-B745-DD9356D2B7E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB5EC1B9-2AA7-4AF6-B745-DD9356D2B7E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
