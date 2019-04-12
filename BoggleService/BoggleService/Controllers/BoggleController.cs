@@ -546,7 +546,7 @@ namespace BoggleService.Controllers
                             reader.Read();
                             gameState = (string)reader["GameState"];
                             int timeLimit = (int)reader["TimeLimit"];
-                            int startTime = (int)(reader["StartTime"]); 
+                            int startTime = Convert.ToInt32((reader["StartTime"])); 
                             if (gameState == "active")
                             {
                                 int timeLeft = calculateTimeLeft(timeLimit, startTime);
@@ -832,7 +832,6 @@ namespace BoggleService.Controllers
                             if(!reader.HasRows)
                             {
                                 reader.Close();
-                                trans.Commit();
                                 return false;
                             }
                         }
@@ -875,7 +874,6 @@ namespace BoggleService.Controllers
                             if (!reader.HasRows)
                             {
                                 reader.Close();
-                                trans.Commit();
                                 return false;
                             }
                         }
