@@ -5,13 +5,6 @@ VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoggleServiceRemoteTests", "BoggleServiceTests\BoggleServiceRemoteTests.csproj", "{71936E2C-E15E-44DE-ABFF-B69805FAE163}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BoggleServicePieces", "BoggleServicePieces", "{DE1ABB99-DA8E-4D0F-A400-0F3E69D73FFE}"
-	ProjectSection(SolutionItems) = preProject
-		api.html = api.html
-		BoggleBoard.cs = BoggleBoard.cs
-		dictionary.txt = dictionary.txt
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoggleService", "BoggleService\BoggleService.csproj", "{1CF87FE2-1E17-42E4-AEF9-CCC25A5551C9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoggleServiceLocalTests", "BoggleServiceLocalTests\BoggleServiceLocalTests.csproj", "{3C7CBD31-8F6C-4DBF-A708-AA7E610E5D5C}"
