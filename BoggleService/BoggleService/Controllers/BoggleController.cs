@@ -357,10 +357,7 @@ namespace BoggleService.Controllers
                             {
                                 turn = "player2";
                             }
-
-                            reader.Close();
                         }
-                        trans.Commit();
                     }
 
                     if(turn == "player1")
@@ -381,10 +378,7 @@ namespace BoggleService.Controllers
                                     score = 0;
                                     beenPlayed = true;
                                 }
-                                
-                                reader.Close();
                             }
-                            trans.Commit();
 
                         }
 
@@ -420,8 +414,6 @@ namespace BoggleService.Controllers
                                     reader.Read();
 
                                     player1Score = (int)reader["Player1Score"];
-
-                                    reader.Close();
                                 }
 
                                 trans.Commit();
@@ -457,10 +449,7 @@ namespace BoggleService.Controllers
                                     score = 0;
                                     beenPlayed = true;
                                 }
-
-                                reader.Close();
                             }
-                            trans.Commit();
                         }
 
                         if (beenPlayed)
@@ -495,8 +484,6 @@ namespace BoggleService.Controllers
                                     reader.Read();
 
                                     player2Score = (int)reader["Player2Score"];
-
-                                    reader.Close();
                                 }
                                 trans.Commit();
                             }
@@ -513,8 +500,6 @@ namespace BoggleService.Controllers
                         }
 
                     }
-          
-                    trans.Commit();
                     return score;   
                 }
             }
@@ -563,7 +548,6 @@ namespace BoggleService.Controllers
                                 }
                             }
                         }
-                        trans.Commit();
                     }
                     if (setToCompleted == true)
                     {
@@ -584,7 +568,6 @@ namespace BoggleService.Controllers
                             reader.Read();
                             gameState = (string)reader["GameState"];
                         }
-                        trans.Commit();
                     }
                     GameInfo output = new GameInfo();
                     if (brief == true)
@@ -617,7 +600,6 @@ namespace BoggleService.Controllers
                                     output.Player1.Score = player1Score;
                                     output.Player2.Score = player2Score;
                                 }
-                                trans.Commit();
                                 return output;
                             }
                         }
@@ -638,7 +620,6 @@ namespace BoggleService.Controllers
                                     output.Player1.Score = player1Score;
                                     output.Player2.Score = player2Score;
                                 }
-                                trans.Commit();
                                 return output;
                             }
                         }
@@ -679,7 +660,6 @@ namespace BoggleService.Controllers
                                     output.Player1.Score = player1Score;
                                     output.Player2.Score = player2Score;
                                 }
-                                trans.Commit();
                             }
                             using (SqlCommand command = new SqlCommand("select Nickname from Users where UserID = @UserID", conn, trans))
                             {
@@ -690,7 +670,6 @@ namespace BoggleService.Controllers
                                     string nickname = (string)reader["Nickname"];
                                     output.Player1.Nickname = nickname;
                                 }
-                                trans.Commit();
                             }
                             using (SqlCommand command = new SqlCommand("select Nickname from Users where UserID = @UserID", conn, trans))
                             {
@@ -701,7 +680,6 @@ namespace BoggleService.Controllers
                                     string nickname = (string)reader["Nickname"];
                                     output.Player2.Nickname = nickname;
                                 }
-                                trans.Commit();
                             }
                             return output;
                         }
@@ -736,7 +714,6 @@ namespace BoggleService.Controllers
                                     output.Player1.Score = player1Score;
                                     output.Player2.Score = player2Score;
                                 }
-                                trans.Commit();
                             }
                             using (SqlCommand command = new SqlCommand("select Nickname from Users where UserID = @UserID", conn, trans))
                             {
@@ -747,7 +724,6 @@ namespace BoggleService.Controllers
                                     string nickname = (string)reader["Nickname"];
                                     output.Player1.Nickname = nickname;
                                 }
-                                trans.Commit();
                             }
                             using (SqlCommand command = new SqlCommand("select Nickname from Users where UserID = @UserID", conn, trans))
                             {
@@ -758,7 +734,6 @@ namespace BoggleService.Controllers
                                     string nickname = (string)reader["Nickname"];
                                     output.Player2.Nickname = nickname;
                                 }
-                                trans.Commit();
                             }
                             using (SqlCommand command = new SqlCommand("select Word, Score from Words, " +
                                 "Games where Words.GameID = Games.GameID and Words.GameID = @GameID and " +
@@ -780,7 +755,6 @@ namespace BoggleService.Controllers
                                     }
                                     output.Player1.WordsPlayed = result;
                                 }
-                                trans.Commit();
                             }
                             using (SqlCommand command = new SqlCommand("select Word, Score from Words, " +
                                 "Games where Words.GameID = Games.GameID and Words.GameID = @GameID and " +
@@ -802,7 +776,6 @@ namespace BoggleService.Controllers
                                     }
                                     output.Player2.WordsPlayed = result;
                                 }
-                                trans.Commit();
                             }
                             return output;
                         }
