@@ -365,7 +365,7 @@ namespace BoggleService.Controllers
 
                         bool beenPlayed = false;
 
-                        using (SqlCommand command = new SqlCommand("select Word from Words where Player = @Player1, Word = @Word", conn, trans))
+                        using (SqlCommand command = new SqlCommand("select Word from Words where Player = @Player1 and Word = @Word", conn, trans))
                         {
                             command.Parameters.AddWithValue("@Player1", player1token);
                             command.Parameters.AddWithValue("@Word", play.word);
@@ -400,13 +400,13 @@ namespace BoggleService.Controllers
                             score = b.score(play.word);
                             int player1Score = 0;
 
-                            using (SqlCommand command = new SqlCommand("insert into Words (Word, GameID, Player, Score) values(@Word, @GameID, @Player, @Score) select Player1Score from Games where GameID = @GameID", conn, trans))
+                            using (SqlCommand command = new SqlCommand("insert into Words (Word, GameID, Player, Score) values(@Word, @GameID, @Player, @Score) select Player1Score from Games where GameID = @GameID2", conn, trans))
                             {
                                 command.Parameters.AddWithValue("@Word", play.word);
                                 command.Parameters.AddWithValue("@GameID", gameID);
                                 command.Parameters.AddWithValue("@Player", player1token);
                                 command.Parameters.AddWithValue("@Score", score);
-                                command.Parameters.AddWithValue("GameID", gameID);
+                                command.Parameters.AddWithValue("@GameID2", gameID);
                                 
 
                                 using (SqlDataReader reader = command.ExecuteReader())
@@ -419,14 +419,18 @@ namespace BoggleService.Controllers
                                 trans.Commit();
                             }
 
-                            using (SqlCommand command = new SqlCommand("update Games set Player1Score = @Player1Score where GameID = @GameID"))
+                            using (SqlCommand command = new SqlCommand("update Games set Player1Score = @Player1Score where GameID = @GameID", conn, trans))
                             {
                                 command.Parameters.AddWithValue("@Player1Score", player1Score + score);
                                 command.Parameters.AddWithValue("@GameID", gameID);
 
-                                command.ExecuteNonQuery();
-
                                 trans.Commit();
+                                int result = command.ExecuteNonQuery();
+                                
+                                if (result == 0)
+                                {
+                                    throw new HttpResponseException(HttpStatusCode.Forbidden);
+                                }
                             }
 
                         }
@@ -485,16 +489,20 @@ namespace BoggleService.Controllers
 
                                     player2Score = (int)reader["Player2Score"];
                                 }
-                                trans.Commit();
+                                //trans.Commit();
                             }
 
-                            using (SqlCommand command = new SqlCommand("update Games set Player2Score = @Player2Score where GameID = @GameID"))
+                            using (SqlCommand command = new SqlCommand("update Games set Player2Score = @Player2Score where GameID = @GameID", conn, trans))
                             {
                                 command.Parameters.AddWithValue("@Player2Score", player2Score + score);
                                 command.Parameters.AddWithValue("@GameID", gameID);
 
-                                command.ExecuteNonQuery();
+                                int result = command.ExecuteNonQuery();
                                 trans.Commit();
+                                if (result == 0)
+                                {
+                                    throw new HttpResponseException(HttpStatusCode.Forbidden);
+                                }
                             }
 
                         }
@@ -556,7 +564,13 @@ namespace BoggleService.Controllers
                         {
                             command.Parameters.AddWithValue("@GameState", "completed");
                             command.Parameters.AddWithValue("@GameID", gameID);
+
+                            int result = command.ExecuteNonQuery();
                             trans.Commit();
+                            if (result == 0)
+                            {
+                                throw new HttpResponseException(HttpStatusCode.Forbidden);
+                            }
                         }
                     }
                     gameState = null;
