@@ -103,6 +103,7 @@ namespace BoggleService.Controllers
                         // rolled back as soon as control leaves the scope of the transaction. 
                         trans.Commit();
                         return userID;
+                        
 
                     }
                 }
