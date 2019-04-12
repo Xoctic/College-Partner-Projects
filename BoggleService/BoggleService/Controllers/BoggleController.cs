@@ -242,30 +242,7 @@ namespace BoggleService.Controllers
             }
         }      
 
-        /// <summary>
-        /// Attempts to cancel a pending game.
-        /// If UserToken is null, not of length 36, or not a token in users, responds with status code Forbidden.
-        /// Otherwise, remoes user token from the pending game and responds witht status code 204(NoContent).
-        /// </summary>
-        /// <param name="token">String user token</param>
-        [Route("BoggleService/games")]
-        public void PutCancelJoin([FromBody]string token)
-        {
-            lock (sync)
-            {
-                if (!(validToken(token)))
-                {
-                    throw new HttpResponseException(HttpStatusCode.Forbidden);
-                }
-                if (pendingInfo.UserToken == null || pendingInfo.UserToken != token)
-                {
-                    throw new HttpResponseException(HttpStatusCode.Forbidden);
-                }
-                //Removes the pending game from games, and then creates a new pending Game Info.
-                games.Remove(pendingInfo.GameID);
-                pendingInfo = new PendingGameInfo();
-            }
-        
+    
 
         /// <summary>
         /// Attempts to cancel a pending game.
