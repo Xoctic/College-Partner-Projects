@@ -432,7 +432,7 @@ namespace BoggleService.Controllers
                             using (SqlCommand command = new SqlCommand("update Games set Player1Score = @Player1Score where GameID = @GameID"))
                             {
                                 command.Parameters.AddWithValue("@Player1Score", player1Score + score);
-                                command.Parameters.AddWithValue("@GameID", gameId);
+                                command.Parameters.AddWithValue("@GameID", gameID);
 
                                 command.ExecuteNonQuery();
 
@@ -506,7 +506,7 @@ namespace BoggleService.Controllers
                             using (SqlCommand command = new SqlCommand("update Games set Player2Score = @Player2Score where GameID = @GameID"))
                             {
                                 command.Parameters.AddWithValue("@Player2Score", player2Score + score);
-                                command.Parameters.AddWithValue("@GameID", gameId);
+                                command.Parameters.AddWithValue("@GameID", gameID);
 
                                 command.ExecuteNonQuery();
                                 trans.Commit();
