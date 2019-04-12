@@ -25,9 +25,9 @@ namespace BoggleService.Models
         /// Constructor to set the Word.
         /// </summary>
         /// <param name="_Word"></param>
-        public PlayedWord(string _Word)
-        {
-            Word = _Word;
-        }
+        //public PlayedWord(string _Word)
+        //{
+        //    Word = _Word;
+        //}
     }
 }

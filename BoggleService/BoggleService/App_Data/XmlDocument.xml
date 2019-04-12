@@ -551,34 +551,14 @@
             <param name="gID"></param>
             <returns></returns>
         </member>
-        <member name="F:BoggleService.Controllers.BoggleController.users">
+        <member name="M:BoggleService.Controllers.BoggleController.calculateTimeLeft(System.Int32,System.Int32)">
             <summary>
-            A dictionary to store the key User Token which links to its value Nickname.
-            </summary>
-        </member>
-        <member name="F:BoggleService.Controllers.BoggleController.games">
-            <summary>
-            A dictionary to store the string key gameID which links to its value GameInfo.
+            Helper method to calculate the TimeLeft based on the time of day.
             </summary>
         </member>
         <member name="F:BoggleService.Controllers.BoggleController.pendingInfo">
             <summary>
             The pending game info for the current pending game.
-            </summary>
-        </member>
-        <member name="F:BoggleService.Controllers.BoggleController.gameId">
-            <summary>
-            The initial ID of the first game.
-            </summary>
-        </member>
-        <member name="F:BoggleService.Controllers.BoggleController.gameIDnum">
-            <summary>
-            Game ID counter, which is incremented each time a new game is created.
-            </summary>
-        </member>
-        <member name="F:BoggleService.Controllers.BoggleController.sync">
-            <summary>
-            A sync lock used to make sure that at any time only 1 method can be running at a time during multi threading.
             </summary>
         </member>
         <member name="T:BoggleService.BoggleBoard">
@@ -769,12 +749,6 @@
             <summary>
             Stores the score for the word played.
             </summary>
-        </member>
-        <member name="M:BoggleService.Models.PlayedWord.#ctor(System.String)">
-            <summary>
-            Constructor to set the Word.
-            </summary>
-            <param name="_Word"></param>
         </member>
         <member name="T:BoggleService.Models.PlayWordInput">
             <summary>
