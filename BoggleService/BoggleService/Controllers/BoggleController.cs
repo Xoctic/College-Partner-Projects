@@ -37,7 +37,7 @@ namespace BoggleService.Controllers
             //
             // Rather than build the connection string into the program, I store it in the Web.config
             // file where it can be easily found and changed.  You should do that too.
-            DB = ConfigurationManager.ConnectionStrings["BoggleDB"].ConnectionString;
+            DB = ConfigurationManager.ConnectionStrings["BoggleServerDB"].ConnectionString;
         }
 
         /// <summary>
@@ -192,13 +192,13 @@ namespace BoggleService.Controllers
                         // In this case the command is a select.
                         using (SqlCommand command = new SqlCommand("select TimeLimit from Games where GameID=@GameID", conn, trans))
                         {
-                            command.Parameters.AddWithValue("@UserID", currentGame);
+                            command.Parameters.AddWithValue("@GameID", currentGame);
                             using (SqlDataReader reader = command.ExecuteReader())
                             {
                                 reader.Read();                              
                                 player1TimeLimit = (int)reader["TimeLimit"];                               
                             }
-                            trans.Commit();
+                            //trans.Commit();
                         }
                         BoggleBoard boggleBoard = new BoggleBoard();
                         string board = boggleBoard.ToString();
@@ -207,7 +207,7 @@ namespace BoggleService.Controllers
                         int newTimeLimit = (player1TimeLimit + joinGameInput.timeLimit) / 2;
 
                         // In this case the command is an update.
-                        using (SqlCommand command = new SqlCommand("update Games set Player2=@Player2, Board=@Board " +
+                        using (SqlCommand command = new SqlCommand("update Games set Player2=@Player2, Board=@Board, " +
                             "TimeLimit=@TimeLimit, StartTime=@StartTime, GameState=@GameState, Player1Score=@Player1Score" +
                             ",Player2Score=@Player2Score where GameID=@GameID", conn, trans))
                         {                      
@@ -220,16 +220,15 @@ namespace BoggleService.Controllers
                             command.Parameters.AddWithValue("@Player2Score", 0);
                             command.Parameters.AddWithValue("@GameID", currentGame);
 
-                            // We pay attention to the number of rows modified.  If no rows were modified,
-                            // we know that there was no game with the given gameID, and we report an error.
-                            //int result = command.ExecuteNonQuery();
+                            //We pay attention to the number of rows modified.If no rows were modified,
+                            //we know that there was no game with the given gameID, and we report an error.
+                            int result = command.ExecuteNonQuery();
                             trans.Commit();
-                            //if (result == 0)
-                            //{
-                            //    throw new HttpResponseException(HttpStatusCode.Forbidden);
-                            //}
+                            if (result == 0)
+                            {
+                                throw new HttpResponseException(HttpStatusCode.Forbidden);
+                            }
                         }
-                       
                         output.IsPending = false;
                         output.GameID = currentGame;
                         pendingInfo = new PendingGameInfo();
@@ -314,7 +313,7 @@ namespace BoggleService.Controllers
 
                 using (SqlTransaction trans = conn.BeginTransaction())
                 {
-                    using (SqlCommand command = new SqlCommand("select Player1, Player2, GameState, TimeLimit, StartTime, Board from Games where GameID = @GameID"))
+                    using (SqlCommand command = new SqlCommand("select Player1, Player2, GameState, TimeLimit, StartTime, Board from Games where GameID = @GameID", conn, trans))
                     {
                         command.Parameters.AddWithValue("@GameID", gameID);
 
@@ -554,7 +553,7 @@ namespace BoggleService.Controllers
                             reader.Read();
                             gameState = (string)reader["GameState"];
                             int timeLimit = (int)reader["TimeLimit"];
-                            int startTime = (int)reader["StartTime"];
+                            int startTime = (int)(reader["StartTime"]); 
                             if (gameState == "active")
                             {
                                 int timeLeft = calculateTimeLeft(timeLimit, startTime);
