@@ -326,7 +326,7 @@ namespace BoggleService.Controllers
                             player2token = (string)reader["Player2"];
                             gameState = (string)reader["GameState"];
                             timeLimit = (int)reader["TimeLimit"];
-                            startTime = (int)reader["StartTime"];
+                            startTime = Convert.ToInt32(reader["StartTime"]);
                             board = (string)reader["Board"];
                             timeLeft = calculateTimeLeft(timeLimit, startTime);
 
@@ -432,9 +432,9 @@ namespace BoggleService.Controllers
                                 command.Parameters.AddWithValue("@Player1Score", player1Score + score);
                                 command.Parameters.AddWithValue("@GameID", gameID);
 
-                                
-                                int result = command.ExecuteNonQuery();
                                 trans.Commit();
+                                int result = command.ExecuteNonQuery();
+                                
 
                                 if (result == 0)
                                 {
@@ -512,8 +512,9 @@ namespace BoggleService.Controllers
                                 command.Parameters.AddWithValue("@Player2Score", player2Score + score);
                                 command.Parameters.AddWithValue("@GameID", gameID);
 
-                                int result = command.ExecuteNonQuery();
                                 trans.Commit();
+                                int result = command.ExecuteNonQuery();
+                                
                                 if (result == 0)
                                 {
                                     throw new HttpResponseException(HttpStatusCode.Forbidden);
