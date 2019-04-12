@@ -486,7 +486,7 @@
             Server controller that deals with a multitude of commands.
             </summary>
         </member>
-        <member name="M:BoggleService.Controllers.BoggleController.PostRegister2(System.String)">
+        <member name="M:BoggleService.Controllers.BoggleController.PostRegister(System.String)">
             <summary>
             Registers a new user with a provided string Nickname.
             If user is null or is empty after trimming, responds with status code Forbidden.

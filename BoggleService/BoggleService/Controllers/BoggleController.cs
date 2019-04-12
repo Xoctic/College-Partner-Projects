@@ -48,11 +48,10 @@ namespace BoggleService.Controllers
         /// <param name="user">String sser nickname to be added to users</param>
         /// <returns>A unique string user token of the newly added user</returns>
         [Route("BoggleService/users")]
-        public string PostRegister2([FromBody]string user)
+        public string PostRegister([FromBody]string user)
         {
             if (user == "stall")
             {
-
                 Thread.Sleep(5000);
             }
             if (user == null || user.Trim().Length == 0 || user.Trim().Length > 50)
