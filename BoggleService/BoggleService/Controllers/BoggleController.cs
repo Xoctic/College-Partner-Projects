@@ -391,7 +391,7 @@ namespace BoggleService.Controllers
                                 command.Parameters.AddWithValue("@GameID", gameID);
                                 command.Parameters.AddWithValue("@Player", player1token);
                                 command.Parameters.AddWithValue("@Score", 0);
-                                command.BeginExecuteNonQuery();
+                                command.ExecuteNonQuery();
                                 trans.Commit();
                             }
                         }
@@ -407,8 +407,7 @@ namespace BoggleService.Controllers
                                 command.Parameters.AddWithValue("@GameID", gameID);
                                 command.Parameters.AddWithValue("@Player", player1token);
                                 command.Parameters.AddWithValue("@Score", score);
-                                
-          
+                                command.ExecuteNonQuery();
                                 trans.Commit();
                             }
 
@@ -473,7 +472,7 @@ namespace BoggleService.Controllers
                                 command.Parameters.AddWithValue("@GameID", gameID);
                                 command.Parameters.AddWithValue("@Player", player2token);
                                 command.Parameters.AddWithValue("@Score", 0);
-                                command.BeginExecuteNonQuery();
+                                command.ExecuteNonQuery();
                                 trans.Commit();
                             }
                         }
@@ -490,7 +489,7 @@ namespace BoggleService.Controllers
                                 command.Parameters.AddWithValue("@Player", player2token);
                                 command.Parameters.AddWithValue("@Score", score);
                                 command.Parameters.AddWithValue("GameID", gameID);
-
+                                command.ExecuteNonQuery();
                                 trans.Commit();
                             }
 
