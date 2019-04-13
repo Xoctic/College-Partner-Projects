@@ -143,7 +143,7 @@ namespace BoggleService.Controllers
                 conn.Open();
                 using (SqlTransaction trans = conn.BeginTransaction())
                 {
-                    using (SqlCommand command = new SqlCommand("select GameState from Games where GameState = @GameState"))
+                    using (SqlCommand command = new SqlCommand("select GameState from Games where GameState = @GameState", conn, trans))
                     {
                         command.Parameters.AddWithValue("@GameState", "pending");
 
@@ -190,7 +190,7 @@ namespace BoggleService.Controllers
                         string currentGame = "";
                         string player1Token = "";
 
-                        using (SqlCommand command = new SqlCommand("select Player1, TimeLimit, GameID from Games where GameState = @GameState"))
+                        using (SqlCommand command = new SqlCommand("select Player1, TimeLimit, GameID from Games where GameState = @GameState", conn, trans))
                         {
                             command.Parameters.AddWithValue("@GameState", "pending");
 
@@ -283,7 +283,7 @@ namespace BoggleService.Controllers
                 conn.Open();
                 using (SqlTransaction trans = conn.BeginTransaction())
                 {
-                    using (SqlCommand command = new SqlCommand("select Player1 from Games where GameState = @GameState"))
+                    using (SqlCommand command = new SqlCommand("select Player1 from Games where GameState = @GameState", conn, trans))
                     {
                         command.Parameters.AddWithValue("@GameState", "pending");
 
@@ -365,7 +365,7 @@ namespace BoggleService.Controllers
 
                 using (SqlTransaction trans = conn.BeginTransaction())
                 {
-                    using (SqlCommand command = new SqlCommand("select GameState from Games where GameID = @GameID"))
+                    using (SqlCommand command = new SqlCommand("select GameState from Games where GameID = @GameID", conn, trans))
                     {
                         command.Parameters.AddWithValue("@GameID", gameID);
 
