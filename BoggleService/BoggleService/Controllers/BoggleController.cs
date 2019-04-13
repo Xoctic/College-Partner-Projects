@@ -10,7 +10,7 @@ using System.Web.Http;
 namespace BoggleService.Controllers
 {
     /// <summary>
-    /// Server controller that deals with a multitude of commands.
+    /// Server controller that deals with a multitude of commands for dealing with a Boggle game.
     /// </summary>
     public class BoggleController : ApiController
     {
@@ -97,14 +97,11 @@ namespace BoggleService.Controllers
                         {
                             throw new Exception("Query failed unexpectedly");
                         }
-
                         // Immediately before each return that appears within the scope of a transaction, it is
                         // important to commit the transaction.  Otherwise, the transaction will be aborted and
                         // rolled back as soon as control leaves the scope of the transaction. 
                         trans.Commit();
                         return userID;
-                        
-
                     }
                 }
             }
@@ -130,12 +127,6 @@ namespace BoggleService.Controllers
             {
                 throw new HttpResponseException(HttpStatusCode.Forbidden);
             }
-
-            //else if (pendingInfo.UserToken == joinGameInput.userToken)
-            //{
-            //    throw new HttpResponseException(HttpStatusCode.Conflict);
-            //}
-
             bool pendingGameAvailable = false;
 
             using (SqlConnection conn = new SqlConnection(DB))
@@ -154,10 +145,9 @@ namespace BoggleService.Controllers
                                 pendingGameAvailable = true;
                             }
                         }
-
                     }
 
-                        PendingGameInfo output = new PendingGameInfo();
+                    PendingGameInfo output = new PendingGameInfo();
                     if (pendingGameAvailable == false)
                     {    
                         //string letterG = "G";               
@@ -171,20 +161,15 @@ namespace BoggleService.Controllers
                             // We execute the command with the ExecuteScalar method, which will return to
                             // us the requested auto-generated ItemID.
                             string gameID = command.ExecuteScalar().ToString();
-                            //pendingInfo.GameID = gameID;
                             output.GameID = gameID;
                             trans.Commit();
                         }
-                        //pendingInfo.TimeLimit = joinGameInput.timeLimit;
-                        //pendingInfo.UserToken = joinGameInput.userToken;
-                        //pendingInfo.IsPending = true;
                         output.IsPending = true;
              
                         return output;
                     }
                     else
-                    {
-                        
+                    {                      
                         int player1TimeLimit = 0;
                         int currentGameID = 0;
                         string currentGame = "";
@@ -208,23 +193,9 @@ namespace BoggleService.Controllers
                                 player1TimeLimit = (int)reader["TimeLimit"];
                                 currentGameID = (int)reader["GameID"];
                             }
-
                         }
 
-
-
-                            currentGame = currentGameID.ToString();
-                        // In this case the command is a select.
-                        //using (SqlCommand command = new SqlCommand("select TimeLimit from Games where GameID=@GameID", conn, trans))
-                        //{
-                        //    command.Parameters.AddWithValue("@GameID", currentGame);
-                        //    using (SqlDataReader reader = command.ExecuteReader())
-                        //    {
-                        //        reader.Read();                              
-                        //        player1TimeLimit = (int)reader["TimeLimit"];                               
-                        //    }
-                        //    //trans.Commit();
-                        //}
+                        currentGame = currentGameID.ToString();
                         BoggleBoard boggleBoard = new BoggleBoard();
                         string board = boggleBoard.ToString();
 
@@ -247,16 +218,15 @@ namespace BoggleService.Controllers
 
                             //We pay attention to the number of rows modified.If no rows were modified,
                             //we know that there was no game with the given gameID, and we report an error.
-                            int result = command.ExecuteNonQuery();
+                            command.ExecuteNonQuery();
                             trans.Commit();
-                            if (result == 0)
-                            {
-                                throw new HttpResponseException(HttpStatusCode.Forbidden);
-                            }
+                            //if (result == 0)
+                            //{
+                            //    throw new HttpResponseException(HttpStatusCode.Forbidden);
+                            //}
                         }
                         output.IsPending = false;
                         output.GameID = currentGame;
-                        //pendingInfo = new PendingGameInfo();
                         return output;
                     }
                 }
@@ -312,13 +282,6 @@ namespace BoggleService.Controllers
                 }
             }
 
-                //if (pendingInfo.UserToken == null || pendingInfo.UserToken != token)
-                //{
-                //    throw new HttpResponseException(HttpStatusCode.Forbidden);
-                //}
-
-            //pendingInfo = new PendingGameInfo();
-
             using (SqlConnection conn = new SqlConnection(DB))
             {
                 conn.Open();
@@ -333,8 +296,8 @@ namespace BoggleService.Controllers
                             command.ExecuteNonQuery();
                             trans.Commit();
                         }
-                    }
                 }
+            }
         }
 
         /// <summary>
@@ -666,12 +629,12 @@ namespace BoggleService.Controllers
                             command.Parameters.AddWithValue("@GameState", "completed");
                             command.Parameters.AddWithValue("@GameID", gameID);
 
-                            int result = command.ExecuteNonQuery();
+                            command.ExecuteNonQuery();
                             trans.Commit();
-                            if (result == 0)
-                            {
-                                throw new HttpResponseException(HttpStatusCode.Forbidden);
-                            }
+                            //if (result == 0)
+                            //{
+                            //    throw new HttpResponseException(HttpStatusCode.Forbidden);
+                            //}
                         }
                     }
                     gameState = null;
@@ -936,7 +899,6 @@ namespace BoggleService.Controllers
                     }
                 }
             }
-
                 return true;
         }
 
@@ -978,10 +940,8 @@ namespace BoggleService.Controllers
                     }
                 }
             }
-
             return true;
         }
-
 
         /// <summary>
         /// Helper method to calculate the TimeLeft based on the time of day.
@@ -989,11 +949,6 @@ namespace BoggleService.Controllers
         private int calculateTimeLeft(int timeLimit, int startTime)
         {
             return timeLimit - (((DateTime.Now.Minute * 60) + DateTime.Now.Second) - startTime);
-        }
-
-        /// <summary>
-        /// The pending game info for the current pending game.
-        /// </summary>
-        private static PendingGameInfo pendingInfo = new PendingGameInfo();       
+        }     
     }
 }

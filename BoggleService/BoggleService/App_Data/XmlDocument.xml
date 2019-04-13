@@ -483,7 +483,7 @@
         </member>
         <member name="T:BoggleService.Controllers.BoggleController">
             <summary>
-            Server controller that deals with a multitude of commands.
+            Server controller that deals with a multitude of commands for dealing with a Boggle game.
             </summary>
         </member>
         <member name="M:BoggleService.Controllers.BoggleController.PostRegister(System.String)">
@@ -554,11 +554,6 @@
         <member name="M:BoggleService.Controllers.BoggleController.calculateTimeLeft(System.Int32,System.Int32)">
             <summary>
             Helper method to calculate the TimeLeft based on the time of day.
-            </summary>
-        </member>
-        <member name="F:BoggleService.Controllers.BoggleController.pendingInfo">
-            <summary>
-            The pending game info for the current pending game.
             </summary>
         </member>
         <member name="T:BoggleService.BoggleBoard">
