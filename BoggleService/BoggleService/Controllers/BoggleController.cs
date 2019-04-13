@@ -380,6 +380,12 @@ namespace BoggleService.Controllers
 
             }
 
+            if(gameState == "pending" || gameState == "completed")
+            {
+                throw new HttpResponseException(HttpStatusCode.Conflict);
+            }
+
+
             if (gameState == "active")
             {
 
