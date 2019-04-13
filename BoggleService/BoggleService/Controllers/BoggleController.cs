@@ -333,18 +333,21 @@ namespace BoggleService.Controllers
 
                             if (player1token != play.userToken && player2token != play.userToken)
                             {
+                                reader.Close();
                                 trans.Commit();
                                 throw new HttpResponseException(HttpStatusCode.Forbidden);
                             }
 
                             if (gameState == "completed" || gameState == "pending")
                             {
+                                reader.Close();
                                 trans.Commit();
                                 throw new HttpResponseException(HttpStatusCode.Forbidden);
                             }
 
                             if (timeLeft <= 0)
                             {
+                                reader.Close();
                                 trans.Commit();
                                 throw new HttpResponseException(HttpStatusCode.Conflict);
                             }
@@ -408,7 +411,6 @@ namespace BoggleService.Controllers
                                 command.Parameters.AddWithValue("@Player", player1token);
                                 command.Parameters.AddWithValue("@Score", score);
                                 command.ExecuteNonQuery();
-                                trans.Commit();
                             }
 
 
@@ -431,14 +433,9 @@ namespace BoggleService.Controllers
                                 command.Parameters.AddWithValue("@Player1Score", player1Score + score);
                                 command.Parameters.AddWithValue("@GameID", gameID);
 
-                                trans.Commit();
-                                int result = command.ExecuteNonQuery();
                                 
-
-                                if (result == 0)
-                                {
-                                    throw new HttpResponseException(HttpStatusCode.Forbidden);
-                                }
+                                command.ExecuteNonQuery();
+                                trans.Commit();
                             }
 
                         }
@@ -448,7 +445,7 @@ namespace BoggleService.Controllers
                     {
                         bool beenPlayed = false;
 
-                        using (SqlCommand command = new SqlCommand("select Word from Words where Player = @Player2, Word = @Word", conn, trans))
+                        using (SqlCommand command = new SqlCommand("select Word from Words where Player = @Player2 and Word = @Word", conn, trans))
                         {
                             command.Parameters.AddWithValue("@Player2", player2token);
                             command.Parameters.AddWithValue("@Word", play.word);
@@ -488,9 +485,7 @@ namespace BoggleService.Controllers
                                 command.Parameters.AddWithValue("@GameID", gameID);
                                 command.Parameters.AddWithValue("@Player", player2token);
                                 command.Parameters.AddWithValue("@Score", score);
-                                command.Parameters.AddWithValue("GameID", gameID);
                                 command.ExecuteNonQuery();
-                                trans.Commit();
                             }
 
                             using (SqlCommand command = new SqlCommand("select Player2Score from Games where GameID = @GameID", conn, trans))
@@ -510,14 +505,9 @@ namespace BoggleService.Controllers
                             {
                                 command.Parameters.AddWithValue("@Player2Score", player2Score + score);
                                 command.Parameters.AddWithValue("@GameID", gameID);
-
+                              
+                                command.ExecuteNonQuery();
                                 trans.Commit();
-                                int result = command.ExecuteNonQuery();
-                                
-                                if (result == 0)
-                                {
-                                    throw new HttpResponseException(HttpStatusCode.Forbidden);
-                                }
                             }
 
                         }
@@ -560,16 +550,19 @@ namespace BoggleService.Controllers
                         {
                             reader.Read();
                             gameState = (string)reader["GameState"];
-                            int timeLimit = (int)reader["TimeLimit"];
-                            int startTime = Convert.ToInt32((reader["StartTime"])); 
-                            if (gameState == "active")
+                            if(!(gameState == "pending"))
                             {
-                                int timeLeft = calculateTimeLeft(timeLimit, startTime);
-                                if (timeLeft <= 0)
+                                int timeLimit = (int)reader["TimeLimit"];
+                                int startTime = Convert.ToInt32((reader["StartTime"]));
+                                if (gameState == "active")
                                 {
-                                    setToCompleted = true;
+                                    int timeLeft = calculateTimeLeft(timeLimit, startTime);
+                                    if (timeLeft <= 0)
+                                    {
+                                        setToCompleted = true;
+                                    }
                                 }
-                            }
+                            }         
                         }
                     }
                     if (setToCompleted == true)
@@ -722,7 +715,7 @@ namespace BoggleService.Controllers
                             output.Player1.WordsPlayed = new List<PlayedWord>();
                             output.Player2.WordsPlayed = new List<PlayedWord>();
                             using (SqlCommand command = new SqlCommand("select Player1, Player2, Board, TimeLimit, " +
-                                "StartTime, Player1Score, Player2Score from Games where GameID = @GameID", conn, trans))
+                                "Player1Score, Player2Score from Games where GameID = @GameID", conn, trans))
                             {
                                 command.Parameters.AddWithValue("@GameID", gameID);
                                 using (SqlDataReader reader = command.ExecuteReader())
@@ -731,15 +724,12 @@ namespace BoggleService.Controllers
                                     player1 = (string)reader["Player1"];
                                     player2 = (string)reader["Player2"];
                                     string board = (string)reader["Board"];
-                                    int timeLimit = (int)reader["TimeLimit"];
-                                    int startTime = (int)reader["StartTime"];
+                                    int timeLimit = (int)reader["TimeLimit"];                                 
                                     int player1Score = (int)reader["Player1Score"];
                                     int player2Score = (int)reader["Player2Score"];
-                                    int timeLeft = calculateTimeLeft(timeLimit, startTime);
-
+                                    
                                     output.Board = board;
                                     output.TimeLimit = timeLimit;
-                                    output.TimeLeft = timeLeft;
                                     output.Player1.Score = player1Score;
                                     output.Player2.Score = player2Score;
                                 }
