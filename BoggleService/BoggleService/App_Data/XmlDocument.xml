@@ -537,18 +537,22 @@
             <param name="brief">Input boolean ,true for minimal information, false for maximum information</param>
             <returns>A GameInfo object which contains information depending on brief</returns>
         </member>
-        <member name="M:BoggleService.Controllers.BoggleController.validToken(System.String)">
+        <member name="M:BoggleService.Controllers.BoggleController.validToken(System.String,System.Data.SqlClient.SqlConnection,System.Data.SqlClient.SqlTransaction)">
             <summary>
             ensures that the userToken passed in is a valid token
             </summary>
             <param name="userToken"></param>
+            <param name="conn"></param>
+            <param name="trans"></param>
             <returns></returns>
         </member>
-        <member name="M:BoggleService.Controllers.BoggleController.validID(System.String)">
+        <member name="M:BoggleService.Controllers.BoggleController.validID(System.String,System.Data.SqlClient.SqlConnection,System.Data.SqlClient.SqlTransaction)">
             <summary>
             esures the gameID passed in is a valid gameId
             </summary>
             <param name="gID"></param>
+            <param name="conn"></param>
+            <param name="trans"></param>
             <returns></returns>
         </member>
         <member name="M:BoggleService.Controllers.BoggleController.calculateTimeLeft(System.Int32,System.Int32)">

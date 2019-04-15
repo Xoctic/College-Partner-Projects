@@ -119,21 +119,22 @@ namespace BoggleService.Controllers
         [Route("BoggleService/games")]
         public PendingGameInfo PostJoinGame(JoinGameInput joinGameInput)
         {
-            if (!(validToken(joinGameInput.userToken)))
+            if (joinGameInput.timeLimit < 5 || joinGameInput.timeLimit > 120)
             {
                 throw new HttpResponseException(HttpStatusCode.Forbidden);
             }
-            else if (joinGameInput.timeLimit < 5 || joinGameInput.timeLimit > 120)
-            {
-                throw new HttpResponseException(HttpStatusCode.Forbidden);
-            }
-            bool pendingGameAvailable = false;
-
             using (SqlConnection conn = new SqlConnection(DB))
             {
                 conn.Open();
                 using (SqlTransaction trans = conn.BeginTransaction())
                 {
+                    if (!validToken(joinGameInput.userToken, conn, trans))
+                    {
+                        throw new HttpResponseException(HttpStatusCode.Forbidden);
+                    }
+
+                    bool pendingGameAvailable = false;
+
                     using (SqlCommand command = new SqlCommand("select GameState from Games where GameState = @GameState", conn, trans))
                     {
                         command.Parameters.AddWithValue("@GameState", "pending");
@@ -202,6 +203,8 @@ namespace BoggleService.Controllers
                         //Averages both players time limits
                         int newTimeLimit = (player1TimeLimit + joinGameInput.timeLimit) / 2;
 
+                        ///(DateTime.Now.Minute * 60) + DateTime.Now.Second);
+
                         // In this case the command is an update.
                         using (SqlCommand command = new SqlCommand("update Games set Player2=@Player2, Board=@Board, " +
                             "TimeLimit=@TimeLimit, StartTime=@StartTime, GameState=@GameState, Player1Score=@Player1Score" +
@@ -210,7 +213,7 @@ namespace BoggleService.Controllers
                             command.Parameters.AddWithValue("@Player2", joinGameInput.userToken);
                             command.Parameters.AddWithValue("@Board", board);
                             command.Parameters.AddWithValue("@TimeLimit", newTimeLimit);
-                            command.Parameters.AddWithValue("@StartTime", (DateTime.Now.Minute * 60) + DateTime.Now.Second);
+                            command.Parameters.AddWithValue("@StartTime", DateTime.Now.Date);
                             command.Parameters.AddWithValue("@GameState", "active");
                             command.Parameters.AddWithValue("@Player1Score", 0);
                             command.Parameters.AddWithValue("@Player2Score", 0);
@@ -236,11 +239,6 @@ namespace BoggleService.Controllers
         [Route("BoggleService/games")]
         public void PutCancelJoin([FromBody]string token)
         {
-            //Ensures that the userToken is a valid token that exists in the data base
-            if (!(validToken(token)))
-            {
-                throw new HttpResponseException(HttpStatusCode.Forbidden);
-            }
             string player1token = "";
 
             //creates a new SQL connection, transaction, and command
@@ -249,6 +247,11 @@ namespace BoggleService.Controllers
                 conn.Open();
                 using (SqlTransaction trans = conn.BeginTransaction())
                 {
+                    //Ensures that the userToken is a valid token that exists in the data base
+                    if (!validToken(token, conn, trans))
+                    {
+                        throw new HttpResponseException(HttpStatusCode.Forbidden);
+                    }
                     //command to find the pending game by finding the game in the data base that has a gameState of pending
                     using (SqlCommand command = new SqlCommand("select Player1 from Games where GameState = @GameState", conn, trans))
                     {
@@ -281,24 +284,14 @@ namespace BoggleService.Controllers
 
                         }
                     }
-                }
-            }
-
-
-            //if the row found is a pending game with the same userToken that was passed in
-            //use an SQL command that deletes the row from the Games table, allowing us to cancel a pending game
-            using (SqlConnection conn = new SqlConnection(DB))
-            {
-                conn.Open();
-                using (SqlTransaction trans = conn.BeginTransaction())
-                {
-
-                        using (SqlCommand command = new SqlCommand("Delete from Games where GameState = @GameState", conn, trans))
-                        {
-                            command.Parameters.AddWithValue("@GameState", "pending");
-                            command.ExecuteNonQuery();
-                            trans.Commit();
-                        }
+                    //if the row found is a pending game with the same userToken that was passed in
+                    //use an SQL command that deletes the row from the Games table, allowing us to cancel a pending game
+                    using (SqlCommand command = new SqlCommand("Delete from Games where GameState = @GameState", conn, trans))
+                    {
+                        command.Parameters.AddWithValue("@GameState", "pending");
+                        command.ExecuteNonQuery();
+                        trans.Commit();
+                    }
                 }
             }
         }
@@ -317,24 +310,33 @@ namespace BoggleService.Controllers
         [Route("BoggleService/games/{gameID}")]
         public int PutPlayWord(string gameID, PlayWordInput play)
         {
-
             int score = 0;
-            string gameState = "";
 
-            //ensures that the word trying to be played is valid, as well as the gameID and the userToken
-            if (play.word == null || play.word == "" || play.word.Trim().Length > 30 || !validToken(play.userToken) || !validID(gameID))
+            //ensures that the word trying to be played is valid
+            if (play.word == null || play.word == "" || play.word.Trim().Length > 30)
             {
                  throw new HttpResponseException(HttpStatusCode.Forbidden);
             }
-
-            //finds the gameState of the gameID passed in
             using (SqlConnection conn = new SqlConnection(DB))
             {
                 conn.Open();
-
+                //retrieves all Game information related to the gameID passed in
                 using (SqlTransaction trans = conn.BeginTransaction())
                 {
-                    using (SqlCommand command = new SqlCommand("select GameState from Games where GameID = @GameID", conn, trans))
+                    string player1token = null;
+                    string player2token = null;
+                    string gameState = null;
+                    int timeLimit = 0;
+                    int startTime = 0;
+                    int timeLeft = 0;
+                    string turn = null;
+                    string board = null;
+                    //Ensures that the userToken is a valid token that exists in the data base, as well as the gameID.
+                    if (!validID(gameID, conn, trans) || !validToken(play.userToken, conn, trans))
+                    {
+                        throw new HttpResponseException(HttpStatusCode.Forbidden);
+                    }
+                    using (SqlCommand command = new SqlCommand("select Player1, Player2, GameState, TimeLimit, StartTime, Board from Games where GameID = @GameID", conn, trans))
                     {
                         command.Parameters.AddWithValue("@GameID", gameID);
 
@@ -343,252 +345,209 @@ namespace BoggleService.Controllers
                             reader.Read();
 
                             gameState = (string)reader["GameState"];
+                            //if the gameState of the game is "completed" or "pending", a word can not be played
+                            //throws a forbidden exception
+                            if (gameState == "pending" || gameState == "completed")
+                            {
+                                reader.Close();
+                                trans.Commit();
+                                throw new HttpResponseException(HttpStatusCode.Conflict);
+                            }
+                            player1token = (string)reader["Player1"];
+                            player2token = (string)reader["Player2"];
+                            timeLimit = (int)reader["TimeLimit"];
+                            startTime = Convert.ToInt32(reader["StartTime"]);
+                            board = (string)reader["Board"];
+                            timeLeft = calculateTimeLeft(timeLimit, startTime);
+
+                            //if there is not more time left in the game throws a conflict exception
+                            if (timeLeft <= 0)
+                            {
+                                reader.Close();
+                                trans.Commit();
+                                throw new HttpResponseException(HttpStatusCode.Conflict);
+                            }
+
+                            //if the userToken passed in does not match either userToken in the game
+                            //throws a forbidden exception
+                            if (player1token != play.userToken && player2token != play.userToken)
+                            {
+                                reader.Close();
+                                trans.Commit();
+                                throw new HttpResponseException(HttpStatusCode.Forbidden);
+                            }
+
+                            //figures out which player is playing the word
+                            if (play.userToken == player1token)
+                            {
+                                turn = "player1";
+                            }
+
+                            if (play.userToken == player2token)
+                            {
+                                turn = "player2";
+                            }
                         }
                     }
-                }
 
-            }
 
-            //if the gameState is pending or completed, a word can not be played and a conflict exception is thrown
-            if(gameState == "pending" || gameState == "completed")
-            {
-                throw new HttpResponseException(HttpStatusCode.Conflict);
-            }
-
-            //if the gameState is active, the word can be played
-            if (gameState == "active")
-            {
-
-                using (SqlConnection conn = new SqlConnection(DB))
-                {
-                    conn.Open();
-
-                    string player1token = "";
-                    string player2token = "";
-                    gameState = "";
-                    int timeLimit = 1000;
-                    int startTime = 1000;
-                    int timeLeft = 1000;
-                    string turn = "idk";
-                    string board = "";
-
-                    //retrieves all Game information related to the gameID passed in
-                    using (SqlTransaction trans = conn.BeginTransaction())
+                    if (turn == "player1")
                     {
-                        using (SqlCommand command = new SqlCommand("select Player1, Player2, GameState, TimeLimit, StartTime, Board from Games where GameID = @GameID", conn, trans))
+
+                        bool beenPlayed = false;
+
+                        //sees if the word has already been played by player1
+                        using (SqlCommand command = new SqlCommand("select Word from Words where Player = @Player1 and Word = @Word", conn, trans))
                         {
-                            command.Parameters.AddWithValue("@GameID", gameID);
+                            command.Parameters.AddWithValue("@Player1", player1token);
+                            command.Parameters.AddWithValue("@Word", play.word);
+
 
                             using (SqlDataReader reader = command.ExecuteReader())
                             {
-                                reader.Read();
-
-                                player1token = (string)reader["Player1"];
-                                player2token = (string)reader["Player2"];
-                                gameState = (string)reader["GameState"];
-                                timeLimit = (int)reader["TimeLimit"];
-                                startTime = Convert.ToInt32(reader["StartTime"]);
-                                board = (string)reader["Board"];
-                                timeLeft = calculateTimeLeft(timeLimit, startTime);
-
-                                //if the userToken passed in does not match either userToken in the game
-                                //throws a forbidden exception
-                                if (player1token != play.userToken && player2token != play.userToken)
+                                if (reader.HasRows)
                                 {
-                                    reader.Close();
-                                    trans.Commit();
-                                    throw new HttpResponseException(HttpStatusCode.Forbidden);
-                                }
-
-                                //if the gameState of the game is completed or pending, a word can not be played
-                                //throws a forbidden exception
-                                if (gameState == "completed" || gameState == "pending")
-                                {
-                                    reader.Close();
-                                    trans.Commit();
-                                    throw new HttpResponseException(HttpStatusCode.Forbidden);
-                                }
-
-                                //if there is not more time left in the game
-                                //throws a conflict exception
-                                if (timeLeft <= 0)
-                                {
-                                    reader.Close();
-                                    trans.Commit();
-                                    throw new HttpResponseException(HttpStatusCode.Conflict);
-                                }
-
-                                //figures out which player is playing the word
-                                if (play.userToken == player1token)
-                                {
-                                    turn = "player1";
-                                }
-
-                                if (play.userToken == player2token)
-                                {
-                                    turn = "player2";
+                                    score = 0;
+                                    beenPlayed = true;
                                 }
                             }
+
                         }
 
-
-                        if (turn == "player1")
+                        //if the word has been played, the word is added to the words table with a score of 0
+                        if (beenPlayed)
                         {
-
-                            bool beenPlayed = false;
-
-                            //sees if the word has already been played by player1
-                            using (SqlCommand command = new SqlCommand("select Word from Words where Player = @Player1 and Word = @Word", conn, trans))
+                            using (SqlCommand command = new SqlCommand("insert into Words (Word, GameID, Player, Score) values(@Word, @GameID, @Player, @Score)", conn, trans))
                             {
-                                command.Parameters.AddWithValue("@Player1", player1token);
                                 command.Parameters.AddWithValue("@Word", play.word);
-
-
-                                using (SqlDataReader reader = command.ExecuteReader())
-                                {
-                                    if (reader.HasRows)
-                                    {
-                                        score = 0;
-                                        beenPlayed = true;
-                                    }
-                                }
-
-                            }
-
-                            //if the word has been played, the word is added to the words table with a score of 0
-                            if (beenPlayed)
-                            {
-                                using (SqlCommand command = new SqlCommand("insert into Words (Word, GameID, Player, Score) values(@Word, @GameID, @Player, @Score)", conn, trans))
-                                {
-                                    command.Parameters.AddWithValue("@Word", play.word);
-                                    command.Parameters.AddWithValue("@GameID", gameID);
-                                    command.Parameters.AddWithValue("@Player", player1token);
-                                    command.Parameters.AddWithValue("@Score", 0);
-                                    command.ExecuteNonQuery();
-                                    trans.Commit();
-                                }
-                            }
-                            //if the word has not been played, the score is calculated through the boggleBoard class
-                            else
-                            {
-                                BoggleBoard b = new BoggleBoard(board);
-                                score = b.score(play.word);
-                                int player1Score = 0;
-
-                                //creates a new played word in the Word table with the score awarded to player1
-                                using (SqlCommand command = new SqlCommand("insert into Words (Word, GameID, Player, Score) values(@Word, @GameID, @Player, @Score)", conn, trans))
-                                {
-                                    command.Parameters.AddWithValue("@Word", play.word);
-                                    command.Parameters.AddWithValue("@GameID", gameID);
-                                    command.Parameters.AddWithValue("@Player", player1token);
-                                    command.Parameters.AddWithValue("@Score", score);
-                                    command.ExecuteNonQuery();
-                                }
-
-                                //retrieves the total score that player1 has
-                                using (SqlCommand command = new SqlCommand("select Player1Score from Games where GameID = @GameID", conn, trans))
-                                {
-                                    command.Parameters.AddWithValue("@GameID", gameID);
-
-                                    using (SqlDataReader reader = command.ExecuteReader())
-                                    {
-                                        reader.Read();
-
-                                        player1Score = (int)reader["Player1Score"];
-                                    }
-                                }
-
-
-                                //updates player1Score by adding the score awarded by playng the word
-                                using (SqlCommand command = new SqlCommand("update Games set Player1Score = @Player1Score where GameID = @GameID", conn, trans))
-                                {
-                                    command.Parameters.AddWithValue("@Player1Score", player1Score + score);
-                                    command.Parameters.AddWithValue("@GameID", gameID);
-
-
-                                    command.ExecuteNonQuery();
-                                    trans.Commit();
-                                }
+                                command.Parameters.AddWithValue("@GameID", gameID);
+                                command.Parameters.AddWithValue("@Player", player1token);
+                                command.Parameters.AddWithValue("@Score", 0);
+                                command.ExecuteNonQuery();
+                                trans.Commit();
                             }
                         }
+                        //if the word has not been played, the score is calculated through the boggleBoard class
                         else
                         {
-                            bool beenPlayed = false;
+                            BoggleBoard b = new BoggleBoard(board);
+                            score = b.score(play.word);
+                            int player1Score = 0;
 
-                            //sees if the word has already been played by player2
-                            using (SqlCommand command = new SqlCommand("select Word from Words where Player = @Player2 and Word = @Word", conn, trans))
+                            //creates a new played word in the Word table with the score awarded to player1
+                            using (SqlCommand command = new SqlCommand("insert into Words (Word, GameID, Player, Score) values(@Word, @GameID, @Player, @Score)", conn, trans))
                             {
-                                command.Parameters.AddWithValue("@Player2", player2token);
                                 command.Parameters.AddWithValue("@Word", play.word);
+                                command.Parameters.AddWithValue("@GameID", gameID);
+                                command.Parameters.AddWithValue("@Player", player1token);
+                                command.Parameters.AddWithValue("@Score", score);
+                                command.ExecuteNonQuery();
+                            }
+
+                            //retrieves the total score that player1 has
+                            using (SqlCommand command = new SqlCommand("select Player1Score from Games where GameID = @GameID", conn, trans))
+                            {
+                                command.Parameters.AddWithValue("@GameID", gameID);
 
                                 using (SqlDataReader reader = command.ExecuteReader())
                                 {
-                                    if (reader.HasRows)
-                                    {
-                                        score = 0;
-                                        beenPlayed = true;
-                                    }
+                                    reader.Read();
+
+                                    player1Score = (int)reader["Player1Score"];
                                 }
                             }
 
-                            //if the word has been played, the word is added to the words table with a score of 0
-                            if (beenPlayed)
+
+                            //updates player1Score by adding the score awarded by playng the word
+                            using (SqlCommand command = new SqlCommand("update Games set Player1Score = @Player1Score where GameID = @GameID", conn, trans))
                             {
+                                command.Parameters.AddWithValue("@Player1Score", player1Score + score);
+                                command.Parameters.AddWithValue("@GameID", gameID);
 
-                                using (SqlCommand command = new SqlCommand("insert into Words (Word, GameID, Player, Score) values(@Word, @GameID, @Player, @Score)", conn, trans))
-                                {
-                                    command.Parameters.AddWithValue("@Word", play.word);
-                                    command.Parameters.AddWithValue("@GameID", gameID);
-                                    command.Parameters.AddWithValue("@Player", player2token);
-                                    command.Parameters.AddWithValue("@Score", 0);
-                                    command.ExecuteNonQuery();
-                                    trans.Commit();
-                                }
+
+                                command.ExecuteNonQuery();
+                                trans.Commit();
                             }
-                            //if the word has not been played, the score is calculated through the boggleBoard class
-                            else
+                        }
+                    }
+                    else
+                    {
+                        bool beenPlayed = false;
+
+                        //sees if the word has already been played by player2
+                        using (SqlCommand command = new SqlCommand("select Word from Words where Player = @Player2 and Word = @Word", conn, trans))
+                        {
+                            command.Parameters.AddWithValue("@Player2", player2token);
+                            command.Parameters.AddWithValue("@Word", play.word);
+
+                            using (SqlDataReader reader = command.ExecuteReader())
                             {
-                                BoggleBoard b = new BoggleBoard(board);
-                                score = b.score(play.word);
-                                int player2Score = 0;
-
-                                //creates a new played word in the Word table with the score awarded to player2
-                                using (SqlCommand command = new SqlCommand("insert into Words (Word, GameID, Player, Score) values(@Word, @GameID, @Player, @Score)", conn, trans))
+                                if (reader.HasRows)
                                 {
-                                    command.Parameters.AddWithValue("@Word", play.word);
-                                    command.Parameters.AddWithValue("@GameID", gameID);
-                                    command.Parameters.AddWithValue("@Player", player2token);
-                                    command.Parameters.AddWithValue("@Score", score);
-                                    command.ExecuteNonQuery();
-                                }
-
-                                //retrieves the total score that player2 has
-                                using (SqlCommand command = new SqlCommand("select Player2Score from Games where GameID = @GameID", conn, trans))
-                                {
-                                    command.Parameters.AddWithValue("@GameID", gameID);
-
-                                    using (SqlDataReader reader = command.ExecuteReader())
-                                    {
-                                        reader.Read();
-
-                                        player2Score = (int)reader["Player2Score"];
-                                    }
-                                }
-
-                                //updates player2Score by adding the score awarded by playng the word
-                                using (SqlCommand command = new SqlCommand("update Games set Player2Score = @Player2Score where GameID = @GameID", conn, trans))
-                                {
-                                    command.Parameters.AddWithValue("@Player2Score", player2Score + score);
-                                    command.Parameters.AddWithValue("@GameID", gameID);
-
-                                    command.ExecuteNonQuery();
-                                    trans.Commit();
+                                    score = 0;
+                                    beenPlayed = true;
                                 }
                             }
-                        }                       
+                        }
+
+                        //if the word has been played, the word is added to the words table with a score of 0
+                        if (beenPlayed)
+                        {
+
+                            using (SqlCommand command = new SqlCommand("insert into Words (Word, GameID, Player, Score) values(@Word, @GameID, @Player, @Score)", conn, trans))
+                            {
+                                command.Parameters.AddWithValue("@Word", play.word);
+                                command.Parameters.AddWithValue("@GameID", gameID);
+                                command.Parameters.AddWithValue("@Player", player2token);
+                                command.Parameters.AddWithValue("@Score", 0);
+                                command.ExecuteNonQuery();
+                                trans.Commit();
+                            }
+                        }
+                        //if the word has not been played, the score is calculated through the boggleBoard class
+                        else
+                        {
+                            BoggleBoard b = new BoggleBoard(board);
+                            score = b.score(play.word);
+                            int player2Score = 0;
+
+                            //creates a new played word in the Word table with the score awarded to player2
+                            using (SqlCommand command = new SqlCommand("insert into Words (Word, GameID, Player, Score) values(@Word, @GameID, @Player, @Score)", conn, trans))
+                            {
+                                command.Parameters.AddWithValue("@Word", play.word);
+                                command.Parameters.AddWithValue("@GameID", gameID);
+                                command.Parameters.AddWithValue("@Player", player2token);
+                                command.Parameters.AddWithValue("@Score", score);
+                                command.ExecuteNonQuery();
+                            }
+
+                            //retrieves the total score that player2 has
+                            using (SqlCommand command = new SqlCommand("select Player2Score from Games where GameID = @GameID", conn, trans))
+                            {
+                                command.Parameters.AddWithValue("@GameID", gameID);
+
+                                using (SqlDataReader reader = command.ExecuteReader())
+                                {
+                                    reader.Read();
+
+                                    player2Score = (int)reader["Player2Score"];
+                                }
+                            }
+
+                            //updates player2Score by adding the score awarded by playng the word
+                            using (SqlCommand command = new SqlCommand("update Games set Player2Score = @Player2Score where GameID = @GameID", conn, trans))
+                            {
+                                command.Parameters.AddWithValue("@Player2Score", player2Score + score);
+                                command.Parameters.AddWithValue("@GameID", gameID);
+
+                                command.ExecuteNonQuery();
+                                trans.Commit();
+                            }
+                        }
                     }
                 }
             }
+
             return score;
         }
 
@@ -603,16 +562,15 @@ namespace BoggleService.Controllers
         [Route("BoggleService/games/{gameID}/{brief}")]
         public GameInfo GetGameStatus(string gameID, bool brief)
         {
-            if (!validID(gameID))
-            {
-                throw new HttpResponseException(HttpStatusCode.Forbidden);
-            }
-
             using (SqlConnection conn = new SqlConnection(DB))
             {
                 conn.Open();
                 using (SqlTransaction trans = conn.BeginTransaction())
                 {
+                    if (!validID(gameID, conn, trans))
+                    {
+                        throw new HttpResponseException(HttpStatusCode.Forbidden);
+                    }
                     string gameState = null;
                     int timeLimit = 0;
                     int startTime = 0;
@@ -679,7 +637,6 @@ namespace BoggleService.Controllers
                                 startTime = (int)reader["StartTime"];
                                 player1Score = (int)reader["Player1Score"];
                                 player2Score = (int)reader["Player2Score"];
-                                timeLeft = calculateTimeLeft(timeLimit, startTime);
                             }
                         }
                     }
@@ -696,9 +653,11 @@ namespace BoggleService.Controllers
                             output.GameState = "active";
                             output.Player1 = new PlayerInfo();
                             output.Player2 = new PlayerInfo();
+                            timeLeft = calculateTimeLeft(timeLimit, startTime);
                             output.TimeLeft = timeLeft;
                             output.Player1.Score = player1Score;
                             output.Player2.Score = player2Score;
+                            return output;
                         }
                         else if (gameState == "completed")
                         {
@@ -707,6 +666,7 @@ namespace BoggleService.Controllers
                             output.Player2 = new PlayerInfo();
                             output.Player1.Score = player1Score;
                             output.Player2.Score = player2Score;
+                            return output;
                         }
                     }
                     else
@@ -743,6 +703,7 @@ namespace BoggleService.Controllers
                             output.GameState = "active";                          
                             output.Board = board;
                             output.TimeLimit = timeLimit;
+                            timeLeft = calculateTimeLeft(timeLimit, startTime);
                             output.TimeLeft = timeLeft;
                             output.Player1.Score = player1Score;
                             output.Player2.Score = player2Score;
@@ -813,37 +774,31 @@ namespace BoggleService.Controllers
         /// ensures that the userToken passed in is a valid token
         /// </summary>
         /// <param name="userToken"></param>
+        /// <param name="conn"></param>
+        /// <param name="trans"></param>
         /// <returns></returns>
-        private bool validToken(string userToken)
+        private bool validToken(string userToken, SqlConnection conn, SqlTransaction trans)
         {
             if(userToken == null || userToken.Trim().Length != 36)
             {
                 return false;
             }
-
-            using (SqlConnection conn = new SqlConnection(DB))
+            //Here the SqlCommand is a select query. We are interested in whether userToken exists
+            //in the Users table
+            using (SqlCommand command = new SqlCommand("select UserID from Users where UserID = @UserID", conn, trans))
             {
-                conn.Open();
-                using (SqlTransaction trans = conn.BeginTransaction())
-                {
-                    //Here the SqlCommand is a select query. We are interested in whether userToken exists
-                    //in the Users table
-                    using (SqlCommand command = new SqlCommand("select UserID from Users where UserID = @UserID", conn, trans))
-                    {
-                        command.Parameters.AddWithValue("@UserID", userToken);
+                command.Parameters.AddWithValue("@UserID", userToken);
 
-                        //This executes a query (i.e. a select statement). The result is an
-                        //SqlDataReader that you can use to iterate through the rows in response.
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            //In this we don't actually need to read any data; we only need
-                            //to know whether a row was returned
-                            if(!reader.HasRows)
-                            {
-                                reader.Close();
-                                return false;
-                            }
-                        }
+                //This executes a query (i.e. a select statement). The result is an
+                //SqlDataReader that you can use to iterate through the rows in response.
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    //In this we don't actually need to read any data; we only need
+                    //to know whether a row was returned
+                    if (!reader.HasRows)
+                    {
+                        reader.Close();
+                        return false;
                     }
                 }
             }
@@ -854,37 +809,31 @@ namespace BoggleService.Controllers
         /// esures the gameID passed in is a valid gameId
         /// </summary>
         /// <param name="gID"></param>
+        /// <param name="conn"></param>
+        /// <param name="trans"></param>
         /// <returns></returns>
-        private bool validID(string gID)
+        private bool validID(string gID, SqlConnection conn, SqlTransaction trans)
         {
             if(gID == null || gID.Trim().Length == 0)
             {
                 return false;
             }
-
-            using (SqlConnection conn = new SqlConnection(DB))
+            //Here the SqlCommand is a select query. We are interested in whether userToken exists
+            //in the Users table
+            using (SqlCommand command = new SqlCommand("select GameID from Games where GameID = @GameID", conn, trans))
             {
-                conn.Open();
-                using (SqlTransaction trans = conn.BeginTransaction())
-                {
-                    //Here the SqlCommand is a select query. We are interested in whether userToken exists
-                    //in the Users table
-                    using (SqlCommand command = new SqlCommand("select GameID from Games where GameID = @GameID", conn, trans))
-                    {
-                        command.Parameters.AddWithValue("@GameID", gID);
+                command.Parameters.AddWithValue("@GameID", gID);
 
-                        //This executes a query (i.e. a select statement). The result is an
-                        //SqlDataReader that you can use to iterate through the rows in response.
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            //In this we don't actually need to read any data; we only need
-                            //to know whether a row was returned
-                            if (!reader.HasRows)
-                            {
-                                reader.Close();
-                                return false;
-                            }
-                        }
+                //This executes a query (i.e. a select statement). The result is an
+                //SqlDataReader that you can use to iterate through the rows in response.
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    //In this we don't actually need to read any data; we only need
+                    //to know whether a row was returned
+                    if (!reader.HasRows)
+                    {
+                        reader.Close();
+                        return false;
                     }
                 }
             }
@@ -894,9 +843,15 @@ namespace BoggleService.Controllers
         /// <summary>
         /// Helper method to calculate the TimeLeft based on the time of day.
         /// </summary>
-        private int calculateTimeLeft(int timeLimit, int startTime)
+        //private int calculateTimeLeft(int timeLimit, int startTime)
+        //{
+        //    return timeLimit - (((DateTime.Now.Minute * 60) + DateTime.Now.Second) - startTime);
+        //}
+
+        private DateTime calculateTimeLeft(DateTime startTime)
         {
-            return timeLimit - (((DateTime.Now.Minute * 60) + DateTime.Now.Second) - startTime);
-        }     
+           return Convert.ToDateTime(DateTime.Now.Date - startTime);
+
+        }
     }
 }
