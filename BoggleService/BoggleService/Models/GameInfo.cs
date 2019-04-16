@@ -59,14 +59,5 @@ namespace BoggleService.Models
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
         public int startTime;
-        
-        /// <summary>
-        /// Helper method to calculate the TimeLeft based on the time of day.
-        /// </summary>
-        public void calculateTimeLeft()
-        {
-            TimeLeft = TimeLimit - (((DateTime.Now.Minute * 60) + DateTime.Now.Second) - startTime);
-
-        }
     }
 }

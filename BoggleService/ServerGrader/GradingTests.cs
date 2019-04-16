@@ -1039,6 +1039,7 @@ namespace ServerGrader
         [TestMethod]
         public void TestStatus22()
         {
+            Reset();
             String player1 = MakeUser("Player 1", OK).Result;
             String player2 = MakeUser("Player 2", OK).Result;
             JoinGame(player1, 10).Wait();
@@ -1047,11 +1048,11 @@ namespace ServerGrader
             for (int time = 10; time > 0; time--)
             {
                 int left = GetStatus(game2, false).Result.TimeLeft;
-                Assert.IsTrue(left <= time + 1 && left >= time - 1 && left <= 10 && left >= 0);
+                Assert.IsTrue(left <= time + 1 && left >= time - 1 && left <= 10 && left >= 1);
                 Thread.Sleep(1000);
             }
 
-            Thread.Sleep(1000);
+            Thread.Sleep(3000);
             int? timeLeft = GetStatus(game2, false).Result.TimeLeft;
             Assert.IsNull(timeLeft);
         }

@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Net;
 using System.Threading;
 using System.Web.Http;
+//Authors:  Andrew Hare (u1033940), Aric Campbell (u1188031)
 
 namespace BoggleService.Controllers
 {
@@ -119,6 +120,7 @@ namespace BoggleService.Controllers
         [Route("BoggleService/games")]
         public PendingGameInfo PostJoinGame(JoinGameInput joinGameInput)
         {
+            //checks if the Time Limit passed in is less than 5 or greater than 120 in seconds.
             if (joinGameInput.timeLimit < 5 || joinGameInput.timeLimit > 120)
             {
                 throw new HttpResponseException(HttpStatusCode.Forbidden);
@@ -128,6 +130,7 @@ namespace BoggleService.Controllers
                 conn.Open();
                 using (SqlTransaction trans = conn.BeginTransaction())
                 {
+                    //checks if user token is valid
                     if (!validToken(joinGameInput.userToken, conn, trans))
                     {
                         throw new HttpResponseException(HttpStatusCode.Forbidden);
@@ -135,6 +138,7 @@ namespace BoggleService.Controllers
 
                     bool pendingGameAvailable = false;
 
+                    //Finds a pending game if it exists.
                     using (SqlCommand command = new SqlCommand("select GameState from Games where GameState = @GameState", conn, trans))
                     {
                         command.Parameters.AddWithValue("@GameState", "pending");
@@ -151,7 +155,8 @@ namespace BoggleService.Controllers
                     PendingGameInfo output = new PendingGameInfo();
                     if (pendingGameAvailable == false)
                     {    
-                        //string letterG = "G";               
+                
+                        //Adds a new game to Games with some info.
                         using (SqlCommand command = new SqlCommand("insert into Games (Player1, TimeLimit, GameState) output inserted.GameID values(@Player1, @TimeLimit, @GameState)", conn, trans))
                         {
                            
@@ -176,6 +181,7 @@ namespace BoggleService.Controllers
                         string currentGame = "";
                         string player1Token = "";
 
+                        //Sets necessary data needed for upcoming update command
                         using (SqlCommand command = new SqlCommand("select Player1, TimeLimit, GameID from Games where GameState = @GameState", conn, trans))
                         {
                             command.Parameters.AddWithValue("@GameState", "pending");
@@ -203,9 +209,7 @@ namespace BoggleService.Controllers
                         //Averages both players time limits
                         int newTimeLimit = (player1TimeLimit + joinGameInput.timeLimit) / 2;
 
-                        ///(DateTime.Now.Minute * 60) + DateTime.Now.Second);
-
-                        // In this case the command is an update.
+                        // In this case the command is an update.  Updates the pending game and changes its GameState to "active".
                         using (SqlCommand command = new SqlCommand("update Games set Player2=@Player2, Board=@Board, " +
                             "TimeLimit=@TimeLimit, StartTime=@StartTime, GameState=@GameState, Player1Score=@Player1Score" +
                             ",Player2Score=@Player2Score where GameID=@GameID", conn, trans))
@@ -213,7 +217,7 @@ namespace BoggleService.Controllers
                             command.Parameters.AddWithValue("@Player2", joinGameInput.userToken);
                             command.Parameters.AddWithValue("@Board", board);
                             command.Parameters.AddWithValue("@TimeLimit", newTimeLimit);
-                            command.Parameters.AddWithValue("@StartTime", DateTime.Now.Date);
+                            command.Parameters.AddWithValue("@StartTime", DateTime.Now);
                             command.Parameters.AddWithValue("@GameState", "active");
                             command.Parameters.AddWithValue("@Player1Score", 0);
                             command.Parameters.AddWithValue("@Player2Score", 0);
@@ -327,7 +331,7 @@ namespace BoggleService.Controllers
                     string player2token = null;
                     string gameState = null;
                     int timeLimit = 0;
-                    int startTime = 0;
+                    DateTime startTime = new DateTime();
                     int timeLeft = 0;
                     string turn = null;
                     string board = null;
@@ -356,9 +360,9 @@ namespace BoggleService.Controllers
                             player1token = (string)reader["Player1"];
                             player2token = (string)reader["Player2"];
                             timeLimit = (int)reader["TimeLimit"];
-                            startTime = Convert.ToInt32(reader["StartTime"]);
+                            startTime = (DateTime)(reader["StartTime"]);
                             board = (string)reader["Board"];
-                            timeLeft = calculateTimeLeft(timeLimit, startTime);
+                            timeLeft = calculateTimeLeft(startTime, timeLimit);
 
                             //if there is not more time left in the game throws a conflict exception
                             if (timeLeft <= 0)
@@ -567,13 +571,14 @@ namespace BoggleService.Controllers
                 conn.Open();
                 using (SqlTransaction trans = conn.BeginTransaction())
                 {
+                    //checks if game token is valid
                     if (!validID(gameID, conn, trans))
                     {
                         throw new HttpResponseException(HttpStatusCode.Forbidden);
                     }
                     string gameState = null;
                     int timeLimit = 0;
-                    int startTime = 0;
+                    DateTime startTime = new DateTime();
                     int timeLeft = 0;
                     bool setToCompleted = false;
                     //Checks the time remaining for gameID, which determines if the game is complete.
@@ -587,10 +592,10 @@ namespace BoggleService.Controllers
                             if(!(gameState == "pending"))
                             {
                                 timeLimit = (int)reader["TimeLimit"];
-                                startTime = Convert.ToInt32((reader["StartTime"]));
+                                startTime = (DateTime)reader["StartTime"];
                                 if (gameState == "active")
                                 {
-                                    timeLeft = calculateTimeLeft(timeLimit, startTime);
+                                    timeLeft = calculateTimeLeft(startTime, timeLimit);
                                     if (timeLeft <= 0)
                                     {
                                         setToCompleted = true;
@@ -615,11 +620,9 @@ namespace BoggleService.Controllers
                     string player1 = null;
                     string player2 = null;
                     string board = null;
-                    timeLimit = 0;
-                    startTime = 0;
                     int player1Score = 0;
                     int player2Score = 0;
-                    timeLeft = 0;
+                    //Sets necessary data needed for upcoming checks and commands.
                     using (SqlCommand command = new SqlCommand("select Player1, Player2, Board, TimeLimit, " +
                                 "StartTime, GameState, Player1Score, Player2Score from Games where GameID = @GameID", conn, trans))
                     {
@@ -634,13 +637,14 @@ namespace BoggleService.Controllers
                                 player2 = (string)reader["Player2"];
                                 board = (string)reader["Board"];
                                 timeLimit = (int)reader["TimeLimit"];
-                                startTime = (int)reader["StartTime"];
+                                startTime = (DateTime)reader["StartTime"];
                                 player1Score = (int)reader["Player1Score"];
                                 player2Score = (int)reader["Player2Score"];
                             }
                         }
                     }
                     GameInfo output = new GameInfo();
+                    //If brief is true
                     if (brief == true)
                     {
                         if (gameState == "pending")
@@ -653,8 +657,8 @@ namespace BoggleService.Controllers
                             output.GameState = "active";
                             output.Player1 = new PlayerInfo();
                             output.Player2 = new PlayerInfo();
-                            timeLeft = calculateTimeLeft(timeLimit, startTime);
-                            output.TimeLeft = timeLeft;
+                            timeLeft = calculateTimeLeft(startTime, timeLimit);
+                            output.TimeLeft = timeLeft;                          
                             output.Player1.Score = player1Score;
                             output.Player2.Score = player2Score;
                             return output;
@@ -669,6 +673,7 @@ namespace BoggleService.Controllers
                             return output;
                         }
                     }
+                    //If brief is false
                     else
                     {
                         if (gameState == "pending")
@@ -703,7 +708,11 @@ namespace BoggleService.Controllers
                             output.GameState = "active";                          
                             output.Board = board;
                             output.TimeLimit = timeLimit;
-                            timeLeft = calculateTimeLeft(timeLimit, startTime);
+                            timeLeft = calculateTimeLeft(startTime, timeLimit);
+                            if (timeLeft < 0)
+                            {
+                                timeLeft = 0;
+                            }
                             output.TimeLeft = timeLeft;
                             output.Player1.Score = player1Score;
                             output.Player2.Score = player2Score;
@@ -719,6 +728,7 @@ namespace BoggleService.Controllers
                             output.Player1.Score = player1Score;
                             output.Player2.Score = player2Score;
 
+                            //Finds all words played by player 1.
                             using (SqlCommand command = new SqlCommand("select Word, Score from Words, " +
                                 "Games where Words.GameID = Games.GameID and Words.GameID = @GameID and " +
                                 "Words.Player = Games.Player1 and Words.Player = @UserID  ", conn, trans))
@@ -740,6 +750,7 @@ namespace BoggleService.Controllers
                                     output.Player1.WordsPlayed = result;
                                 }
                             }
+                            //Finds all words played by player 2.
                             using (SqlCommand command = new SqlCommand("select Word, Score from Words, " +
                                 "Games where Words.GameID = Games.GameID and Words.GameID = @GameID and " +
                                 "Words.Player = Games.Player2 and Words.Player = @UserID  ", conn, trans))
@@ -843,15 +854,10 @@ namespace BoggleService.Controllers
         /// <summary>
         /// Helper method to calculate the TimeLeft based on the time of day.
         /// </summary>
-        //private int calculateTimeLeft(int timeLimit, int startTime)
-        //{
-        //    return timeLimit - (((DateTime.Now.Minute * 60) + DateTime.Now.Second) - startTime);
-        //}
-
-        private DateTime calculateTimeLeft(DateTime startTime)
+        private int calculateTimeLeft(DateTime startTime, int timeLimit)
         {
-           return Convert.ToDateTime(DateTime.Now.Date - startTime);
-
+            TimeSpan elapsed = DateTime.Now - startTime;
+            return timeLimit - Convert.ToInt32(elapsed.TotalSeconds);
         }
     }
 }

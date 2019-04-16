@@ -555,7 +555,7 @@
             <param name="trans"></param>
             <returns></returns>
         </member>
-        <member name="M:BoggleService.Controllers.BoggleController.calculateTimeLeft(System.Int32,System.Int32)">
+        <member name="M:BoggleService.Controllers.BoggleController.calculateTimeLeft(System.DateTime,System.Int32)">
             <summary>
             Helper method to calculate the TimeLeft based on the time of day.
             </summary>
@@ -677,11 +677,6 @@
         <member name="F:BoggleService.Models.GameInfo.startTime">
             <summary>
             Stores the time of day once the game starts.
-            </summary>
-        </member>
-        <member name="M:BoggleService.Models.GameInfo.calculateTimeLeft">
-            <summary>
-            Helper method to calculate the TimeLeft based on the time of day.
             </summary>
         </member>
         <member name="T:BoggleService.Models.PendingGameInfo">
