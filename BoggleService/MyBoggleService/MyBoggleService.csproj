@@ -48,6 +48,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="StringSocket">
+      <HintPath>..\StringSocket.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -67,7 +70,7 @@
     <Compile Include="PlayedWord.cs" />
     <Compile Include="PlayerInfo.cs" />
     <Compile Include="PlayWordInput.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="BoggleExpress.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

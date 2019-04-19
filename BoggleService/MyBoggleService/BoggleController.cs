@@ -727,8 +727,18 @@ namespace BoggleService.Controllers
                             output.GameState = "active";
                             output.Board = board;
                             output.TimeLimit = timeLimit;
-                            timeLeft = calculateTimeLeft(startTime, timeLimit);
-                            if (timeLeft < 0)
+
+                            if(timeLeft > 0 && timeLeft < 1)
+                            {
+                                timeLeft = calculateTimeLeftRounded(startTime, timeLimit);
+                            }
+                            else
+                            {
+                                timeLeft = calculateTimeLeft(startTime, timeLimit);
+                            }
+
+                            
+                            if (timeLeft <= 0)
                             {
                                 timeLeft = 0;
                             }
@@ -869,12 +879,41 @@ namespace BoggleService.Controllers
         }
 
         /// <summary>
-        /// Helper method to calculate the TimeLeft based on the time of day.
+        /// Helper method to calculate the TimeLeft in seconds based on the time of day.
         /// </summary>
         private int calculateTimeLeft(DateTime startTime, int timeLimit)
         {
             TimeSpan elapsed = DateTime.Now - startTime;
             return timeLimit - Convert.ToInt32(elapsed.TotalSeconds);
         }
+
+
+        /// <summary>
+        /// Helper method to calculate the rounded version of TimeLeft in seconds based on the time of day.
+        /// </summary>
+        private int calculateTimeLeftRounded(DateTime startTime, int timeLimit)
+        {
+            TimeSpan elapsed = DateTime.Now - startTime;
+            double timeLeft = timeLimit - elapsed.TotalSeconds;
+            double dec = timeLeft - Math.Floor(timeLeft);
+
+            if(dec >= .5)
+            {
+                timeLeft = Math.Ceiling(timeLeft);
+            }
+            else
+            {
+                timeLeft = Math.Floor(timeLeft);
+            }
+
+            
+
+
+            return Convert.ToInt32(timeLeft);
+        }
+
+
+        
+
     }
 }
