@@ -1,4 +1,4 @@
-﻿using BoggleService.Models;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -7,7 +7,7 @@ using System.IO;
 using System.Net;
 using System.Threading;
 
-namespace BoggleService.Controllers
+namespace Express
 {
     class HttpResponseException : Exception
     {

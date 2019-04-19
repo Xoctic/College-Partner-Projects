@@ -2,9 +2,9 @@
 
 using System;
 using System.IO;
-using BoggleService.Models;
 
-namespace BoggleService
+
+namespace Express
 {
     /// <summary>
     /// Represents a Boggle board.

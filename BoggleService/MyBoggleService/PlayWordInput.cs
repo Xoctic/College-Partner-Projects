@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace BoggleService.Models
+namespace Express
 {
     /// <summary>
     /// Class that stores the input Info when a play word request executes.

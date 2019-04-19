@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Web;
 
-namespace BoggleService.Models
+namespace Express
 {
     /// <summary>
     /// Class to store the information of each player.

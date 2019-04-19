@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace BoggleService.Models
+namespace Express
 {
     /// <summary>
     /// Class to store the Game Info when a Join Game request executes.
