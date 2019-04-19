@@ -29,16 +29,11 @@ namespace MyBoggleService
 
         private StringSocketClient client;
 
-        private delegate void ConnectionRequested();
+        
 
         public BoggleExpress(int port)
         {
             client = new StringSocketClient("", port, new System.Text.UTF8Encoding());
-
-
-           
-
-
             server = new StringSocketListener(port, new System.Text.UTF8Encoding());
 
             server.Start();
@@ -47,17 +42,19 @@ namespace MyBoggleService
 
             server.BeginAcceptStringSocket(ConnectionRequested, null);
 
-            
-
-            
         }
 
-        private void ConectionRequested(IAsyncResult result)
+        private void ConnectionRequested(StringSocket ss, object payload)
         {
             StringSocket s = server.AcceptStringSocket();
 
-            return s;
+            server.BeginAcceptStringSocket(ConnectionRequested, null);
+
+
+
         }
+
+        
 
 
       
