@@ -883,8 +883,9 @@ namespace BoggleService.Controllers
         /// </summary>
         private int calculateTimeLeft(DateTime startTime, int timeLimit)
         {
-            TimeSpan elapsed = DateTime.Now - startTime;
-            return timeLimit - Convert.ToInt32(elapsed.TotalSeconds);
+            TimeSpan timePassed = DateTime.Now - startTime;
+            double num = (double)timeLimit - timePassed.TotalSeconds;
+            return Convert.ToInt32(Math.Round(num, MidpointRounding.AwayFromZero));
         }
 
 
