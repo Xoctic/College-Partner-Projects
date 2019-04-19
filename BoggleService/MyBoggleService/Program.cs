@@ -19,5 +19,7 @@ namespace MyBoggleService
             // exiting while the server is in use            
             Console.ReadLine();
         }
+
+        private StringSocketListener server = new StringSocketListener();
     }
 }
