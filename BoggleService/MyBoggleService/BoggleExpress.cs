@@ -27,13 +27,36 @@ namespace MyBoggleService
         //Listens for incoming connection requests
         private StringSocketListener server;
 
+        private StringSocketClient client;
+
+        private delegate void ConnectionRequested();
+
         public BoggleExpress(int port)
         {
+            client = new StringSocketClient("", port, new System.Text.UTF8Encoding());
+
+
+           
+
+
             server = new StringSocketListener(port, new System.Text.UTF8Encoding());
 
             server.Start();
 
+            
+
             server.BeginAcceptStringSocket(ConnectionRequested, null);
+
+            
+
+            
+        }
+
+        private void ConectionRequested(IAsyncResult result)
+        {
+            StringSocket s = server.AcceptStringSocket();
+
+            return s;
         }
 
 
