@@ -114,11 +114,13 @@ namespace Express
                 incoming = "";
                 outgoing = "";
 
+               
+
                 bController = new BoggleController();
 
                 try
                 {
-                    ss.BeginReceive(MessageRecieved, new object(), 0);
+                    ss.BeginReceive(MessageRecieved, new object(), -1);
 
                     
                 }
@@ -131,33 +133,60 @@ namespace Express
 
             }
 
+            
+
+
             private void MessageRecieved(string s, object payload)
             {
                 string[] words;
-                
+
                 dynamic info = JsonConvert.DeserializeObject(payload.ToString());
                 StringReader reader = new StringReader(s);
                 string line = reader.ReadLine();
-                line = line.Remove(line.Length - 5, 4);
+                line = line.Remove(line.Length - 3, 2);
                 char[] array = line.ToCharArray();
+
+                outgoing = "";
+                int contentLength = 0;
+
                 
 
-                while(line != null)
+                while (line != null)
                 {
-                    if(array[0] == 'P')
+                    if (array[0] == 'P')
                     {
                         words = line.Split('/');
 
                         if (array[1] == 'U' && array[2] == 'T')
                         {
-                            
 
-                            if(words.Length == 4)
+
+                            if (words.Length == 4)
                             {
-                                bController.PutCancelJoin(payload.ToString());
-                                //send message
+                                try
+                                {
+                                    bController.PutCancelJoin(payload.ToString());
+
+                                    outgoing += "HTTP/1.1 204 NoContent \r\n";
+
+                                }
+                                catch (HttpResponseException e)
+                                {
+                                    if (e.Code == HttpStatusCode.Forbidden)
+                                    {
+                                        outgoing += "HTTP/1.1 403 Forbidden \r\n";
+                                    }
+                                }
+                                outgoing += "Content-Length: 0 \r\n";
+                                outgoing += "Content-Type: application/json; charset=utf-8 \r\n";
+                                outgoing += "\r\n";
+
+                                //payload = null;
+
+                                ss.BeginSend(outgoing, MessageSent, new object());
+
                             }
-                            else if(words.Length == 5)
+                            else if (words.Length == 5)
                             {
                                 PlayWordInput input;
                                 String userT;
@@ -169,24 +198,71 @@ namespace Express
                                 input = new PlayWordInput(userT, word);
                                 words[3] = words[3].Remove(words[3].Length - 6, 5);
 
-                                bController.PutPlayWord(words[3] , input);
+                                try
+                                {
+
+                                    payload = bController.PutPlayWord(words[3], input);
+                                    payload = JsonConvert.SerializeObject(payload);
+
+                                    contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
+
+
+                                    outgoing += "HTTP/1.1 200 OK \r\n";
+                                }
+                                catch (HttpResponseException e)
+                                {
+                                    if (e.Code == HttpStatusCode.Forbidden)
+                                    {
+                                        outgoing += "HTTP/1.1 403 Forbidden \r\n";
+                                    }
+                                    if (e.Code == HttpStatusCode.Conflict)
+                                    {
+                                        outgoing += "HTTP/1.1 409 Conflict \r\n";
+                                    }
+
+                                }
+
+                                outgoing += "Content-Length: " + contentLength + " \r\n";
+                                outgoing += "Content-Type: application/json; charset=utf-8 \r\n";
+                                outgoing += "\r\n";
+
+                                ss.BeginSend(outgoing, MessageSent, payload);
                                 //send message
 
                             }
 
                         }
-                        else if(array[1] == 'O' && array[2] == 'S' && array[3] == 'T')
+                        else if (array[1] == 'O' && array[2] == 'S' && array[3] == 'T')
                         {
-                            if(words.Length == 5)
+                            if (words.Length == 5)
                             {
-                                
-
                                 if (words[3] == "users")
                                 {
-                                    bController.PostRegister(payload.ToString());
+                                    try
+                                    {
+                                        payload = bController.PostRegister(payload.ToString());
+                                        payload = JsonConvert.SerializeObject(payload);
+
+                                        contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
+
+                                        outgoing += "HTTP/1.1 200 OK \r\n";
+                                    }
+                                    catch (HttpResponseException e)
+                                    {
+                                        if (e.Code == HttpStatusCode.Forbidden)
+                                        {
+                                            outgoing += "HTTP/1.1 403 Forbidden \r\n";
+                                        }
+                                    }
+                                    outgoing += "Content-Length: " + contentLength + " \r\n";
+                                    outgoing += "Content-Type: application/json; charset=utf-8 \r\n";
+                                    outgoing += "\r\n";
+
+
+                                    ss.BeginSend(outgoing, MessageSent, payload);
                                     //send message
                                 }
-                                else if(words[3] == "games")
+                                else if (words[3] == "games")
                                 {
                                     string userT;
                                     int time;
@@ -196,7 +272,32 @@ namespace Express
 
                                     JoinGameInput input = new JoinGameInput(time, userT);
 
-                                    bController.PostJoinGame(input);
+                                    try
+                                    {
+                                        payload = bController.PostJoinGame(input);
+                                        payload = JsonConvert.SerializeObject(payload);
+
+                                        contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
+
+                                        outgoing += "HTTP/1.1 200 OK \r\n";
+                                    }
+                                    catch (HttpResponseException e)
+                                    {
+                                        if (e.Code == HttpStatusCode.Forbidden)
+                                        {
+                                            outgoing += "HTTP/1.1 403 Forbidden \r\n";
+                                        }
+                                        if (e.Code == HttpStatusCode.Conflict)
+                                        {
+                                            outgoing += "HTTP/1.1 409 Conflict \r\n";
+                                        }
+                                    }
+                                    outgoing += "Content-Length: " + contentLength + " \r\n";
+                                    outgoing += "Content-Type: application/json; charset=utf-8 \r\n";
+                                    outgoing += "\r\n";
+
+
+                                    ss.BeginSend(outgoing, MessageSent, payload);
                                     //send message
                                 }
                             }
@@ -204,41 +305,86 @@ namespace Express
 
                         }
                     }
-                    else if(array[0] == 'G' && array[1] == 'E' && array[2] == 'T')
+                    else if (array[0] == 'G' && array[1] == 'E' && array[2] == 'T')
                     {
                         words = line.Split('/');
 
-                        if(words.Length == 6)
+                        if (words.Length == 6)
                         {
                             words[4] = words[4].Remove(words[4].Length - 6, 5);
                             words[3] = words[3].Remove(words[3].Length - 6, 5);
 
                             if (words[4] == "true")
                             {
-                                bController.GetGameStatus(words[3], true);
+                                try
+                                {
+                                    payload = bController.GetGameStatus(words[3], true);
+                                    payload = JsonConvert.SerializeObject(payload);
+
+                                    contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
+
+
+                                    outgoing += "HTTP/1.1 200 OK \r\n";
+                                }
+                                catch (HttpResponseException e)
+                                {
+                                    if (e.Code == HttpStatusCode.Forbidden)
+                                    {
+                                        outgoing += "HTTP/1.1 403 Forbidden \r\n";
+                                    }
+                                }
+                                outgoing += "Content-Length: " + contentLength + " \r\n";
+                                outgoing += "Content-Type: application/json; charset=utf-8 \r\n";
+                                outgoing += "\r\n";
+
+                                ss.BeginSend(outgoing, MessageSent, payload);
                                 //send message
                             }
-                            else if(words[4] == "false")
+                            else if (words[4] == "false")
                             {
-                                bController.GetGameStatus(words[3], false);
+                                try
+                                {
+                                    payload = bController.GetGameStatus(words[3], false);
+                                    payload = JsonConvert.SerializeObject(payload);
+
+                                    contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
+
+                                    outgoing += "HTTP/1.1 200 OK \r\n";
+                                }
+                                catch (HttpResponseException e)
+                                {
+                                    if (e.Code == HttpStatusCode.Forbidden)
+                                    {
+                                        outgoing += "HTTP/1.1 403 Forbidden \r\n";
+                                    }
+                                }
+                                outgoing += "Content-Length: " + contentLength + " \r\n";
+                                outgoing += "Content-Type: application/json; charset=utf-8 \r\n";
+                                outgoing += "\r\n";
+
+                                ss.BeginSend(outgoing, MessageSent, payload);
                                 //send message
                             }
                         }
                     }
 
                     line = reader.ReadLine();
-                    line = line.Remove(line.Length - 5, 4);
+                    line = line.Remove(line.Length - 3, 2);
                     array = line.ToCharArray();
                 }
 
+            }
+
+
+
+            private void MessageSent(bool wasSent, object payload)
+            {
 
 
             }
-           
-            
 
 
-           
+
 
 
         }
