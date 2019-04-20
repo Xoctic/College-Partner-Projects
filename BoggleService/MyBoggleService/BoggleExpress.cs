@@ -33,44 +33,32 @@ namespace Express
 
         private StringSocketClient client;
 
-        
-
         // All the clients that have connected but haven't closed
         private List<ClientConnection> clients = new List<ClientConnection>();
 
         // Read/write lock to coordinate access to the clients list
         private readonly ReaderWriterLockSlim sync = new ReaderWriterLockSlim();
         
-
         public BoggleExpress(int port)
         {
             client = new StringSocketClient("localhost", port, new System.Text.UTF8Encoding());
             server = new StringSocketListener(port, new System.Text.UTF8Encoding());
             
-
             server.Start();
 
-            
-
-            server.BeginAcceptStringSocket(ConnectionRequested, null);
-
-            
+            server.BeginAcceptStringSocket(ConnectionRequested, null);         
         }
 
         private void ConnectionRequested(StringSocket ss, object payload)
         {
-
             ss = client.Client;
             
-
             server.BeginAcceptStringSocket(ConnectionRequested, null);
 
             try
             {
                 sync.EnterWriteLock();
-                clients.Add(new ClientConnection(ss, this));
-
-               
+                clients.Add(new ClientConnection(ss, this));              
             }
             finally
             {
@@ -78,9 +66,6 @@ namespace Express
             }
 
         }
-
-
-
 
         public class ClientConnection
         {
@@ -114,27 +99,17 @@ namespace Express
                 incoming = "";
                 outgoing = "";
 
-               
-
                 bController = new BoggleController();
 
                 try
                 {
-                    ss.BeginReceive(MessageRecieved, new object(), -1);
-
-                    
+                    ss.BeginReceive(MessageRecieved, new object(), -1);                 
                 }
                 catch
                 {
 
                 }
-
-
-
-            }
-
-            
-
+            }         
 
             private void MessageRecieved(string s, object payload)
             {
@@ -145,12 +120,11 @@ namespace Express
                 string line = reader.ReadLine();
                 line = line.Remove(line.Length - 3, 2);
                 char[] array = line.ToCharArray();
-
-                outgoing = "";
+                outgoing = null;
+                string code = null;
                 int contentLength = 0;
 
                 
-
                 while (line != null)
                 {
                     if (array[0] == 'P')
@@ -159,27 +133,22 @@ namespace Express
 
                         if (array[1] == 'U' && array[2] == 'T')
                         {
-
-
                             if (words.Length == 4)
                             {
                                 try
                                 {
                                     bController.PutCancelJoin(payload.ToString());
 
-                                    outgoing += "HTTP/1.1 204 NoContent \r\n";
-
+                                    code = "204 NoContent";
                                 }
                                 catch (HttpResponseException e)
                                 {
                                     if (e.Code == HttpStatusCode.Forbidden)
                                     {
-                                        outgoing += "HTTP/1.1 403 Forbidden \r\n";
+                                        code = "403 Forbidden";
                                     }
                                 }
-                                outgoing += "Content-Length: 0 \r\n";
-                                outgoing += "Content-Type: application/json; charset=utf-8 \r\n";
-                                outgoing += "\r\n";
+                                SetOutgoingMessage(code, contentLength);
 
                                 //payload = null;
 
@@ -206,29 +175,24 @@ namespace Express
 
                                     contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
 
-
-                                    outgoing += "HTTP/1.1 200 OK \r\n";
+                                    code = "200 OK";
                                 }
                                 catch (HttpResponseException e)
                                 {
                                     if (e.Code == HttpStatusCode.Forbidden)
                                     {
-                                        outgoing += "HTTP/1.1 403 Forbidden \r\n";
+                                        code = "403 Forbidden";
                                     }
                                     if (e.Code == HttpStatusCode.Conflict)
                                     {
-                                        outgoing += "HTTP/1.1 409 Conflict \r\n";
+                                        code = "409 Conflict";
                                     }
 
                                 }
-
-                                outgoing += "Content-Length: " + contentLength + " \r\n";
-                                outgoing += "Content-Type: application/json; charset=utf-8 \r\n";
-                                outgoing += "\r\n";
+                                SetOutgoingMessage(code, contentLength);
 
                                 ss.BeginSend(outgoing, MessageSent, payload);
                                 //send message
-
                             }
 
                         }
@@ -245,18 +209,16 @@ namespace Express
 
                                         contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
 
-                                        outgoing += "HTTP/1.1 200 OK \r\n";
+                                        code = "200 OK";
                                     }
                                     catch (HttpResponseException e)
                                     {
                                         if (e.Code == HttpStatusCode.Forbidden)
                                         {
-                                            outgoing += "HTTP/1.1 403 Forbidden \r\n";
+                                            code = "403 Forbidden";
                                         }
                                     }
-                                    outgoing += "Content-Length: " + contentLength + " \r\n";
-                                    outgoing += "Content-Type: application/json; charset=utf-8 \r\n";
-                                    outgoing += "\r\n";
+                                    SetOutgoingMessage(code, contentLength);
 
 
                                     ss.BeginSend(outgoing, MessageSent, payload);
@@ -279,30 +241,25 @@ namespace Express
 
                                         contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
 
-                                        outgoing += "HTTP/1.1 200 OK \r\n";
+                                        code = "200 OK";
                                     }
                                     catch (HttpResponseException e)
                                     {
                                         if (e.Code == HttpStatusCode.Forbidden)
                                         {
-                                            outgoing += "HTTP/1.1 403 Forbidden \r\n";
+                                            code = "403 Forbidden";
                                         }
                                         if (e.Code == HttpStatusCode.Conflict)
                                         {
-                                            outgoing += "HTTP/1.1 409 Conflict \r\n";
+                                            code = "409 Conflict";
                                         }
                                     }
-                                    outgoing += "Content-Length: " + contentLength + " \r\n";
-                                    outgoing += "Content-Type: application/json; charset=utf-8 \r\n";
-                                    outgoing += "\r\n";
-
+                                    SetOutgoingMessage(code, contentLength);
 
                                     ss.BeginSend(outgoing, MessageSent, payload);
                                     //send message
                                 }
                             }
-
-
                         }
                     }
                     else if (array[0] == 'G' && array[1] == 'E' && array[2] == 'T')
@@ -324,18 +281,16 @@ namespace Express
                                     contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
 
 
-                                    outgoing += "HTTP/1.1 200 OK \r\n";
+                                    code = "200 OK";
                                 }
                                 catch (HttpResponseException e)
                                 {
                                     if (e.Code == HttpStatusCode.Forbidden)
                                     {
-                                        outgoing += "HTTP/1.1 403 Forbidden \r\n";
+                                        code = "403 Forbidden";
                                     }
                                 }
-                                outgoing += "Content-Length: " + contentLength + " \r\n";
-                                outgoing += "Content-Type: application/json; charset=utf-8 \r\n";
-                                outgoing += "\r\n";
+                                SetOutgoingMessage(code, contentLength);
 
                                 ss.BeginSend(outgoing, MessageSent, payload);
                                 //send message
@@ -349,56 +304,45 @@ namespace Express
 
                                     contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
 
-                                    outgoing += "HTTP/1.1 200 OK \r\n";
+                                    code = "200 OK";
                                 }
                                 catch (HttpResponseException e)
                                 {
                                     if (e.Code == HttpStatusCode.Forbidden)
                                     {
-                                        outgoing += "HTTP/1.1 403 Forbidden \r\n";
+                                        code = "403 Forbidden";
                                     }
                                 }
-                                outgoing += "Content-Length: " + contentLength + " \r\n";
-                                outgoing += "Content-Type: application/json; charset=utf-8 \r\n";
-                                outgoing += "\r\n";
+                                SetOutgoingMessage(code, contentLength);
 
                                 ss.BeginSend(outgoing, MessageSent, payload);
                                 //send message
                             }
                         }
                     }
-
                     line = reader.ReadLine();
                     line = line.Remove(line.Length - 3, 2);
                     array = line.ToCharArray();
                 }
-
             }
-
-
 
             private void MessageSent(bool wasSent, object payload)
             {
 
-
             }
 
-
-
-
-
+            /// <summary>
+            /// Helper method to assist in setting the outgoing string properly.
+            /// </summary>
+            /// <param name="code"></param>
+            /// <param name="contentLength"></param>
+            private void SetOutgoingMessage(string code, int contentLength)
+            {
+                outgoing += "HTTP/1.1 " + code + " \r\n";
+                outgoing += "Content-Length: " + contentLength + " \r\n";
+                outgoing += "Content-Type: application/json; charset=utf-8 \r\n";
+                outgoing += "\r\n";
+            }
         }
-
-
-
-
-
-
-
-        
-
-
-      
-
     }
 }
