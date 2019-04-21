@@ -125,7 +125,7 @@ namespace Express
 
                 try
                 {
-                    ss.BeginReceive(MessageRecieved, payload, 0);   
+                    ss.BeginReceive(MessageRecieved, null, 0);   
                     
                 }
                 catch
@@ -141,7 +141,7 @@ namespace Express
 
                 if (s != null && payloadReady)
                 {
-                    payload = s.Replace("\"", "");
+                    payload = s.Replace("\"", "");                  
                     s = null;
                 }
                 if (s != null && !payloadReady)
@@ -173,10 +173,14 @@ namespace Express
                     
                     dynamic info = new ExpandoObject();
                     StringReader reader = new StringReader(incoming);
-                    if(payload.ToString()[0] == '{')
+                    if((string)payload != null && (string)payload != "")
                     {
-                        info = JsonConvert.DeserializeObject(payload.ToString());
-                    }                    
+                        if (payload.ToString()[0] == '{')
+                        {
+                            //Something is wrong with this line, as errors are being thrown.
+                            info = JsonConvert.DeserializeObject(payload.ToString());
+                        }
+                    }             
 
                     string line = reader.ReadLine();
                     //line = line.Trim();
@@ -203,9 +207,9 @@ namespace Express
 
                                         code = "204 NoContent";
                                     }
-                                    catch (HttpResponseException e)
+                                    catch(Exception e)
                                     {
-                                        if (e.Code == HttpStatusCode.Forbidden)
+                                        if (e is HttpResponseException)
                                         {
                                             code = "403 Forbidden";
                                         }
@@ -234,8 +238,7 @@ namespace Express
                                     words[3] = words[3].Trim();
 
                                     try
-                                    {
-                                        
+                                    {                  
                                         output = bController.PutPlayWord(words[3], input).ToString();
                                         output = JsonConvert.SerializeObject(output);
 
@@ -243,17 +246,20 @@ namespace Express
 
                                         code = "200 OK";
                                     }
-                                    catch (HttpResponseException e)
+                                    catch (Exception e)
                                     {
-                                        if (e.Code == HttpStatusCode.Forbidden)
+                                        if (e is HttpResponseException)
                                         {
-                                            code = "403 Forbidden";
+                                            HttpResponseException httpException = (HttpResponseException)e.InnerException;
+                                            if (httpException.Code == HttpStatusCode.Forbidden)
+                                            {
+                                                code = "403 Forbidden";
+                                            }
+                                            if (httpException.Code == HttpStatusCode.Conflict)
+                                            {
+                                                code = "409 Conflict";
+                                            }
                                         }
-                                        if (e.Code == HttpStatusCode.Conflict)
-                                        {
-                                            code = "409 Conflict";
-                                        }
-
                                     }
                                     SetOutgoingMessage(code, contentLength);
                                     outgoing += output;
@@ -275,16 +281,23 @@ namespace Express
 
                                         try
                                         {
-                                            output.UserToken = bController.PostRegister(payload.ToString());
+                                            if((string)payload == "null" || (string)payload == "")
+                                            {
+                                                output = bController.PostRegister(null);
+                                            }
+                                            else
+                                            {
+                                                output = bController.PostRegister(payload.ToString());
+                                            }
                                             output2 = JsonConvert.SerializeObject(output);
 
                                             contentLength = encoding.GetByteCount(output2.ToCharArray());
 
                                             code = "200 OK";
                                         }
-                                        catch (HttpResponseException e)
+                                        catch (Exception e)
                                         {
-                                            if (e.Code == HttpStatusCode.Forbidden)
+                                            if(e is HttpResponseException)
                                             {
                                                 code = "403 Forbidden";
                                             }
@@ -317,15 +330,19 @@ namespace Express
 
                                             code = "200 OK";
                                         }
-                                        catch (HttpResponseException e)
+                                        catch (Exception e)
                                         {
-                                            if (e.Code == HttpStatusCode.Forbidden)
+                                            if (e is HttpResponseException)
                                             {
-                                                code = "403 Forbidden";
-                                            }
-                                            if (e.Code == HttpStatusCode.Conflict)
-                                            {
-                                                code = "409 Conflict";
+                                                HttpResponseException httpException = (HttpResponseException)e.InnerException;
+                                                if(httpException.Code == HttpStatusCode.Forbidden)
+                                                {
+                                                    code = "403 Forbidden";
+                                                }
+                                                if(httpException.Code == HttpStatusCode.Conflict)
+                                                {
+                                                    code = "409 Conflict";
+                                                }
                                             }
                                         }
                                         SetOutgoingMessage(code, contentLength);
@@ -360,9 +377,9 @@ namespace Express
 
                                         code = "200 OK";
                                     }
-                                    catch (HttpResponseException e)
+                                    catch (Exception e)
                                     {
-                                        if (e.Code == HttpStatusCode.Forbidden)
+                                        if (e is HttpResponseException)
                                         {
                                             code = "403 Forbidden";
                                         }
@@ -383,9 +400,9 @@ namespace Express
 
                                         code = "200 OK";
                                     }
-                                    catch (HttpResponseException e)
+                                    catch (Exception e)
                                     {
-                                        if (e.Code == HttpStatusCode.Forbidden)
+                                        if (e is HttpResponseException)
                                         {
                                             code = "403 Forbidden";
                                         }
@@ -436,9 +453,9 @@ namespace Express
             /// <param name="contentLength"></param>
             private void SetOutgoingMessage(string code, int contentLength)
             {
-                outgoing += "HTTP/1.1 " + code + " \r\n";
-                outgoing += "Content-Length: " + contentLength + " \r\n";
-                outgoing += "Content-Type: application/json; charset=utf-8 \r\n";
+                outgoing += "HTTP/1.1 " + code + "\r\n";
+                outgoing += "Content-Length: " + contentLength + "\r\n";
+                outgoing += "Content-Type: application/json; charset=utf-8\r\n";
                 outgoing += "\r\n";
             }
         }
