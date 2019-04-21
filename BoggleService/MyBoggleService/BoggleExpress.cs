@@ -63,7 +63,22 @@ namespace Express
             {
                 sync.ExitWriteLock();
             }
+        }
 
+        /// <summary>
+        /// Remove c from the client list.
+        /// </summary>
+        public void RemoveClient(ClientConnection c)
+        {
+            try
+            {
+                sync.EnterWriteLock();
+                clients.Remove(c);
+            }
+            finally
+            {
+                sync.ExitWriteLock();
+            }
         }
 
         public class ClientConnection
@@ -125,7 +140,6 @@ namespace Express
 
                 if (s != null && payloadReady)
                 {
-                    //payload = s.Replace("\\", "");
                     payload = s.Replace("\"", "");
                     s = null;
                 }
@@ -383,7 +397,19 @@ namespace Express
 
             private void MessageSent(bool wasSent, object payload)
             {
+                lock (sendSync)
+                {
+                    if (wasSent == true)
+                    {
+                        ss.Close();
+                        server.RemoveClient(this);
+                        Console.WriteLine("Socket closed");
+                    }
+                    else
+                    {
 
+                    }
+                }
             }
 
             /// <summary>
