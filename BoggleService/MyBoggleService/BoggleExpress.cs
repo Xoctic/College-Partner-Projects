@@ -141,7 +141,7 @@ namespace Express
 
                 if (s != null && payloadReady)
                 {
-                    payload = s.Replace("\"", "");                  
+                    payload = s;                 
                     s = null;
                 }
                 if (s != null && !payloadReady)
@@ -177,18 +177,14 @@ namespace Express
                     {
                         if (payload.ToString()[0] == '{')
                         {
-                            //Something is wrong with this line, as errors are being thrown.
                             info = JsonConvert.DeserializeObject(payload.ToString());
                         }
                     }             
-
                     string line = reader.ReadLine();
-                    //line = line.Trim();
                     char[] array = line.ToCharArray();
                     outgoing = null;
                     string code = null;
                     int contentLength = 0;
-
 
                     while (line != "" && line != null)
                     {
@@ -250,12 +246,12 @@ namespace Express
                                     {
                                         if (e is HttpResponseException)
                                         {
-                                            HttpResponseException httpException = (HttpResponseException)e.InnerException;
-                                            if (httpException.Code == HttpStatusCode.Forbidden)
+                                            HttpResponseException httpResponse = (HttpResponseException)e;
+                                            if (httpResponse.Code == HttpStatusCode.Forbidden)
                                             {
                                                 code = "403 Forbidden";
                                             }
-                                            if (httpException.Code == HttpStatusCode.Conflict)
+                                            if (httpResponse.Code == HttpStatusCode.Conflict)
                                             {
                                                 code = "409 Conflict";
                                             }
@@ -334,12 +330,12 @@ namespace Express
                                         {
                                             if (e is HttpResponseException)
                                             {
-                                                HttpResponseException httpException = (HttpResponseException)e.InnerException;
-                                                if(httpException.Code == HttpStatusCode.Forbidden)
+                                                HttpResponseException httpResponse = (HttpResponseException)e;
+                                                if(httpResponse.Code == HttpStatusCode.Forbidden)
                                                 {
                                                     code = "403 Forbidden";
                                                 }
-                                                if(httpException.Code == HttpStatusCode.Conflict)
+                                                if(httpResponse.Code == HttpStatusCode.Conflict)
                                                 {
                                                     code = "409 Conflict";
                                                 }
@@ -416,7 +412,10 @@ namespace Express
                         }
                         line = reader.ReadLine();
                         //line = line.Trim();
-                        array = line.ToCharArray();
+                        if(line != null)
+                        {
+                            array = line.ToCharArray();
+                        }
                     }
                 }
                 //try
