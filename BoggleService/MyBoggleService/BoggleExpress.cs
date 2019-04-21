@@ -41,7 +41,7 @@ namespace Express
         
         public BoggleExpress(int port)
         {
-            //client = new StringSocketClient("localhost", port, new System.Text.UTF8Encoding());
+            //client = new StringSocketClient("", port, new System.Text.UTF8Encoding());
             server = new StringSocketListener(port, new System.Text.UTF8Encoding());
             
             server.Start();
@@ -51,6 +51,7 @@ namespace Express
 
         private void ConnectionRequested(StringSocket ss, object payload)
         {
+            client = new StringSocketClient("localhost", 60000, new System.Text.UTF8Encoding());
             ss = client.Client;
             
             server.BeginAcceptStringSocket(ConnectionRequested, null);
