@@ -20,15 +20,14 @@ namespace Express
             //BoggleController controller = new BoggleController();
             //String userToken = controller.PostRegister("Joe");
             //Console.WriteLine(userToken);
-            StringSocketClient client = new StringSocketClient("localhost", 60000, new System.Text.UTF8Encoding());
-            new BoggleExpress(60000, client);
+            
+            new BoggleExpress(60000);
 
             // This is our way of preventing the main thread from            
             // exiting while the server is in use            
-            //Console.ReadLine();
+            Console.ReadLine();
         }
 
-        private StringSocketClient client;
         //Listens for incoming connection requests
         private StringSocketListener server;
 
@@ -38,29 +37,27 @@ namespace Express
         // Read/write lock to coordinate access to the clients list
         private readonly ReaderWriterLockSlim sync = new ReaderWriterLockSlim();
         
-        public BoggleExpress(int port, StringSocketClient _client)
+        public BoggleExpress(int port)
         {
-            client = _client;
-            server = new StringSocketListener(port, new System.Text.UTF8Encoding());
             
+            server = new StringSocketListener(port, new System.Text.UTF8Encoding());
+
             server.Start();
 
-            server.BeginAcceptStringSocket(ConnectionRequested, null);         
+            server.BeginAcceptStringSocket(ConnectionRequested, "yo");
+
+            
         }
 
         private void ConnectionRequested(StringSocket ss, object payload)
         {
-            client = new StringSocketClient("localhost", 60000, new System.Text.UTF8Encoding());
-            ss = client.Client;
-            //ss = server.AcceptStringSocket();
             
-
-            server.BeginAcceptStringSocket(ConnectionRequested, null);
+            server.BeginAcceptStringSocket(ConnectionRequested, payload);
 
             try
             {
                 sync.EnterWriteLock();
-                clients.Add(new ClientConnection(ss, this));              
+                clients.Add(new ClientConnection(ss, this, payload));              
             }
             finally
             {
@@ -85,6 +82,10 @@ namespace Express
             // Text that needs to be sent to the client but which we have not yet started sending
             private String outgoing;
 
+            private int contentLength = 0;
+
+            private bool payloadReady = false;
+
             // For decoding incoming UTF8-encoded byte streams.
             private Decoder decoder = encoding.GetDecoder();
 
@@ -98,7 +99,7 @@ namespace Express
 
             private BoggleController bController;
 
-            public ClientConnection(StringSocket sc, BoggleExpress ex)
+            public ClientConnection(StringSocket sc, BoggleExpress ex, object payload)
             {
                 this.server = ex;
                 ss = sc;
@@ -109,7 +110,8 @@ namespace Express
 
                 try
                 {
-                    ss.BeginReceive(MessageRecieved, new object(), 0);                 
+                    ss.BeginReceive(MessageRecieved, payload, 0);   
+                    
                 }
                 catch
                 {
@@ -120,101 +122,63 @@ namespace Express
             private void MessageRecieved(string s, object payload)
             {
                 string[] words;
-                dynamic info = JsonConvert.DeserializeObject(payload.ToString());
                 StringReader reader = new StringReader(s);
-                string line = reader.ReadLine();
-                line = line.Remove(line.Length - 3, 2);
-                char[] array = line.ToCharArray();
-                outgoing = null;
-                string code = null;
-                int contentLength = 0;
-
+                //int contentLength;
                 
-                while (line != null)
+
+
+                if(s != null)
                 {
-                    if (array[0] == 'P')
+                    words = s.Split(':');
+                    if(words[0] == "Content-Length")
                     {
-                        words = line.Split('/');
-
-                        if (array[1] == 'U' && array[2] == 'T')
+                        if(words[1] != null)
                         {
-                            if (words.Length == 4)
-                            {
-                                try
-                                {
-                                    bController.PutCancelJoin(payload.ToString());
-
-                                    code = "204 NoContent";
-                                }
-                                catch (HttpResponseException e)
-                                {
-                                    if (e.Code == HttpStatusCode.Forbidden)
-                                    {
-                                        code = "403 Forbidden";
-                                    }
-                                }
-                                SetOutgoingMessage(code, contentLength);
-
-                                //payload = null;
-
-                                ss.BeginSend(outgoing, MessageSent, new object());
-
-                            }
-                            else if (words.Length == 5)
-                            {
-                                PlayWordInput input;
-                                String userT;
-                                String word;
-
-                                userT = info.UserToken;
-                                word = info.Word;
-
-                                input = new PlayWordInput(userT, word);
-                                words[3] = words[3].Remove(words[3].Length - 6, 5);
-
-                                try
-                                {
-
-                                    payload = bController.PutPlayWord(words[3], input);
-                                    payload = JsonConvert.SerializeObject(payload);
-
-                                    contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
-
-                                    code = "200 OK";
-                                }
-                                catch (HttpResponseException e)
-                                {
-                                    if (e.Code == HttpStatusCode.Forbidden)
-                                    {
-                                        code = "403 Forbidden";
-                                    }
-                                    if (e.Code == HttpStatusCode.Conflict)
-                                    {
-                                        code = "409 Conflict";
-                                    }
-
-                                }
-                                SetOutgoingMessage(code, contentLength);
-
-                                ss.BeginSend(outgoing, MessageSent, payload);
-                                //send message
-                            }
-
+                            words[1] = words[1].Remove(words[1].Length-5, 4);
+                            contentLength = int.Parse(words[1].Trim());
                         }
-                        else if (array[1] == 'O' && array[2] == 'S' && array[3] == 'T')
+                    }
+                    if(words[0] == "\r\n")
+                    {
+                        payloadReady = true;
+                        ss.BeginReceive(MessageRecieved, payload, contentLength);
+                    }
+                    if(payloadReady)
+                    {
+                        payload = s;
+                    }
+                    incoming += s + "\n";
+                }
+
+                ss.BeginReceive(MessageRecieved, payload, 0);
+
+                if (s == null)
+                {
+                    dynamic info = JsonConvert.DeserializeObject(payload.ToString());
+
+                    string line = reader.ReadLine();
+                    line = line.Remove(line.Length - 3, 2);
+                    char[] array = line.ToCharArray();
+                    outgoing = null;
+                    string code = null;
+                    int contentLength = 0;
+
+
+                    while (line != null)
+                    {
+                        if (array[0] == 'P')
                         {
-                            if (words.Length == 5)
+                            words = line.Split('/');
+
+                            if (array[1] == 'U' && array[2] == 'T')
                             {
-                                if (words[3] == "users")
+                                if (words.Length == 4)
                                 {
                                     try
                                     {
-                                        payload = bController.PostRegister(payload.ToString());
-                                        payload = JsonConvert.SerializeObject(payload);
+                                        bController.PutCancelJoin(payload.ToString());
 
-                                        contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
-
-                                        code = "200 OK";
+                                        code = "204 NoContent";
                                     }
                                     catch (HttpResponseException e)
                                     {
@@ -225,23 +189,27 @@ namespace Express
                                     }
                                     SetOutgoingMessage(code, contentLength);
 
+                                    //payload = null;
 
-                                    ss.BeginSend(outgoing, MessageSent, payload);
-                                    //send message
+                                    ss.BeginSend(outgoing, MessageSent, new object());
+
                                 }
-                                else if (words[3] == "games")
+                                else if (words.Length == 5)
                                 {
-                                    string userT;
-                                    int time;
+                                    PlayWordInput input;
+                                    String userT;
+                                    String word;
 
                                     userT = info.UserToken;
-                                    time = info.TimeLimit;
+                                    word = info.Word;
 
-                                    JoinGameInput input = new JoinGameInput(time, userT);
+                                    input = new PlayWordInput(userT, word);
+                                    words[3] = words[3].Remove(words[3].Length - 6, 5);
 
                                     try
                                     {
-                                        payload = bController.PostJoinGame(input);
+
+                                        payload = bController.PutPlayWord(words[3], input);
                                         payload = JsonConvert.SerializeObject(payload);
 
                                         contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
@@ -258,6 +226,131 @@ namespace Express
                                         {
                                             code = "409 Conflict";
                                         }
+
+                                    }
+                                    SetOutgoingMessage(code, contentLength);
+
+                                    ss.BeginSend(outgoing, MessageSent, payload);
+                                    //send message
+                                }
+
+                            }
+                            else if (array[1] == 'O' && array[2] == 'S' && array[3] == 'T')
+                            {
+                                if (words.Length == 5)
+                                {
+                                    if (words[3] == "users")
+                                    {
+                                        try
+                                        {
+                                            payload = bController.PostRegister(payload.ToString());
+                                            payload = JsonConvert.SerializeObject(payload);
+
+                                            contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
+
+                                            code = "200 OK";
+                                        }
+                                        catch (HttpResponseException e)
+                                        {
+                                            if (e.Code == HttpStatusCode.Forbidden)
+                                            {
+                                                code = "403 Forbidden";
+                                            }
+                                        }
+                                        SetOutgoingMessage(code, contentLength);
+
+
+                                        ss.BeginSend(outgoing, MessageSent, payload);
+                                        //send message
+                                    }
+                                    else if (words[3] == "games")
+                                    {
+                                        string userT;
+                                        int time;
+
+                                        userT = info.UserToken;
+                                        time = info.TimeLimit;
+
+                                        JoinGameInput input = new JoinGameInput(time, userT);
+
+                                        try
+                                        {
+                                            payload = bController.PostJoinGame(input);
+                                            payload = JsonConvert.SerializeObject(payload);
+
+                                            contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
+
+                                            code = "200 OK";
+                                        }
+                                        catch (HttpResponseException e)
+                                        {
+                                            if (e.Code == HttpStatusCode.Forbidden)
+                                            {
+                                                code = "403 Forbidden";
+                                            }
+                                            if (e.Code == HttpStatusCode.Conflict)
+                                            {
+                                                code = "409 Conflict";
+                                            }
+                                        }
+                                        SetOutgoingMessage(code, contentLength);
+
+                                        ss.BeginSend(outgoing, MessageSent, payload);
+                                        //send message
+                                    }
+                                }
+                            }
+                        }
+                        else if (array[0] == 'G' && array[1] == 'E' && array[2] == 'T')
+                        {
+                            words = line.Split('/');
+
+                            if (words.Length == 6)
+                            {
+                                words[4] = words[4].Remove(words[4].Length - 6, 5);
+                                words[3] = words[3].Remove(words[3].Length - 6, 5);
+
+                                if (words[4] == "true")
+                                {
+                                    try
+                                    {
+                                        payload = bController.GetGameStatus(words[3], true);
+                                        payload = JsonConvert.SerializeObject(payload);
+
+                                        contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
+
+
+                                        code = "200 OK";
+                                    }
+                                    catch (HttpResponseException e)
+                                    {
+                                        if (e.Code == HttpStatusCode.Forbidden)
+                                        {
+                                            code = "403 Forbidden";
+                                        }
+                                    }
+                                    SetOutgoingMessage(code, contentLength);
+
+                                    ss.BeginSend(outgoing, MessageSent, payload);
+                                    //send message
+                                }
+                                else if (words[4] == "false")
+                                {
+                                    try
+                                    {
+                                        payload = bController.GetGameStatus(words[3], false);
+                                        payload = JsonConvert.SerializeObject(payload);
+
+                                        contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
+
+                                        code = "200 OK";
+                                    }
+                                    catch (HttpResponseException e)
+                                    {
+                                        if (e.Code == HttpStatusCode.Forbidden)
+                                        {
+                                            code = "403 Forbidden";
+                                        }
                                     }
                                     SetOutgoingMessage(code, contentLength);
 
@@ -266,68 +359,10 @@ namespace Express
                                 }
                             }
                         }
+                        line = reader.ReadLine();
+                        line = line.Remove(line.Length - 3, 2);
+                        array = line.ToCharArray();
                     }
-                    else if (array[0] == 'G' && array[1] == 'E' && array[2] == 'T')
-                    {
-                        words = line.Split('/');
-
-                        if (words.Length == 6)
-                        {
-                            words[4] = words[4].Remove(words[4].Length - 6, 5);
-                            words[3] = words[3].Remove(words[3].Length - 6, 5);
-
-                            if (words[4] == "true")
-                            {
-                                try
-                                {
-                                    payload = bController.GetGameStatus(words[3], true);
-                                    payload = JsonConvert.SerializeObject(payload);
-
-                                    contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
-
-
-                                    code = "200 OK";
-                                }
-                                catch (HttpResponseException e)
-                                {
-                                    if (e.Code == HttpStatusCode.Forbidden)
-                                    {
-                                        code = "403 Forbidden";
-                                    }
-                                }
-                                SetOutgoingMessage(code, contentLength);
-
-                                ss.BeginSend(outgoing, MessageSent, payload);
-                                //send message
-                            }
-                            else if (words[4] == "false")
-                            {
-                                try
-                                {
-                                    payload = bController.GetGameStatus(words[3], false);
-                                    payload = JsonConvert.SerializeObject(payload);
-
-                                    contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
-
-                                    code = "200 OK";
-                                }
-                                catch (HttpResponseException e)
-                                {
-                                    if (e.Code == HttpStatusCode.Forbidden)
-                                    {
-                                        code = "403 Forbidden";
-                                    }
-                                }
-                                SetOutgoingMessage(code, contentLength);
-
-                                ss.BeginSend(outgoing, MessageSent, payload);
-                                //send message
-                            }
-                        }
-                    }
-                    line = reader.ReadLine();
-                    line = line.Remove(line.Length - 3, 2);
-                    array = line.ToCharArray();
                 }
                 //try
                 //{
