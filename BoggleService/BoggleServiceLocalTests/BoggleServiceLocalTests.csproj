@@ -110,12 +110,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BoggleService\BoggleService.csproj">
-      <Project>{1cf87fe2-1e17-42e4-aef9-ccc25a5551c9}</Project>
-      <Name>BoggleService</Name>
-    </ProjectReference>
-  </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

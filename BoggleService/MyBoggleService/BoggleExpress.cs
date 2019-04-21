@@ -20,18 +20,17 @@ namespace Express
             //BoggleController controller = new BoggleController();
             //String userToken = controller.PostRegister("Joe");
             //Console.WriteLine(userToken);
-
-            new BoggleExpress(60000);
+            StringSocketClient client = new StringSocketClient("localhost", 60000, new System.Text.UTF8Encoding());
+            new BoggleExpress(60000, client);
 
             // This is our way of preventing the main thread from            
             // exiting while the server is in use            
-            Console.ReadLine();
+            //Console.ReadLine();
         }
 
+        private StringSocketClient client;
         //Listens for incoming connection requests
         private StringSocketListener server;
-
-        private StringSocketClient client;
 
         // All the clients that have connected but haven't closed
         private List<ClientConnection> clients = new List<ClientConnection>();
@@ -39,9 +38,9 @@ namespace Express
         // Read/write lock to coordinate access to the clients list
         private readonly ReaderWriterLockSlim sync = new ReaderWriterLockSlim();
         
-        public BoggleExpress(int port)
+        public BoggleExpress(int port, StringSocketClient _client)
         {
-            //client = new StringSocketClient("", port, new System.Text.UTF8Encoding());
+            client = _client;
             server = new StringSocketListener(port, new System.Text.UTF8Encoding());
             
             server.Start();
@@ -53,7 +52,9 @@ namespace Express
         {
             client = new StringSocketClient("localhost", 60000, new System.Text.UTF8Encoding());
             ss = client.Client;
+            //ss = server.AcceptStringSocket();
             
+
             server.BeginAcceptStringSocket(ConnectionRequested, null);
 
             try
@@ -70,9 +71,13 @@ namespace Express
 
         public class ClientConnection
         {
-            private StringSocket ss;
-
+            // Incoming/outgoing is UTF8-encoded.  This is a multi-byte encoding.  The first 128 Unicode characters
+            // (which corresponds to the old ASCII character set and contains the common keyboard characters) are
+            // encoded into a single byte.  The rest of the Unicode characters can take from 2 to 4 bytes to encode.
             private static System.Text.UTF8Encoding encoding = new System.Text.UTF8Encoding();
+
+            //The string socket through which we communicate with the remote client.
+            private StringSocket ss;
 
             // Text that has been received from the client but not yet dealt with
             private String incoming;
@@ -104,9 +109,7 @@ namespace Express
 
                 try
                 {
-                    ss.BeginReceive(MessageRecieved, new object(), -1);
-                    
-                    
+                    ss.BeginReceive(MessageRecieved, new object(), 0);                 
                 }
                 catch
                 {
@@ -117,7 +120,6 @@ namespace Express
             private void MessageRecieved(string s, object payload)
             {
                 string[] words;
-
                 dynamic info = JsonConvert.DeserializeObject(payload.ToString());
                 StringReader reader = new StringReader(s);
                 string line = reader.ReadLine();
@@ -327,6 +329,14 @@ namespace Express
                     line = line.Remove(line.Length - 3, 2);
                     array = line.ToCharArray();
                 }
+                //try
+                //{
+                //    ss.BeginReceive(MessageRecieved, payload, );
+                //}
+                //catch
+                //{
+
+                //}
             }
 
             private void MessageSent(bool wasSent, object payload)
