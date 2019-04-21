@@ -173,12 +173,15 @@ namespace Express
                     
                     dynamic info = new ExpandoObject();
                     StringReader reader = new StringReader(incoming);
-                    if((string)payload != null && (string)payload != "")
+                    if((string)payload != null)
                     {
-                        if (payload.ToString()[0] == '{')
-                        {
-                            info = JsonConvert.DeserializeObject(payload.ToString());
-                        }
+
+                        info = JsonConvert.DeserializeObject(payload.ToString());
+
+                        //if (payload.ToString()[0] == '{')
+                        //{
+                        //    info = JsonConvert.DeserializeObject(payload.ToString());
+                        //}
                     }             
                     string line = reader.ReadLine();
                     char[] array = line.ToCharArray();
@@ -199,7 +202,11 @@ namespace Express
                                 {
                                     try
                                     {
-                                        bController.PutCancelJoin(payload.ToString());
+                                        string token = payload.ToString();
+
+                                        token = token.Replace("\"", "");
+
+                                        bController.PutCancelJoin(token);
 
                                         code = "204 NoContent";
                                     }
@@ -230,8 +237,8 @@ namespace Express
                                     word = info.Word;
 
                                     input = new PlayWordInput(userT, word);
-                                    //words[3] = words[3].Remove(words[3].Length - 6, 5);
-                                    words[3] = words[3].Trim();
+                                    words[3] = words[3].Remove(words[3].Length - 5, 5);
+                                    
 
                                     try
                                     {                  
@@ -277,7 +284,8 @@ namespace Express
 
                                         try
                                         {
-                                            if((string)payload == "null" || (string)payload == "")
+                                            //if((string)payload == "null" || (string)payload == "")
+                                            if(info ==null || info == "")
                                             {
                                                 output = bController.PostRegister(null);
                                             }
