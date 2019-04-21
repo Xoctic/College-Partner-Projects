@@ -137,6 +137,7 @@ namespace Express
             private void MessageRecieved(string s, object payload)
             {
                 string[] words;
+                
 
                 if (s != null && payloadReady)
                 {
@@ -145,7 +146,6 @@ namespace Express
                 }
                 if (s != null && !payloadReady)
                 {
-
                     words = s.Split(':');
                     if(words[0] == "Content-Length")
                     {
@@ -170,6 +170,7 @@ namespace Express
 
                 if (s == null)
                 {
+                    
                     dynamic info = new ExpandoObject();
                     StringReader reader = new StringReader(incoming);
                     if(payload.ToString()[0] == '{')
@@ -178,7 +179,7 @@ namespace Express
                     }                    
 
                     string line = reader.ReadLine();
-                    line = line.Remove(line.Length - 3, 2);
+                    //line = line.Trim();
                     char[] array = line.ToCharArray();
                     outgoing = null;
                     string code = null;
@@ -193,6 +194,7 @@ namespace Express
 
                             if (array[1] == 'U' && array[2] == 'T')
                             {
+                                //putCancel
                                 if (words.Length == 4)
                                 {
                                     try
@@ -210,16 +212,19 @@ namespace Express
                                     }
                                     SetOutgoingMessage(code, contentLength);
 
+
                                     //payload = null;
 
                                     ss.BeginSend(outgoing, MessageSent, new object());
 
                                 }
+                                //putPlayWord
                                 else if (words.Length == 5)
                                 {
                                     PlayWordInput input;
                                     String userT;
                                     String word;
+                                    string output = "";
 
                                     userT = info.UserToken;
                                     word = info.Word;
@@ -229,11 +234,11 @@ namespace Express
 
                                     try
                                     {
+                                        
+                                        output = bController.PutPlayWord(words[3], input).ToString();
+                                        output = JsonConvert.SerializeObject(output);
 
-                                        payload = bController.PutPlayWord(words[3], input);
-                                        payload = JsonConvert.SerializeObject(payload);
-
-                                        contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
+                                        contentLength = encoding.GetByteCount(output.ToCharArray());
 
                                         code = "200 OK";
                                     }
@@ -250,8 +255,9 @@ namespace Express
 
                                     }
                                     SetOutgoingMessage(code, contentLength);
+                                    outgoing += output;
 
-                                    ss.BeginSend(outgoing, MessageSent, payload);
+                                    ss.BeginSend(outgoing, MessageSent, new object());
                                     //send message
                                 }
 
@@ -260,14 +266,17 @@ namespace Express
                             {
                                 if (words.Length == 5)
                                 {
+                                    //postRegister
                                     if (words[3] == "users")
                                     {
+                                        string output = "";
+
                                         try
                                         {
-                                            payload = bController.PostRegister(payload.ToString());
-                                            payload = JsonConvert.SerializeObject(payload);
+                                            output = bController.PostRegister(payload.ToString());
+                                            output = JsonConvert.SerializeObject(output);
 
-                                            contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
+                                            contentLength = encoding.GetByteCount(output.ToCharArray());
 
                                             code = "200 OK";
                                         }
@@ -279,15 +288,18 @@ namespace Express
                                             }
                                         }
                                         SetOutgoingMessage(code, contentLength);
+                                        outgoing += output;
 
-
-                                        ss.BeginSend(outgoing, MessageSent, payload);
+                                        ss.BeginSend(outgoing, MessageSent, new object());
                                         //send message
                                     }
+                                    //postJoinGame
                                     else if (words[3] == "games")
                                     {
                                         string userT;
                                         int time;
+                                        dynamic output;
+                                        string output2 = "";
 
                                         userT = info.UserToken;
                                         time = info.TimeLimit;
@@ -296,10 +308,10 @@ namespace Express
 
                                         try
                                         {
-                                            payload = bController.PostJoinGame(input);
-                                            payload = JsonConvert.SerializeObject(payload);
+                                            output = bController.PostJoinGame(input);
+                                            output2 = JsonConvert.SerializeObject(output);
 
-                                            contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
+                                            contentLength = encoding.GetByteCount(output2.ToCharArray());
 
                                             code = "200 OK";
                                         }
@@ -315,8 +327,9 @@ namespace Express
                                             }
                                         }
                                         SetOutgoingMessage(code, contentLength);
+                                        outgoing += output2;
 
-                                        ss.BeginSend(outgoing, MessageSent, payload);
+                                        ss.BeginSend(outgoing, MessageSent, new object());
                                         //send message
                                     }
                                 }
@@ -381,7 +394,7 @@ namespace Express
                             }
                         }
                         line = reader.ReadLine();
-                        line = line.Remove(line.Length - 3, 2);
+                        //line = line.Trim();
                         array = line.ToCharArray();
                     }
                 }
