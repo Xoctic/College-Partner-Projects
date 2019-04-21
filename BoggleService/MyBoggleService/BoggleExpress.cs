@@ -171,7 +171,7 @@ namespace Express
                     int contentLength = 0;
 
 
-                    while (line != null)
+                    while (line != "" && line != null)
                     {
                         if (array[0] == 'P')
                         {
@@ -215,7 +215,8 @@ namespace Express
                                     word = info.Word;
 
                                     input = new PlayWordInput(userT, word);
-                                    words[3] = words[3].Remove(words[3].Length - 6, 5);
+                                    //words[3] = words[3].Remove(words[3].Length - 6, 5);
+                                    words[3] = words[3].Trim();
 
                                     try
                                     {
@@ -249,19 +250,20 @@ namespace Express
                             }
                             else if (array[1] == 'O' && array[2] == 'S' && array[3] == 'T')
                             {
-                                if (words.Length == 5)
+                                if (words.Length == 4)
                                 {
                                     //postRegister
-                                    if (words[3] == "users")
+                                    if (words[2] == "users HTTP")
                                     {
-                                        string output = "";
+                                        dynamic output = new ExpandoObject();
+                                        string output2 = "";
 
                                         try
                                         {
-                                            output = bController.PostRegister(payload.ToString());
-                                            output = JsonConvert.SerializeObject(output);
+                                            output.UserToken = bController.PostRegister(payload.ToString());
+                                            output2 = JsonConvert.SerializeObject(output);
 
-                                            contentLength = encoding.GetByteCount(output.ToCharArray());
+                                            contentLength = encoding.GetByteCount(output2.ToCharArray());
 
                                             code = "200 OK";
                                         }
@@ -273,13 +275,13 @@ namespace Express
                                             }
                                         }
                                         SetOutgoingMessage(code, contentLength);
-                                        outgoing += output;
+                                        outgoing += output2;
 
                                         ss.BeginSend(outgoing, MessageSent, new object());
                                         //send message
                                     }
                                     //postJoinGame
-                                    else if (words[3] == "games")
+                                    else if (words[2] == "games HTTP")
                                     {
                                         string userT;
                                         int time;
@@ -326,8 +328,10 @@ namespace Express
 
                             if (words.Length == 6)
                             {
-                                words[4] = words[4].Remove(words[4].Length - 6, 5);
-                                words[3] = words[3].Remove(words[3].Length - 6, 5);
+                                //words[4] = words[4].Remove(words[4].Length - 6, 5);
+                                words[4] = words[4].Trim();
+                                //words[3] = words[3].Remove(words[3].Length - 6, 5);
+                                words[3] = words[3].Trim();
 
                                 if (words[4] == "true")
                                 {
