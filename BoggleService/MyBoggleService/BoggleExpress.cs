@@ -122,39 +122,46 @@ namespace Express
             private void MessageRecieved(string s, object payload)
             {
                 string[] words;
-                StringReader reader = new StringReader(s);
-                //int contentLength;
-                
 
-
-                if(s != null)
+                if (s != null && payloadReady)
                 {
+                    //payload = s.Replace("\\", "");
+                    payload = s.Replace("\"", "");
+                    s = null;
+                }
+                if (s != null && !payloadReady)
+                {
+
                     words = s.Split(':');
                     if(words[0] == "Content-Length")
                     {
                         if(words[1] != null)
                         {
-                            words[1] = words[1].Remove(words[1].Length-5, 4);
-                            contentLength = int.Parse(words[1].Trim());
+                            words[1] = words[1].Trim();
+                            contentLength = Convert.ToInt32(words[1]);
                         }
                     }
-                    if(words[0] == "\r\n")
+                    if(words[0] == "\r")
                     {
                         payloadReady = true;
                         ss.BeginReceive(MessageRecieved, payload, contentLength);
                     }
-                    if(payloadReady)
-                    {
-                        payload = s;
-                    }
                     incoming += s + "\n";
                 }
 
-                ss.BeginReceive(MessageRecieved, payload, 0);
+                if(payloadReady != true)
+                {
+                    ss.BeginReceive(MessageRecieved, payload, 0);
+                }
 
                 if (s == null)
                 {
-                    dynamic info = JsonConvert.DeserializeObject(payload.ToString());
+                    dynamic info = new ExpandoObject();
+                    StringReader reader = new StringReader(incoming);
+                    if(payload.ToString()[0] == '{')
+                    {
+                        info = JsonConvert.DeserializeObject(payload.ToString());
+                    }                    
 
                     string line = reader.ReadLine();
                     line = line.Remove(line.Length - 3, 2);
