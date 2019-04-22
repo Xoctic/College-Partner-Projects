@@ -120,8 +120,8 @@ namespace Express
             {
                 this.server = ex;
                 ss = sc;
-                incoming = "";
-                outgoing = "";
+                incoming = null;
+                outgoing = null;
 
                 bController = new BoggleController();
 
@@ -195,7 +195,7 @@ namespace Express
                     }             
                     string line = reader.ReadLine();
                     char[] array = line.ToCharArray();
-                    outgoing = null;
+                    //outgoing = null;
                     string code = null;
                     int contentLength = 0;
 
@@ -239,7 +239,7 @@ namespace Express
                                     PlayWordInput input;
                                     String userT;
                                     String word;
-                                    string output = "";
+                                    string output = null;
                                     int score = 0;
 
                                     userT = info.UserToken;
@@ -288,8 +288,8 @@ namespace Express
                                     //postRegister
                                     if (words[2] == "users HTTP")
                                     {
-                                        dynamic output = new ExpandoObject();
-                                        string output2 = "";
+                                        dynamic output;
+                                        string output2 = null;
 
                                         try
                                         {
