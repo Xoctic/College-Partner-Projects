@@ -232,6 +232,7 @@ namespace Express
                                     String userT;
                                     String word;
                                     string output = "";
+                                    int score = 0;
 
                                     userT = info.UserToken;
                                     word = info.Word;
@@ -242,8 +243,8 @@ namespace Express
 
                                     try
                                     {                  
-                                        output = bController.PutPlayWord(words[3], input).ToString();
-                                        output = JsonConvert.SerializeObject(output);
+                                        score = bController.PutPlayWord(words[3], input);
+                                        output = JsonConvert.SerializeObject(score);
 
                                         contentLength = encoding.GetByteCount(output.ToCharArray());
 

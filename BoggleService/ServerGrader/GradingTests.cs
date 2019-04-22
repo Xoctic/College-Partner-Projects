@@ -560,14 +560,15 @@ namespace ServerGrader
         }
 
         // Bad word correct score for player 2
+        //changed time to 100 for debugging
         [TestMethod]
         public void TestPlayWord10()
         {
             Reset();
             string player1 = MakeUser("Player 1").Result;
             string player2 = MakeUser("Player 2").Result;
-            JoinGame(player1, 10).Wait();
-            string game2 = JoinGame(player2, 10).Result.GameID;
+            JoinGame(player1, 100).Wait();
+            string game2 = JoinGame(player2, 100).Result.GameID;
             int score = PlayWord(player2, game2, "xyzzy123").Result;
             Assert.AreEqual(-1, score);
         }
