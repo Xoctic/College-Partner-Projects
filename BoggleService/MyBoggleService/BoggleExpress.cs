@@ -101,6 +101,8 @@ namespace Express
 
             private bool payloadReady = false;
 
+            private bool isGetRequest = false;
+
             // For decoding incoming UTF8-encoded byte streams.
             private Decoder decoder = encoding.GetDecoder();
 
@@ -138,10 +140,9 @@ namespace Express
             {
                 string[] words;
                 
-
                 if (s != null && payloadReady)
                 {
-                    payload = s;                 
+                    payload = s;                                 
                     s = null;
                 }
                 if (s != null && !payloadReady)
@@ -158,26 +159,35 @@ namespace Express
                     if(words[0] == "\r")
                     {
                         payloadReady = true;
-                        ss.BeginReceive(MessageRecieved, payload, contentLength);
+                        if(isGetRequest == true)
+                        {
+                            s = null;
+                        }
+                        else
+                        {
+                            ss.BeginReceive(MessageRecieved, payload, contentLength);
+                        }
                     }
                     incoming += s + "\n";
                 }
 
                 if(payloadReady != true)
                 {
+                    words = s.Split('/');
+                    if(words[0].Trim() == "GET")
+                    {
+                        isGetRequest = true;
+                    }
                     ss.BeginReceive(MessageRecieved, payload, 0);
                 }
 
                 if (s == null)
-                {
-                    
+                {                   
                     dynamic info = new ExpandoObject();
                     StringReader reader = new StringReader(incoming);
                     if((string)payload != null)
                     {
-
                         info = JsonConvert.DeserializeObject(payload.ToString());
-
                         //if (payload.ToString()[0] == '{')
                         //{
                         //    info = JsonConvert.DeserializeObject(payload.ToString());
@@ -370,7 +380,7 @@ namespace Express
                                 //words[3] = words[3].Remove(words[3].Length - 6, 5);
                                 //words[3] = words[3].Trim();
 
-                                if (words[4] == "true")
+                                if (words[4] == "True HTTP")
                                 {
                                     try
                                     {
@@ -394,7 +404,7 @@ namespace Express
                                     ss.BeginSend(outgoing, MessageSent, new object());
                                     //send message
                                 }
-                                else if (words[4] == "false")
+                                else if (words[4] == "False HTTP")
                                 {
                                     try
                                     {
