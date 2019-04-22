@@ -218,8 +218,6 @@ namespace Express
                                         }
                                     }
                                     SetOutgoingMessage(code, contentLength);
-
-
                                     //payload = null;
 
                                     ss.BeginSend(outgoing, MessageSent, new object());
@@ -319,7 +317,7 @@ namespace Express
                                         string userT;
                                         int time;
                                         dynamic output;
-                                        string output2 = "";
+                                        string output2 = null;
 
                                         userT = info.UserToken;
                                         time = info.TimeLimit;
@@ -365,20 +363,22 @@ namespace Express
 
                             if (words.Length == 6)
                             {
+                                dynamic output;
+                                string output2 = null;
+
                                 //words[4] = words[4].Remove(words[4].Length - 6, 5);
-                                words[4] = words[4].Trim();
+                                //words[4] = words[4].Trim();
                                 //words[3] = words[3].Remove(words[3].Length - 6, 5);
-                                words[3] = words[3].Trim();
+                                //words[3] = words[3].Trim();
 
                                 if (words[4] == "true")
                                 {
                                     try
                                     {
-                                        payload = bController.GetGameStatus(words[3], true);
-                                        payload = JsonConvert.SerializeObject(payload);
+                                        output = bController.GetGameStatus(words[3], true);
+                                        output2 = JsonConvert.SerializeObject(output);
 
-                                        contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
-
+                                        contentLength = encoding.GetByteCount(output2.ToCharArray());
 
                                         code = "200 OK";
                                     }
@@ -390,18 +390,19 @@ namespace Express
                                         }
                                     }
                                     SetOutgoingMessage(code, contentLength);
+                                    outgoing += output2;
 
-                                    ss.BeginSend(outgoing, MessageSent, payload);
+                                    ss.BeginSend(outgoing, MessageSent, new object());
                                     //send message
                                 }
                                 else if (words[4] == "false")
                                 {
                                     try
                                     {
-                                        payload = bController.GetGameStatus(words[3], false);
-                                        payload = JsonConvert.SerializeObject(payload);
+                                        output = bController.GetGameStatus(words[3], false);
+                                        output2 = JsonConvert.SerializeObject(output);
 
-                                        contentLength = encoding.GetByteCount(payload.ToString().ToCharArray());
+                                        contentLength = encoding.GetByteCount(output2.ToCharArray());
 
                                         code = "200 OK";
                                     }
@@ -413,14 +414,14 @@ namespace Express
                                         }
                                     }
                                     SetOutgoingMessage(code, contentLength);
+                                    outgoing += output2;
 
-                                    ss.BeginSend(outgoing, MessageSent, payload);
+                                    ss.BeginSend(outgoing, MessageSent, new object());
                                     //send message
                                 }
                             }
                         }
                         line = reader.ReadLine();
-                        //line = line.Trim();
                         if(line != null)
                         {
                             array = line.ToCharArray();
