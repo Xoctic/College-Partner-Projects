@@ -373,7 +373,8 @@ namespace Express
 
                             if (words.Length == 6)
                             {
-                                dynamic output;
+                                //dynamic output;
+                                GameInfo output;
                                 string output2 = null;
 
                                 //words[4] = words[4].Remove(words[4].Length - 6, 5);
@@ -386,6 +387,13 @@ namespace Express
                                     try
                                     {
                                         output = bController.GetGameStatus(words[3], true);
+                                        
+                                        if(output.GameState != "pending")
+                                        {
+                                            output.Player1.Nickname = output.Player1.Nickname.Replace("\"", "");
+                                            output.Player2.Nickname = output.Player2.Nickname.Replace("\"", "");
+                                        }
+                                       
                                         output2 = JsonConvert.SerializeObject(output);
 
                                         contentLength = encoding.GetByteCount(output2.ToCharArray());
@@ -410,6 +418,14 @@ namespace Express
                                     try
                                     {
                                         output = bController.GetGameStatus(words[3], false);
+                                        
+
+                                        if (output.GameState != "pending")
+                                        {
+                                            output.Player1.Nickname = output.Player1.Nickname.Replace("\"", "");
+                                            output.Player2.Nickname = output.Player2.Nickname.Replace("\"", "");
+                                        }
+
                                         output2 = JsonConvert.SerializeObject(output);
 
                                         contentLength = encoding.GetByteCount(output2.ToCharArray());
