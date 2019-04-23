@@ -106,8 +106,7 @@ namespace Express
             // For decoding incoming UTF8-encoded byte streams.
             private Decoder decoder = encoding.GetDecoder();
 
-            // Records whether an asynchronous send attempt is ongoing
-            private bool sendIsOngoing = false;
+            private string code = null;
 
             // For synchronizing sends
             private readonly object sendSync = new object();
@@ -130,7 +129,7 @@ namespace Express
                     ss.BeginReceive(MessageRecieved, null, 0);   
                     
                 }
-                catch
+                catch(ObjectDisposedException)
                 {
 
                 }
@@ -139,204 +138,290 @@ namespace Express
             private void MessageRecieved(string s, object payload)
             {
                 string[] words;
-                
-                if (s != null && payloadReady)
+                try
                 {
-                    payload = s;                                 
-                    s = null;
-                }
-                if (s != null && !payloadReady)
-                {
-                    words = s.Split(':');
-                    if(words[0] == "Content-Length")
+                    if (s != null && payloadReady)
                     {
-                        if(words[1] != null)
-                        {
-                            words[1] = words[1].Trim();
-                            contentLength = Convert.ToInt32(words[1]);
-                        }
+                        payload = s;
+                        s = null;
                     }
-                    if(words[0] == "\r")
+                    if (s != null && !payloadReady)
                     {
-                        payloadReady = true;
-                        if(isGetRequest == true)
+                        words = s.Split(':');
+                        if (words[0] == "Content-Length")
                         {
-                            s = null;
-                        }
-                        else
-                        {
-                            ss.BeginReceive(MessageRecieved, payload, contentLength);
-                        }
-                    }
-                    incoming += s + "\n";
-                }
-
-                if(payloadReady != true)
-                {
-                    words = s.Split('/');
-                    if(words[0].Trim() == "GET")
-                    {
-                        isGetRequest = true;
-                    }
-                    ss.BeginReceive(MessageRecieved, payload, 0);
-                }
-
-                if (s == null)
-                {                   
-                    dynamic info = new ExpandoObject();
-                    StringReader reader = new StringReader(incoming);
-                    if((string)payload != null)
-                    {
-                        info = JsonConvert.DeserializeObject(payload.ToString());
-                        //if (payload.ToString()[0] == '{')
-                        //{
-                        //    info = JsonConvert.DeserializeObject(payload.ToString());
-                        //}
-                    }             
-                    string line = reader.ReadLine();
-                    char[] array = line.ToCharArray();
-                    //outgoing = null;
-                    string code = null;
-                    int contentLength = 0;
-
-                    while (line != "" && line != null)
-                    {
-                        if (array[0] == 'P')
-                        {
-                            words = line.Split('/');
-
-                            if (array[1] == 'U' && array[2] == 'T')
+                            if (words[1] != null)
                             {
-                                //putCancel
-                                if (words.Length == 4)
+                                words[1] = words[1].Trim();
+                                contentLength = Convert.ToInt32(words[1]);
+                            }
+                        }
+                        if (words[0] == "\r")
+                        {
+                            payloadReady = true;
+                            if (isGetRequest == true)
+                            {
+                                s = null;
+                            }
+                            else
+                            {
+                                ss.BeginReceive(MessageRecieved, payload, contentLength);
+                            }
+                        }
+                        incoming += s + "\n";
+                    }
+
+                    if (payloadReady != true)
+                    {
+                        words = s.Split('/');
+                        if (words[0].Trim() == "GET")
+                        {
+                            isGetRequest = true;
+                        }
+                        ss.BeginReceive(MessageRecieved, payload, 0);
+                    }
+                    if (s == null)
+                    {
+                        dynamic info = new ExpandoObject();
+                        StringReader reader = new StringReader(incoming);
+                        if ((string)payload != null)
+                        {
+                            info = JsonConvert.DeserializeObject(payload.ToString());
+                        }
+                        string line = reader.ReadLine();
+                        bool httpExceptionThrown = false;
+                        char[] array = line.ToCharArray();
+                        int contentLength = 0;
+
+                        while (line != "" && line != null)
+                        {
+                            if (array[0] == 'P')
+                            {
+                                words = line.Split('/');
+
+                                if (array[1] == 'U' && array[2] == 'T')
                                 {
-                                    try
+                                    //putCancel
+                                    if (words.Length == 4)
                                     {
-                                        string token = payload.ToString();
-
-                                        token = token.Replace("\"", "");
-
-                                        bController.PutCancelJoin(token);
-
-                                        code = "204 NoContent";
-                                    }
-                                    catch(Exception e)
-                                    {
-                                        if (e is HttpResponseException)
+                                        try
                                         {
-                                            code = "403 Forbidden";
+                                            string token = payload.ToString();
+                                            token = token.Replace("\"", "");
+
+                                            bController.PutCancelJoin(token);
+                                            code = "204 NoContent";
                                         }
-                                    }
-                                    SetOutgoingMessage(code, contentLength);
-                                    //payload = null;
-
-                                    ss.BeginSend(outgoing, MessageSent, new object());
-
-                                }
-                                //putPlayWord
-                                else if (words.Length == 5)
-                                {
-                                    PlayWordInput input;
-                                    String userT;
-                                    String word;
-                                    string output = null;
-                                    int score = 0;
-
-                                    userT = info.UserToken;
-                                    word = info.Word;
-
-                                    input = new PlayWordInput(userT, word);
-                                    words[3] = words[3].Remove(words[3].Length - 5, 5);
-                                    
-
-                                    try
-                                    {                  
-                                        score = bController.PutPlayWord(words[3], input);
-                                        output = JsonConvert.SerializeObject(score);
-
-                                        contentLength = encoding.GetByteCount(output.ToCharArray());
-
-                                        code = "200 OK";
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        if (e is HttpResponseException)
+                                        catch (Exception e)
                                         {
-                                            HttpResponseException httpResponse = (HttpResponseException)e;
-                                            if (httpResponse.Code == HttpStatusCode.Forbidden)
+                                            if (e is HttpResponseException)
                                             {
                                                 code = "403 Forbidden";
+                                                httpExceptionThrown = true;
                                             }
-                                            if (httpResponse.Code == HttpStatusCode.Conflict)
+                                            if (httpExceptionThrown == false)
                                             {
-                                                code = "409 Conflict";
+                                                code = "500 Internal Server Error";
                                             }
                                         }
+                                        try
+                                        {
+                                            SetOutgoingMessage(code, contentLength);
+                                            ss.BeginSend(outgoing, MessageSent, new object());
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            ss.Close();
+                                        }
+
                                     }
-                                    SetOutgoingMessage(code, contentLength);
-                                    outgoing += output;
-
-                                    ss.BeginSend(outgoing, MessageSent, new object());
-                                    //send message
-                                }
-
-                            }
-                            else if (array[1] == 'O' && array[2] == 'S' && array[3] == 'T')
-                            {
-                                if (words.Length == 4)
-                                {
-                                    //postRegister
-                                    if (words[2] == "users HTTP")
+                                    //putPlayWord
+                                    else if (words.Length == 5)
                                     {
-                                        dynamic output;
-                                        string output2 = null;
+                                        PlayWordInput input;
+                                        String userT;
+                                        String word;
+                                        string output = null;
+                                        int score = 0;
+
+                                        userT = info.UserToken;
+                                        word = info.Word;
+
+                                        input = new PlayWordInput(userT, word);
+                                        words[3] = words[3].Remove(words[3].Length - 5, 5);
+
 
                                         try
                                         {
-                                            //if((string)payload == "null" || (string)payload == "")
-                                            if(info ==null || info == "")
-                                            {
-                                                output = bController.PostRegister(null);
-                                            }
-                                            else
-                                            {
-                                                output = bController.PostRegister(payload.ToString());
-                                            }
-                                            output2 = JsonConvert.SerializeObject(output);
+                                            score = bController.PutPlayWord(words[3], input);
+                                            output = JsonConvert.SerializeObject(score);
 
-                                            contentLength = encoding.GetByteCount(output2.ToCharArray());
+                                            contentLength = encoding.GetByteCount(output.ToCharArray());
 
                                             code = "200 OK";
                                         }
                                         catch (Exception e)
                                         {
-                                            if(e is HttpResponseException)
+                                            if (e is HttpResponseException)
                                             {
-                                                code = "403 Forbidden";
+                                                HttpResponseException httpResponse = (HttpResponseException)e;
+                                                if (httpResponse.Code == HttpStatusCode.Forbidden)
+                                                {
+                                                    code = "403 Forbidden";
+                                                    httpExceptionThrown = true;
+                                                }
+                                                if (httpResponse.Code == HttpStatusCode.Conflict)
+                                                {
+                                                    code = "409 Conflict";
+                                                    httpExceptionThrown = true;
+                                                }
+                                            }
+                                            if (httpExceptionThrown == false)
+                                            {
+                                                code = "500 Internal Server Error";
                                             }
                                         }
-                                        SetOutgoingMessage(code, contentLength);
-                                        outgoing += output2;
-
-                                        ss.BeginSend(outgoing, MessageSent, new object());
-                                        //send message
-                                    }
-                                    //postJoinGame
-                                    else if (words[2] == "games HTTP")
-                                    {
-                                        string userT;
-                                        int time;
-                                        dynamic output;
-                                        string output2 = null;
-
-                                        userT = info.UserToken;
-                                        time = info.TimeLimit;
-
-                                        JoinGameInput input = new JoinGameInput(time, userT);
-
                                         try
                                         {
-                                            output = bController.PostJoinGame(input);
+                                            SetOutgoingMessage(code, contentLength);
+                                            outgoing += output;
+                                            ss.BeginSend(outgoing, MessageSent, new object());
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            ss.Close();
+                                        }
+                                    }
+
+                                }
+                                else if (array[1] == 'O' && array[2] == 'S' && array[3] == 'T')
+                                {
+                                    if (words.Length == 4)
+                                    {
+                                        //postRegister
+                                        if (words[2] == "users HTTP")
+                                        {
+                                            dynamic output;
+                                            string output2 = null;
+
+                                            try
+                                            {
+                                                //if((string)payload == "null" || (string)payload == "")
+                                                if (info == null || info == "")
+                                                {
+                                                    output = bController.PostRegister(null);
+                                                }
+                                                else
+                                                {
+                                                    output = bController.PostRegister(payload.ToString());
+                                                }
+                                                output2 = JsonConvert.SerializeObject(output);
+
+                                                contentLength = encoding.GetByteCount(output2.ToCharArray());
+
+                                                code = "200 OK";
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                if (e is HttpResponseException)
+                                                {
+                                                    code = "403 Forbidden";
+                                                    httpExceptionThrown = true;
+                                                }
+                                                if (httpExceptionThrown == false)
+                                                {
+                                                    code = "500 Internal Server Error";
+                                                }
+                                            }
+                                            try
+                                            {
+                                                SetOutgoingMessage(code, contentLength);
+                                                outgoing += output2;
+                                                ss.BeginSend(outgoing, MessageSent, new object());
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                ss.Close();
+                                            }
+                                        }
+                                        //postJoinGame
+                                        else if (words[2] == "games HTTP")
+                                        {
+                                            string userT;
+                                            int time;
+                                            dynamic output;
+                                            string output2 = null;
+
+                                            userT = info.UserToken;
+                                            time = info.TimeLimit;
+
+                                            JoinGameInput input = new JoinGameInput(time, userT);
+
+                                            try
+                                            {
+                                                output = bController.PostJoinGame(input);
+                                                output2 = JsonConvert.SerializeObject(output);
+
+                                                contentLength = encoding.GetByteCount(output2.ToCharArray());
+
+                                                code = "200 OK";
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                if (e is HttpResponseException)
+                                                {
+                                                    HttpResponseException httpResponse = (HttpResponseException)e;
+                                                    if (httpResponse.Code == HttpStatusCode.Forbidden)
+                                                    {
+                                                        code = "403 Forbidden";
+                                                        httpExceptionThrown = true;
+                                                    }
+                                                    if (httpResponse.Code == HttpStatusCode.Conflict)
+                                                    {
+                                                        code = "409 Conflict";
+                                                        httpExceptionThrown = true;
+                                                    }
+                                                }
+                                                if (httpExceptionThrown == false)
+                                                {
+                                                    code = "500 Internal Server Error";
+                                                }
+                                            }
+                                            try
+                                            {
+                                                SetOutgoingMessage(code, contentLength);
+                                                outgoing += output2;
+                                                ss.BeginSend(outgoing, MessageSent, new object());
+                                            }
+                                            catch(Exception ex)
+                                            {
+                                                ss.Close();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else if (array[0] == 'G' && array[1] == 'E' && array[2] == 'T')
+                            {
+                                words = line.Split('/');
+
+                                if (words.Length == 6)
+                                {
+                                    GameInfo output;
+                                    string output2 = null;
+
+                                    if (words[4] == "True HTTP")
+                                    {
+                                        try
+                                        {
+                                            output = bController.GetGameStatus(words[3], true);
+
+                                            if (output.GameState != "pending")
+                                            {
+                                                output.Player1.Nickname = output.Player1.Nickname.Replace("\"", "");
+                                                output.Player2.Nickname = output.Player2.Nickname.Replace("\"", "");
+                                            }
+
                                             output2 = JsonConvert.SerializeObject(output);
 
                                             contentLength = encoding.GetByteCount(output2.ToCharArray());
@@ -347,121 +432,90 @@ namespace Express
                                         {
                                             if (e is HttpResponseException)
                                             {
-                                                HttpResponseException httpResponse = (HttpResponseException)e;
-                                                if(httpResponse.Code == HttpStatusCode.Forbidden)
-                                                {
-                                                    code = "403 Forbidden";
-                                                }
-                                                if(httpResponse.Code == HttpStatusCode.Conflict)
-                                                {
-                                                    code = "409 Conflict";
-                                                }
+                                                code = "403 Forbidden";
+                                                httpExceptionThrown = true;
+                                            }
+                                            if (httpExceptionThrown == false)
+                                            {
+                                                code = "500 Internal Server Error";
                                             }
                                         }
-                                        SetOutgoingMessage(code, contentLength);
-                                        outgoing += output2;
+                                        try
+                                        {
+                                            SetOutgoingMessage(code, contentLength);
+                                            outgoing += output2;
+                                            ss.BeginSend(outgoing, MessageSent, new object());
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            ss.Close();
+                                        }
+                                    }
+                                    else if (words[4] == "False HTTP")
+                                    {
+                                        try
+                                        {
+                                            output = bController.GetGameStatus(words[3], false);
 
-                                        ss.BeginSend(outgoing, MessageSent, new object());
-                                        //send message
+
+                                            if (output.GameState != "pending")
+                                            {
+                                                output.Player1.Nickname = output.Player1.Nickname.Replace("\"", "");
+                                                output.Player2.Nickname = output.Player2.Nickname.Replace("\"", "");
+                                            }
+
+                                            output2 = JsonConvert.SerializeObject(output);
+
+                                            contentLength = encoding.GetByteCount(output2.ToCharArray());
+
+                                            code = "200 OK";
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            if (e is HttpResponseException)
+                                            {
+                                                code = "403 Forbidden";
+                                                httpExceptionThrown = true;
+                                            }
+                                            if (httpExceptionThrown == false)
+                                            {
+                                                code = "500 Internal Server Error";
+                                            }
+                                        }
+                                        try
+                                        {
+                                            SetOutgoingMessage(code, contentLength);
+                                            outgoing += output2;
+                                            ss.BeginSend(outgoing, MessageSent, new object());
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            ss.Close();
+                                        }
                                     }
                                 }
                             }
-                        }
-                        else if (array[0] == 'G' && array[1] == 'E' && array[2] == 'T')
-                        {
-                            words = line.Split('/');
-
-                            if (words.Length == 6)
+                            line = reader.ReadLine();
+                            if (line != null)
                             {
-                                //dynamic output;
-                                GameInfo output;
-                                string output2 = null;
-
-                                //words[4] = words[4].Remove(words[4].Length - 6, 5);
-                                //words[4] = words[4].Trim();
-                                //words[3] = words[3].Remove(words[3].Length - 6, 5);
-                                //words[3] = words[3].Trim();
-
-                                if (words[4] == "True HTTP")
-                                {
-                                    try
-                                    {
-                                        output = bController.GetGameStatus(words[3], true);
-                                        
-                                        if(output.GameState != "pending")
-                                        {
-                                            output.Player1.Nickname = output.Player1.Nickname.Replace("\"", "");
-                                            output.Player2.Nickname = output.Player2.Nickname.Replace("\"", "");
-                                        }
-                                       
-                                        output2 = JsonConvert.SerializeObject(output);
-
-                                        contentLength = encoding.GetByteCount(output2.ToCharArray());
-
-                                        code = "200 OK";
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        if (e is HttpResponseException)
-                                        {
-                                            code = "403 Forbidden";
-                                        }
-                                    }
-                                    SetOutgoingMessage(code, contentLength);
-                                    outgoing += output2;
-
-                                    ss.BeginSend(outgoing, MessageSent, new object());
-                                    //send message
-                                }
-                                else if (words[4] == "False HTTP")
-                                {
-                                    try
-                                    {
-                                        output = bController.GetGameStatus(words[3], false);
-                                        
-
-                                        if (output.GameState != "pending")
-                                        {
-                                            output.Player1.Nickname = output.Player1.Nickname.Replace("\"", "");
-                                            output.Player2.Nickname = output.Player2.Nickname.Replace("\"", "");
-                                        }
-
-                                        output2 = JsonConvert.SerializeObject(output);
-
-                                        contentLength = encoding.GetByteCount(output2.ToCharArray());
-
-                                        code = "200 OK";
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        if (e is HttpResponseException)
-                                        {
-                                            code = "403 Forbidden";
-                                        }
-                                    }
-                                    SetOutgoingMessage(code, contentLength);
-                                    outgoing += output2;
-
-                                    ss.BeginSend(outgoing, MessageSent, new object());
-                                    //send message
-                                }
+                                array = line.ToCharArray();
                             }
-                        }
-                        line = reader.ReadLine();
-                        if(line != null)
-                        {
-                            array = line.ToCharArray();
                         }
                     }
                 }
-                //try
-                //{
-                //    ss.BeginReceive(MessageRecieved, payload, );
-                //}
-                //catch
-                //{
-
-                //}
+                catch (Exception e)
+                {
+                    try
+                    {
+                        code = "500 Internal Server Error";
+                        SetOutgoingMessage(code, contentLength);
+                        ss.BeginSend(outgoing, MessageSent, new object());
+                    }
+                    catch (Exception ex)
+                    {
+                        ss.Close();
+                    }
+                }      
             }
 
             private void MessageSent(bool wasSent, object payload)
@@ -476,7 +530,7 @@ namespace Express
                     }
                     else
                     {
-
+                        server.RemoveClient(this);
                     }
                 }
             }

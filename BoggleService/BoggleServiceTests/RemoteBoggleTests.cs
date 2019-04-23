@@ -5,7 +5,7 @@ using System.Dynamic;
 using static System.Net.HttpStatusCode;
 using static System.Net.Http.HttpMethod;
 using System.Diagnostics;
-using BoggleService.Models;
+using Express;
 
 namespace BoggleTests
 {
@@ -232,27 +232,6 @@ namespace BoggleTests
             r3 = client.DoMethodAsync("PUT", "games/G1", input).Result;
 
             Assert.AreEqual(Forbidden, r3.Status);          
-        }
-
-        //Tests all response codes within the gameStatus method
-        [TestMethod]
-        public void TestMethod8()
-        {
-            RestClient client = new RestClient("http://localhost:60000/BoggleService/");
-            string user1 = "Aric";
-            string user2 = "Andrew";
-            Response r1 = client.DoMethodAsync("POST", "users", user1).Result;
-            Response r2 = client.DoMethodAsync("POST", "users", user2).Result;
-            Assert.AreEqual(OK, r1.Status);
-            Assert.AreEqual(OK, r2.Status);
-
-            Response r3 = client.DoMethodAsync("GET", "games/G11/true").Result;
-
-            Assert.AreEqual(Forbidden, r3.Status);
-
-            r3 = client.DoMethodAsync("GET", "games/G1/true").Result;
-
-            Assert.AreEqual(OK, r3.Status);
         }
     } 
 }
