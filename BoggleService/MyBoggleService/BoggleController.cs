@@ -727,21 +727,7 @@ namespace Express
                             output.GameState = "active";
                             output.Board = board;
                             output.TimeLimit = timeLimit;
-
-                            if(timeLeft > 0 && timeLeft < 1)
-                            {
-                                timeLeft = calculateTimeLeftRounded(startTime, timeLimit);
-                            }
-                            else
-                            {
-                                timeLeft = calculateTimeLeft(startTime, timeLimit);
-                            }
-
-                            
-                            if (timeLeft <= 0)
-                            {
-                                timeLeft = 0;
-                            }
+                            timeLeft = calculateTimeLeft(startTime, timeLimit);
                             output.TimeLeft = timeLeft;
                             output.Player1.Score = player1Score;
                             output.Player2.Score = player2Score;
@@ -885,7 +871,14 @@ namespace Express
         {
             TimeSpan timePassed = DateTime.Now - startTime;
             double num = (double)timeLimit - timePassed.TotalSeconds;
-            return Convert.ToInt32(Math.Round(num, MidpointRounding.AwayFromZero));
+            if(num <=  0)
+            {
+                return 0;
+            }
+            else
+            {
+                return Convert.ToInt32(Math.Round(num, MidpointRounding.AwayFromZero));
+            }
         }
 
 
