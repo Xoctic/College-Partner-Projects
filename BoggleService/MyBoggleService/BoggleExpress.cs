@@ -278,7 +278,7 @@ namespace Express
                                         }
                                         catch (Exception ex)
                                         {
-                                            ss.Close();
+                                            closeSocketandRemoveClient();
                                         }
 
                                     }
@@ -344,7 +344,7 @@ namespace Express
                                         }
                                         catch (Exception ex)
                                         {
-                                            ss.Close();
+                                            closeSocketandRemoveClient();
                                         }
                                     }
 
@@ -407,7 +407,7 @@ namespace Express
                                             }
                                             catch (Exception ex)
                                             {
-                                                ss.Close();
+                                                closeSocketandRemoveClient();
                                             }
                                         }
                                         //line contains postJoinGame
@@ -467,7 +467,7 @@ namespace Express
                                             }
                                             catch (Exception ex)
                                             {
-                                                ss.Close();
+                                                closeSocketandRemoveClient();
                                             }
                                         }
                                     }
@@ -533,7 +533,7 @@ namespace Express
                                         }
                                         catch (Exception ex)
                                         {
-                                            ss.Close();
+                                            closeSocketandRemoveClient();
                                         }
                                     }
                                     //if the getRequest does not want a brief status update
@@ -584,7 +584,7 @@ namespace Express
                                         }
                                         catch (Exception ex)
                                         {
-                                            ss.Close();
+                                            closeSocketandRemoveClient();
                                         }
                                     }
                                 }
@@ -602,7 +602,7 @@ namespace Express
                 catch (Exception e)
                 {
                     //If we get here, something happened internally with the socket.
-                    //An attempt is made to respond with 500 code and close the socket whether the response suceeds or not.
+                    //An attempt is made to respond with 500 code and close the socket whether the response succeeds or not.
                     try
                     {
                         code = "500 Internal Server Error";
@@ -611,14 +611,14 @@ namespace Express
                     }
                     catch (Exception ex)
                     {
-                        ss.Close();
+                        closeSocketandRemoveClient();
                     }
                 }
             }
 
             /// <summary>
-            /// Callback methos for messageSent, ensures that the message was sent, in which case the socket is closed
-            /// and the clientConnection is removed from clients list
+            /// Callback method for messageSent, ensures that the message was sent, in which case the socket is closed
+            /// and the clientConnection is removed from clients list.  If an error occurs in socket, wasSent becomes false and clientConnection is removed from clients list.
             /// </summary>
             /// <param name="wasSent"></param>
             /// <param name="payload"></param>
@@ -628,15 +628,23 @@ namespace Express
                 {
                     if (wasSent == true)
                     {
-                        ss.Close();
-                        server.RemoveClient(this);
-                        Console.WriteLine("Socket closed");
+                        closeSocketandRemoveClient();
                     }
                     else if (wasSent == false)
                     {
-                        server.RemoveClient(this);
+                        closeSocketandRemoveClient();
                     }
                 }
+            }
+
+            /// <summary>
+            /// Helper method that closes the current socket and removes the client from clients.
+            /// </summary>
+            private void closeSocketandRemoveClient()
+            {
+                ss.Close();
+                server.RemoveClient(this);
+                Console.WriteLine("Socket closed");
             }
 
             /// <summary>
