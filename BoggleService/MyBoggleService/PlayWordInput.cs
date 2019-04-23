@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Express
+namespace Controller
 {
     /// <summary>
     /// Class that stores the input Info when a play word request executes.

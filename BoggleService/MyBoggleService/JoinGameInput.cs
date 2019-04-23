@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Express
+namespace Controller
 {
     /// <summary>
     /// Class to store the Game Info when a Join Game request executes.

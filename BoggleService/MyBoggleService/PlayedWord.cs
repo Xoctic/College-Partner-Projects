@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Web;
 
-namespace Express
+namespace Controller
 {
     /// <summary>
     /// Class to store each word played by a player

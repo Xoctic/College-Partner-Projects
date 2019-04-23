@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Web;
 
-namespace Express
+namespace Controller
 {
     /// <summary>
     /// Class to store the Pending Game Info when a Join Game request executes.

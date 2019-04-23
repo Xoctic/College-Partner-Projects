@@ -5,7 +5,7 @@ using System.Dynamic;
 using static System.Net.HttpStatusCode;
 using static System.Net.Http.HttpMethod;
 using System.Diagnostics;
-using Express;
+using Controller;
 
 namespace BoggleTests
 {
@@ -118,120 +118,6 @@ namespace BoggleTests
             string user = "Aric";
             Response r = client.DoMethodAsync("POST", "users", user).Result;
             Assert.AreEqual(OK, r.Status);
-        }
-
-        //Tests all conflicts involved with the join game method
-        [TestMethod]
-        public void TestMethod5()
-        {
-            RestClient client = new RestClient("http://localhost:60000/BoggleService/");
-            string user1 = "Aric";
-            string user2 = "Andrew";
-            Response r1 = client.DoMethodAsync("POST", "users", user1).Result;
-            Response r2 = client.DoMethodAsync("POST", "users", user2).Result;
-            Assert.AreEqual(OK, r1.Status);
-            Assert.AreEqual(OK, r2.Status);
-
-            JoinGameInput badJoinGame1 = new JoinGameInput(1, r1.Data);
-            JoinGameInput badJoinGame2 = new JoinGameInput(150, r2.Data);
-            JoinGameInput badJoinGame3 = new JoinGameInput(100, "poop");
-
-
-            JoinGameInput goodJoinGame1 = new JoinGameInput(50, r1.Data);
-            JoinGameInput goodJoinGame2 = new JoinGameInput(100, r2.Data);
-            
-
-            Response r3 = client.DoMethodAsync("POST", "games", badJoinGame1).Result;
-            Assert.AreEqual(Forbidden, r3.Status);
-
-            r3 = client.DoMethodAsync("POST", "games", badJoinGame2).Result;
-            Assert.AreEqual(Forbidden, r3.Status);
-
-            r3 = client.DoMethodAsync("POST", "games", badJoinGame3).Result;
-            Assert.AreEqual(Forbidden, r3.Status);
-
-
-            r3 = client.DoMethodAsync("POST", "games", goodJoinGame1).Result;
-            Assert.AreEqual(OK, r3.Status);
-
-            try
-            {
-                r3 = client.DoMethodAsync("POST", "games", goodJoinGame1).Result;
-            }
-            catch
-            {
-                Assert.AreEqual(Conflict, r3.Status);
-            }
-
-            r3 = client.DoMethodAsync("POST", "games", goodJoinGame2).Result;
-            Assert.AreEqual(OK, r3.Status);
-        }
-
-        //Tests all conflicts involved with cancelJoinGame method
-        [TestMethod]
-        public void TestMethod6()
-        {
-            RestClient client = new RestClient("http://localhost:60000/BoggleService/");
-            string user1 = "Aric";
-            Response r1 = client.DoMethodAsync("POST", "users", user1).Result;
-            Assert.AreEqual(OK, r1.Status);
-            string user1Token = r1.Data;
-            JoinGameInput goodJoinGame1 = new JoinGameInput(50, r1.Data);
-
-
-            r1 = client.DoMethodAsync("POST", "games", goodJoinGame1).Result;
-            Assert.AreEqual(OK, r1.Status);
-
-            r1 = client.DoMethodAsync("PUT", "games", user1Token).Result;
-            Assert.AreEqual(NoContent, r1.Status);
-
-            r1 = client.DoMethodAsync("PUT", "games", "whoyoucallinpinheadlarrypatrickstar???").Result;
-            Assert.AreEqual(Forbidden, r1.Status);
-        }
-
-        //Tests all response codes for method put play word
-        [TestMethod]
-        public void TestMethod7()
-        {
-            RestClient client = new RestClient("http://localhost:60000/BoggleService/");
-            string user1 = "Aric";
-            string user2 = "Andrew";
-            Response r1 = client.DoMethodAsync("POST", "users", user1).Result;
-            Response r2 = client.DoMethodAsync("POST", "users", user2).Result;
-            Assert.AreEqual(OK, r1.Status);
-            Assert.AreEqual(OK, r2.Status);
-
-            string user1Token = r1.Data;
-            string user2Token = r2.Data;
-
-            JoinGameInput goodJoinGame1 = new JoinGameInput(50, r1.Data);
-            JoinGameInput goodJoinGame2 = new JoinGameInput(100, r2.Data);
-
-            Response r3 = client.DoMethodAsync("POST", "games", goodJoinGame1).Result;
-            Assert.AreEqual(OK, r3.Status);
-
-            r3 = client.DoMethodAsync("POST", "games", goodJoinGame2).Result;
-            Assert.AreEqual(OK, r3.Status);
-
-            PlayWordInput input = new PlayWordInput(user1Token, null);
-            r3 = client.DoMethodAsync("PUT", "games/G1", input).Result;
-
-            Assert.AreEqual(Forbidden, r3.Status);
-
-            input = new PlayWordInput(user1Token, "lllllllllllllllllllllllllllllllllll");
-            r3 = client.DoMethodAsync("PUT", "games/G1", input).Result;
-
-            Assert.AreEqual(Forbidden, r3.Status);
-
-            input = new PlayWordInput(user1Token, "Hi");
-            r3 = client.DoMethodAsync("PUT", "games/GG3", input).Result;
-
-            Assert.AreEqual(Forbidden, r3.Status);
-
-            input = new PlayWordInput("clerenge", "Hi");
-            r3 = client.DoMethodAsync("PUT", "games/G1", input).Result;
-
-            Assert.AreEqual(Forbidden, r3.Status);          
         }
     } 
 }

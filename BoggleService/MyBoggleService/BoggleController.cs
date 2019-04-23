@@ -6,8 +6,10 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Net;
 using System.Threading;
+using System.Web.Http;
+//Authors: Andrew Hare(u1033940), Aric Campbell (u1188031)
 
-namespace Express
+namespace Controller
 {
     class HttpResponseException : Exception
     {
@@ -18,7 +20,6 @@ namespace Express
             Code = c;
         }
     }
-
 
     /// <summary>
     /// Server controller that deals with a multitude of commands for dealing with a Boggle game.
@@ -33,7 +34,6 @@ namespace Express
             //NEW WAY OF GETTING CONNECTION STRING
             string dbFolder = System.IO.Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName;
             DB = String.Format(@"Data Source = (LocalDB)\MSSQLLocalDB; AttachDbFilename = {0}\BoggleServer.mdf; Integrated Security = True", dbFolder);
-
 
             // Saves the connection string for the database.  A connection string contains the
             // information necessary to connect with the database server.  When you create a

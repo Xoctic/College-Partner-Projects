@@ -10,6 +10,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.IO;
+using Controller;
+//Authors: Andrew Hare(u1033940), Aric Campbell (u1188031)
 
 namespace Express
 {
@@ -27,7 +29,7 @@ namespace Express
         //Listens for incoming connection requests
         private StringSocketListener server;
 
-        // All the clients that have connected but haven't closed
+        // All the clients that have connected but haven't had their socket closed
         private List<ClientConnection> clients = new List<ClientConnection>();
 
         // Read/write lock to coordinate access to the clients list
@@ -58,7 +60,7 @@ namespace Express
             try
             {
                 sync.EnterWriteLock();
-                clients.Add(new ClientConnection(ss, this, payload));
+                clients.Add(new ClientConnection(ss, this));
             }
             finally
             {
@@ -98,10 +100,10 @@ namespace Express
             private StringSocket ss;
 
             // Text that has been received from the client but not yet dealt with
-            private String incoming;
+            private String incoming = null;
 
             // Text that needs to be sent to the client but which we have not yet started sending
-            private String outgoing;
+            private String outgoing = null;
 
             //Represents the length of the content(body) of a message
             private int contentLength = 0;
@@ -112,12 +114,10 @@ namespace Express
             //Flag which signifies the header contains a Get Request
             private bool isGetRequest = false;
 
-            // For decoding incoming UTF8-encoded byte streams.
-            private Decoder decoder = encoding.GetDecoder();
-
+            //Status code that will be sent as part of the response.
             private string code = null;
 
-            // For synchronizing sends
+            //For synchronizing sends
             private readonly object sendSync = new object();
 
             //Represents the BoggleExpress object that is associated with the stringSocket contained in this clientConnection
@@ -128,23 +128,18 @@ namespace Express
 
             /// <summary>
             /// constructor for the clientConnection class
-            /// the parameters sc(stringSocket), ex(BoggleExpress), payload(object) are all passed in from the connectionRequested callback method
+            /// the parameters sc(stringSocket), ex(BoggleExpress) are all passed in from the connectionRequested callback method
             /// initializes the stringSocket to be used for this clientConnection equal to the stringSocket passed in from the connectionRequested callback method
             /// initializes the BoggleController to be used for this client connection to be equal to the one passed in from the connectionRequested callback method
             /// initializes a new BoggleController object to be used for this specific clientConnection
             /// </summary>
             /// <param name="sc"></param>
             /// <param name="ex"></param>
-            /// <param name="payload"></param>
-            public ClientConnection(StringSocket sc, BoggleExpress ex, object payload)
+            public ClientConnection(StringSocket sc, BoggleExpress ex)
             {
                 this.server = ex;
                 ss = sc;
-                incoming = null;
-                outgoing = null;
-
                 bController = new BoggleController();
-
                 try
                 {
                     ss.BeginReceive(MessageRecieved, null, 0);
@@ -156,7 +151,7 @@ namespace Express
             }
 
             /// <summary>
-            /// Handles when a meesage has been recieved from the client through the stringSocket
+            /// Handles when a message has been recieved from the client through the stringSocket
             /// </summary>
             /// <param name="s"></param>
             /// <param name="payload"></param>
@@ -171,11 +166,12 @@ namespace Express
                     {
                         payload = s;
                         s = null;
+                        Console.WriteLine(incoming);
                     }
                     //determines what line we are on in the header
                     if (s != null && !payloadReady)
                     {
-                        //if the line contains the length of the content(payload) set contentLength equal to the length in bytes of the content(payload)
+                        //if the line contains the length of the content(payload) set contentLength equal to the length in chars of the content(payload)
                         words = s.Split(':');
                         if (words[0] == "Content-Length")
                         {
@@ -228,13 +224,14 @@ namespace Express
                             info = JsonConvert.DeserializeObject(payload.ToString());
                         }
 
-                        //initializes line to read each line of incoming, array to separate the characters of each line, code to contain the HTTPResponseCode sent back by bController
+                        //initializes line to read each line of incoming, array to separate the characters of each line, 
+                        //contentLength to represent length of the content sent in the response, httpExceptionThrown to keep track if a HttpResponseException was thrown.
                         string line = reader.ReadLine();
                         bool httpExceptionThrown = false;
                         char[] array = line.ToCharArray();
                         int contentLength = 0;
 
-                        //if line contains some information, then we determine if it contains one of the commands from the clinet (GET, PUSH, PUT, POST)
+                        //if line contains some information, then we determine if it contains one of the commands from the clinet (GET, PUT, POST)
                         while (line != "" && line != null)
                         {
                             if (array[0] == 'P')
@@ -265,7 +262,7 @@ namespace Express
                                                 code = "403 Forbidden";
                                                 httpExceptionThrown = true;
                                             }
-                                            if (httpExceptionThrown == false)
+                                            else if (httpExceptionThrown == false)
                                             {
                                                 code = "500 Internal Server Error";
                                             }
@@ -275,6 +272,7 @@ namespace Express
                                             //sets up the outgoing message in the correct format
                                             SetOutgoingMessage(code, contentLength);
 
+                                            Console.WriteLine(outgoing);
                                             //sends outgoing message to the client
                                             ss.BeginSend(outgoing, MessageSent, new object());
                                         }
@@ -323,13 +321,13 @@ namespace Express
                                                     code = "403 Forbidden";
                                                     httpExceptionThrown = true;
                                                 }
-                                                if (httpResponse.Code == HttpStatusCode.Conflict)
+                                                else if (httpResponse.Code == HttpStatusCode.Conflict)
                                                 {
                                                     code = "409 Conflict";
                                                     httpExceptionThrown = true;
                                                 }
                                             }
-                                            if (httpExceptionThrown == false)
+                                            else if (httpExceptionThrown == false)
                                             {
                                                 code = "500 Internal Server Error";
                                             }
@@ -340,6 +338,7 @@ namespace Express
                                             SetOutgoingMessage(code, contentLength);
                                             outgoing += output;
 
+                                            Console.WriteLine(outgoing);
                                             //sends the outgoing message to the client
                                             ss.BeginSend(outgoing, MessageSent, new object());
                                         }
@@ -355,14 +354,14 @@ namespace Express
                                 {
                                     if (words.Length == 4)
                                     {
+                                        //creates dynamic to hold the information required to hold what is returned by calling the postRegister method in the controller
+                                        dynamic output;
+                                        //creates a string to hold the serialized version of the output
+                                        string output2 = null;
+
                                         //line contains a postRegister request
                                         if (words[2] == "users HTTP")
                                         {
-                                            //creates dynamic to hold the information required to hold what is returned by calling the postRegister method in the controller
-                                            dynamic output;
-                                            //creates a string to hold the serialized version of the output
-                                            string output2 = null;
-
                                             //tries to call the postRegister method
                                             try
                                             {
@@ -391,7 +390,7 @@ namespace Express
                                                     code = "403 Forbidden";
                                                     httpExceptionThrown = true;
                                                 }
-                                                if (httpExceptionThrown == false)
+                                                else if (httpExceptionThrown == false)
                                                 {
                                                     code = "500 Internal Server Error";
                                                 }
@@ -402,6 +401,7 @@ namespace Express
                                                 SetOutgoingMessage(code, contentLength);
                                                 outgoing += output2;
 
+                                                Console.WriteLine(outgoing);
                                                 //outgoing message is sent to the client
                                                 ss.BeginSend(outgoing, MessageSent, new object());
                                             }
@@ -416,8 +416,6 @@ namespace Express
                                             //creates variables required for input into the postJoinGame method in boggleController and output to the client
                                             string userT;
                                             int time;
-                                            dynamic output;
-                                            string output2 = null;
 
                                             userT = info.UserToken;
                                             time = info.TimeLimit;
@@ -446,13 +444,13 @@ namespace Express
                                                         code = "403 Forbidden";
                                                         httpExceptionThrown = true;
                                                     }
-                                                    if (httpResponse.Code == HttpStatusCode.Conflict)
+                                                    else if (httpResponse.Code == HttpStatusCode.Conflict)
                                                     {
                                                         code = "409 Conflict";
                                                         httpExceptionThrown = true;
                                                     }
                                                 }
-                                                if (httpExceptionThrown == false)
+                                                else if (httpExceptionThrown == false)
                                                 {
                                                     code = "500 Internal Server Error";
                                                 }
@@ -463,6 +461,7 @@ namespace Express
                                                 SetOutgoingMessage(code, contentLength);
                                                 outgoing += output2;
 
+                                                Console.WriteLine(outgoing);
                                                 //sends the outgoing message to the client
                                                 ss.BeginSend(outgoing, MessageSent, new object());
                                             }
@@ -517,7 +516,7 @@ namespace Express
                                                 code = "403 Forbidden";
                                                 httpExceptionThrown = true;
                                             }
-                                            if (httpExceptionThrown == false)
+                                            else if (httpExceptionThrown == false)
                                             {
                                                 code = "500 Internal Server Error";
                                             }
@@ -528,6 +527,7 @@ namespace Express
                                             SetOutgoingMessage(code, contentLength);
                                             outgoing += output2;
 
+                                            Console.WriteLine(outgoing);
                                             //sends the outgoing message to the client
                                             ss.BeginSend(outgoing, MessageSent, new object());
                                         }
@@ -567,7 +567,7 @@ namespace Express
                                                 code = "403 Forbidden";
                                                 httpExceptionThrown = true;
                                             }
-                                            if (httpExceptionThrown == false)
+                                            else if (httpExceptionThrown == false)
                                             {
                                                 code = "500 Internal Server Error";
                                             }
@@ -578,6 +578,7 @@ namespace Express
                                             SetOutgoingMessage(code, contentLength);
                                             outgoing += output2;
 
+                                            Console.WriteLine(outgoing);
                                             //sends the outgoing message to the client
                                             ss.BeginSend(outgoing, MessageSent, new object());
                                         }
@@ -600,6 +601,8 @@ namespace Express
                 }
                 catch (Exception e)
                 {
+                    //If we get here, something happened internally with the socket.
+                    //An attempt is made to respond with 500 code and close the socket whether the response suceeds or not.
                     try
                     {
                         code = "500 Internal Server Error";
@@ -629,7 +632,7 @@ namespace Express
                         server.RemoveClient(this);
                         Console.WriteLine("Socket closed");
                     }
-                    else
+                    else if (wasSent == false)
                     {
                         server.RemoveClient(this);
                     }
