@@ -89,6 +89,8 @@ namespace BoggleClient
         /// </summary>
         private System.Windows.Forms.Timer myTimer = new System.Windows.Forms.Timer();
 
+        
+
         /// <summary>
         /// Constructor for the controller which deals with all the back end work of the gui
         /// </summary>
@@ -173,7 +175,14 @@ namespace BoggleClient
         /// <param name="e"></param>
         private void TimerEventProcessor(object sender, EventArgs e)
         {
-            Update();
+            try
+            {
+                Update();
+            }
+            catch
+            {
+
+            }
         }
 
         /// <summary>
@@ -249,6 +258,7 @@ namespace BoggleClient
             view.SetBoard(gameBoard);
             view.SetPlayer1NameLabel(player1Nickname);
             view.SetPlayer2NameLabel(player2Nickname);
+            
 
         }
 
@@ -263,8 +273,8 @@ namespace BoggleClient
             player1Score = items.Player1.Score;
             player2Score = items.Player2.Score;
             view.SetSecondsLabel(timeLeft.ToString());
-            view.SetPlayer1Score(player1Score);
-            view.SetPlayer2Score(player2Score);
+            view.SetPlayer1Score("Score: " + player1Score);
+            view.SetPlayer2Score("Score: " + player2Score);
         }
 
         /// <summary>
@@ -290,8 +300,25 @@ namespace BoggleClient
                 player2Words.Add(item.Word.ToString() + ": " + item.Score.ToString());
             }
 
+            view.SetWordsPlayedTitle(true);
             view.SetWordsPlayed(player1Words, player2Words);
             view.SetSecondsLabel("0");
+
+            
+
+           
+                int.TryParse(player1Score, out int score1);
+                int.TryParse(player2Score, out int score2);
+
+                if (score1 > score2)
+                {
+                    view.SetPlayer1Title(true);
+                }
+                else if (score2 > score1)
+                {
+                    view.SetPlayer2Title(true);
+                }
+               
 
         }
 
@@ -338,6 +365,7 @@ namespace BoggleClient
             player1Score = "";
             player2Nickname = "";
             player2Score = "";
+            
 
             view.SetBoard(gameBoard);
             view.SetPlayer1NameLabel(player1Nickname);
@@ -346,9 +374,14 @@ namespace BoggleClient
             view.SetPlayer2Score(player2Score);
             view.SetSecondsLabel("");
             view.SetNameTextBox("");
+            view.SetWordsPlayedTitle(false);
+            view.SetWordsPlayed(new List<string>(), new List<string>());
+            view.SetPlayer1Title(false);
+            view.SetPlayer2Title(false);
             view.IsUserRegistered = false;
             view.RegistrationComplete = false;
-            view.EnableControls(true);           
+            view.EnableControls(true);
+           
         }
 
         /// <summary>
@@ -420,7 +453,7 @@ namespace BoggleClient
                 {
                     //Compose & Send Request
                     tokenSource = new CancellationTokenSource();
-                    StringContent content = new StringContent(JsonConvert.SerializeObject(name), Encoding.UTF8, "application/json");
+                    StringContent content = new StringContent(JsonConvert.SerializeObject("Name: " + name), Encoding.UTF8, "application/json");
                     HttpResponseMessage response = await client.PostAsync("BoggleService/users", content, tokenSource.Token);
 
                     //Deal With Response

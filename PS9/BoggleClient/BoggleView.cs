@@ -35,6 +35,7 @@ namespace BoggleClient
         public BoggleView()
         {
             InitializeComponent();
+            
         }
 
         /// <summary>
@@ -337,6 +338,45 @@ namespace BoggleClient
             TimeTextBox.Text = time;
         }
 
+        public void SetWordsPlayedTitle(bool set)
+        {
+            if(set == true)
+            {
+                Player1WordsPlayedTitle.Text = "Words Played";
+                Player2WordsPlayedTitle.Text = "Words Played";
+            }
+            else
+            {
+                Player1WordsPlayedTitle.Text = "";
+                Player2WordsPlayedTitle.Text = "";
+            }
+            
+        }
+
+        public void SetPlayer1Title(bool won)
+        {
+            if(won)
+            {
+                Player1Title.Text = "Player 1 Won!";               
+            }
+            else
+            {
+                Player1Title.Text = "Player 1";
+            }
+        }
+
+        public void SetPlayer2Title(bool won)
+        {
+            if(won)
+            {
+                Player2Title.Text = "Player 2 Won!";
+            }
+            else
+            {
+                Player2Title.Text = "Player 2";
+            }
+        }
+
         /// <summary>
         /// displays the words played by both players to the window
         /// </summary>
@@ -357,6 +397,7 @@ namespace BoggleClient
                 p2Words += "\n" + el;
             }
 
+            
             Player1WordsPlayed.Text = p1Words;
             Player2WordsPlayed.Text = p2Words;
         }
